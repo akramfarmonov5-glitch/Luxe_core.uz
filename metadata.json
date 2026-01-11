@@ -1,0 +1,7 @@
+{
+  "name": "Luxecore_uz",
+  "description": "Premium onlayn do'kon - zamonaviy dizayn va yuqori sifat.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
