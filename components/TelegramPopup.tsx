@@ -25,7 +25,7 @@ const TelegramPopup: React.FC = () => {
     };
 
     const handleJoin = () => {
-        window.open('https://t.me/luxecore_uz', '_blank');
+        window.open('https://t.me/luxe_core_uz', '_blank');
         handleClose();
     };
 
