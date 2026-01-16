@@ -17,6 +17,7 @@ import BlogPostDetail from './components/BlogPostDetail';
 import Wishlist from './components/Wishlist';
 import MetaPixel from './components/MetaPixel';
 import SearchModal from './components/SearchModal';
+import TelegramPopup from './components/TelegramPopup';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, DEFAULT_HERO_CONTENT, DEFAULT_NAVIGATION } from './constants';
 import { CartProvider, useCart } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -312,6 +313,8 @@ const AppContent: React.FC = () => {
       )}
 
       <AIChatAssistant products={products} />
+
+      <TelegramPopup />
 
       <SearchModal
         isOpen={isSearchOpen}
