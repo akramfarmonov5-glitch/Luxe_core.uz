@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import { methodNotAllowed, parseBody } from '../_utils';
 
 const getEnv = (key: string): string => {
   if (typeof process !== 'undefined' && process.env && process.env[key]) {
@@ -16,10 +15,20 @@ const getBearerToken = (req: any): string | null => {
   return parts[1];
 };
 
+const parseBody = (req: any): any => {
+  if (!req?.body) return {};
+  if (typeof req.body === 'string') {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return {};
+    }
+  }
+  return req.body;
+};
+
 /**
  * Create a Supabase client using the admin user's JWT token.
- * This ensures RLS policies like is_admin_user() work correctly
- * even without a service role key.
  */
 const getSupabaseWithAuth = (accessToken: string) => {
   const url = getEnv('SUPABASE_URL') || getEnv('VITE_SUPABASE_URL');
@@ -30,20 +39,17 @@ const getSupabaseWithAuth = (accessToken: string) => {
     throw new Error('SUPABASE_URL muhit o\'zgaruvchisi topilmadi');
   }
 
-  // If we have service role key, use it (bypasses RLS)
   if (serviceKey) {
     return createClient(url, serviceKey, {
       auth: { persistSession: false },
     });
   }
 
-  // Otherwise, use anon key but set the user's session
-  // so RLS is_admin_user() can check auth.jwt()
   if (!anonKey) {
     throw new Error('SUPABASE_ANON_KEY muhit o\'zgaruvchisi topilmadi');
   }
 
-  const client = createClient(url, anonKey, {
+  return createClient(url, anonKey, {
     auth: { persistSession: false },
     global: {
       headers: {
@@ -51,12 +57,9 @@ const getSupabaseWithAuth = (accessToken: string) => {
       },
     },
   });
-
-  return client;
 };
 
 export default async function handler(req: any, res: any) {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -67,29 +70,23 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    // 1. Extract and verify admin token
     const token = getBearerToken(req);
     if (!token) {
-      res.status(401).json({ error: 'Avtorizatsiya tokeni topilmadi' });
-      return;
+      return res.status(401).json({ error: 'Avtorizatsiya tokeni topilmadi' });
     }
 
-    // 2. Verify the user is admin using anon key client
     const url = getEnv('SUPABASE_URL') || getEnv('VITE_SUPABASE_URL');
     const anonKey = getEnv('SUPABASE_ANON_KEY') || getEnv('VITE_SUPABASE_KEY');
 
     if (!url || !anonKey) {
-      console.error('Missing Supabase env:', { url: !!url, anonKey: !!anonKey });
-      res.status(500).json({ error: 'Server konfiguratsiya xatosi' });
-      return;
+      return res.status(500).json({ error: 'Server konfiguratsiya xatosi (Supabase URL/Key missing)' });
     }
 
     const authClient = createClient(url, anonKey, { auth: { persistSession: false } });
     const { data: userData, error: authError } = await authClient.auth.getUser(token);
 
     if (authError || !userData?.user) {
-      res.status(401).json({ error: 'Sessiya yaroqsiz. Qayta login qiling.' });
-      return;
+      return res.status(401).json({ error: 'Sessiya yaroqsiz. Qayta login qiling.' });
     }
 
     const user = userData.user;
@@ -99,11 +96,9 @@ export default async function handler(req: any, res: any) {
       (allowedEmails.length > 0 && !!user.email && allowedEmails.includes(user.email.toLowerCase()));
 
     if (!isAdmin) {
-      res.status(403).json({ error: 'Admin huquqi yo\'q' });
-      return;
+      return res.status(403).json({ error: 'Admin huquqi yo\'q' });
     }
 
-    // 3. Create Supabase client with admin auth
     const supabase = getSupabaseWithAuth(token);
 
     if (req.method === 'GET') {
@@ -114,26 +109,17 @@ export default async function handler(req: any, res: any) {
 
       if (error) {
         console.error('Orders fetch error:', JSON.stringify(error));
-        // If RLS blocks, return empty instead of error for better UX
-        if (error.code === '42501' || error.message?.includes('permission')) {
-          res.status(200).json({ data: [] });
-          return;
-        }
-        res.status(500).json({ error: error.message });
-        return;
+        return res.status(500).json({ error: error.message });
       }
 
-      res.status(200).json({ data: data || [] });
-      return;
+      return res.status(200).json({ data: data || [] });
     }
 
     if (req.method === 'PATCH') {
       const body = parseBody(req);
-      const id = body.id;
-      const status = body.status;
+      const { id, status } = body;
       if (!id || !status) {
-        res.status(400).json({ error: 'id va status kerak' });
-        return;
+        return res.status(400).json({ error: 'id va status kerak' });
       }
 
       const { data, error } = await supabase
@@ -144,18 +130,16 @@ export default async function handler(req: any, res: any) {
         .single();
 
       if (error) {
-        console.error('Order update error:', JSON.stringify(error));
-        res.status(400).json({ error: error.message });
-        return;
+        return res.status(400).json({ error: error.message });
       }
 
-      res.status(200).json({ data });
-      return;
+      return res.status(200).json({ data });
     }
 
-    methodNotAllowed(res, ['GET', 'PATCH']);
+    res.setHeader('Allow', 'GET, PATCH');
+    return res.status(405).json({ error: 'Method not allowed' });
   } catch (err: any) {
     console.error('Admin orders handler error:', err?.message || err);
-    res.status(500).json({ error: err?.message || 'Server xatosi' });
+    return res.status(500).json({ error: err?.message || 'Server xatosi' });
   }
 }
