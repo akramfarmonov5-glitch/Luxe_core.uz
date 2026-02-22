@@ -1,4 +1,4 @@
-import { serverSupabase } from './admin/_utils';
+import { parseBody, serverSupabase } from './_utils';
 
 export default async function handler(req, res) {
   try {

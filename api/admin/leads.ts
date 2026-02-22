@@ -1,4 +1,4 @@
-import { methodNotAllowed, requireAdmin, serverSupabase } from './_utils';
+import { requireAdmin, serverSupabase, parseBody } from '../_utils';
 
 export default async function handler(req: any, res: any) {
   const user = await requireAdmin(req, res);
