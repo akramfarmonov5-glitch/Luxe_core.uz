@@ -1,9 +1,10 @@
 services:
-  - type: worker
+  - type: web
     name: luxecore-bot
     runtime: docker
     dockerfilePath: ./bot/Dockerfile
     dockerContext: ./bot
+    plan: free
     envVars:
       - key: BOT_TOKEN
         sync: false
