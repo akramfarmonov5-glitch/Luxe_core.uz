@@ -1,13 +1,14 @@
 # LUXECORE - Premium Store
-# https://luxecoreuz.vercel.app
+# https://luxe-core-uz-three.vercel.app
 
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /admin/
+Disallow: /api/
+Disallow: /#admin
 
-# Crawl delay (optional, be nice to bots)
+# Crawl delay
 Crawl-delay: 1
 
-# Sitemap location
-Sitemap: https://luxe_core.uz/sitemap.xml
+# Sitemap
+Sitemap: https://luxe-core-uz-three.vercel.app/api/sitemap
