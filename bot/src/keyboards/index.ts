@@ -1,19 +1,21 @@
 import { InlineKeyboard } from 'grammy';
 import { config } from '../config';
 
-// ========== BOSH MENYU (Reply Keyboard) ==========
-export const mainMenuKeyboard = {
-    reply_markup: {
-        keyboard: [
-            [{ text: '🛒 Do\'kon (Sayt)' }, { text: '🔍 Qidirish' }],
-            [{ text: '📂 Kategoriyalar' }, { text: '📦 Buyurtmalarim' }],
-            [{ text: '🤖 AI Yordamchi' }, { text: '📞 Aloqa' }],
-            [{ text: 'ℹ️ Yordam' }, { text: '📢 Kanalimiz' }],
-        ],
-        resize_keyboard: true,
-        is_persistent: true,
-    },
-};
+// ========== BOSH MENYU (Inline Keyboard) ==========
+export function mainMenuKeyboard() {
+    return new InlineKeyboard()
+        .url('🛒 Do\'kon (Sayt)', config.SITE_URL)
+        .text('🔍 Qidirish', 'menu:search')
+        .row()
+        .text('📂 Kategoriyalar', 'menu:categories')
+        .text('📦 Buyurtmalarim', 'menu:orders')
+        .row()
+        .text('🤖 AI Yordamchi', 'menu:ai')
+        .text('📞 Aloqa', 'menu:contact')
+        .row()
+        .text('ℹ️ Yordam', 'menu:help')
+        .url('📢 Kanalimiz', config.CHANNEL_URL);
+}
 
 // ========== KATEGORIYALAR INLINE KEYBOARD ==========
 export function categoriesKeyboard(categories: { id: string; name: string; slug: string }[]) {
@@ -23,6 +25,7 @@ export function categoriesKeyboard(categories: { id: string; name: string; slug:
         if (i % 2 === 1) kb.row();
     });
     if (categories.length % 2 !== 0) kb.row();
+    kb.text('🏠 Bosh menyu', 'home');
     return kb;
 }
 
@@ -30,16 +33,19 @@ export function categoriesKeyboard(categories: { id: string; name: string; slug:
 export function productPaginationKeyboard(
     currentPage: number,
     totalPages: number,
-    prefix: string // "catpage:slug" or "searchpage:query"
+    prefix: string
 ) {
     const kb = new InlineKeyboard();
     if (currentPage > 0) {
-        kb.text('◀️ Oldingi', `${prefix}:${currentPage - 1}`);
+        kb.text('◀️', `${prefix}:${currentPage - 1}`);
     }
     kb.text(`${currentPage + 1}/${totalPages}`, 'noop');
     if (currentPage < totalPages - 1) {
-        kb.text('Keyingi ▶️', `${prefix}:${currentPage + 1}`);
+        kb.text('▶️', `${prefix}:${currentPage + 1}`);
     }
+    kb.row();
+    kb.text('🛒 Savatga', `addcart:${currentPage}`);
+    kb.url('🌐 Saytda', `${config.SITE_URL}/#product/0`);
     kb.row();
     kb.text('🏠 Bosh menyu', 'home');
     return kb;
