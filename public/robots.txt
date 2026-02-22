@@ -3,7 +3,6 @@
 
 User-agent: *
 Allow: /
-Disallow: /admin
 Disallow: /api/
 Disallow: /#admin
 
@@ -11,4 +10,4 @@ Disallow: /#admin
 Crawl-delay: 1
 
 # Sitemap
-Sitemap: https://luxe-core-uz-three.vercel.app/api/sitemap
+Sitemap: https://luxe-core-uz-three.vercel.app/sitemap.xml
