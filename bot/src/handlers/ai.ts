@@ -1,46 +1,32 @@
 import { Context } from 'grammy';
 import { InlineKeyboard } from 'grammy';
 import { config } from '../config';
+import { t, getLang } from '../i18n';
 
 const aiState = new Map<number, boolean>();
 const aiHistory = new Map<number, { role: string; parts: { text: string }[] }[]>();
 
-export function setAiMode(userId: number) {
-    aiState.set(userId, true);
-}
-
-export function isInAiMode(userId: number): boolean {
-    return aiState.has(userId);
-}
-
-export function clearAiMode(userId: number) {
-    aiState.delete(userId);
-}
+export function setAiMode(userId: number) { aiState.set(userId, true); }
+export function isInAiMode(userId: number): boolean { return aiState.has(userId); }
+export function clearAiMode(userId: number) { aiState.delete(userId); }
 
 export async function handleAiPrompt(ctx: Context) {
-    const userId = ctx.from?.id;
-    if (!userId) return;
-
+    const userId = ctx.from?.id || 0;
     setAiMode(userId);
-    aiHistory.delete(userId); // fresh conversation
+    aiHistory.delete(userId);
     await ctx.reply(
-        '🤖 *AI Yordamchi*\n\n' +
-        'Men sizga LUXECORE mahsulotlari haqida maslahat bera olaman.\n' +
-        'Savolingizni yozing!\n\n' +
-        '_Chiqish uchun /start bosing_',
+        t(userId, 'ai_prompt'),
         { parse_mode: 'Markdown' }
     );
 }
 
 export async function handleAiMessage(ctx: Context) {
-    const userId = ctx.from?.id;
-    if (!userId) return;
-
+    const userId = ctx.from?.id || 0;
     const message = ctx.message?.text?.trim();
     if (!message) return;
 
     if (!config.GEMINI_API_KEY) {
-        await ctx.reply('❌ AI tizimi hozirda ishlamayapti.');
+        await ctx.reply(t(userId, 'ai_error'));
         clearAiMode(userId);
         return;
     }
@@ -51,29 +37,28 @@ export async function handleAiMessage(ctx: Context) {
         const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
 
+        const lang = getLang(userId);
+        const langName = lang === 'ru' ? 'Русский' : 'O\'zbek';
+
         const systemInstruction =
             `Sen LUXECORE premium do'konining yordamchisisiga. ` +
-            `O'zbek tilida javob ber. LUXECORE - O'zbekistondagi premium onlayn do'kon. ` +
+            `${langName} tilida javob ber. LUXECORE - O'zbekistondagi premium onlayn do'kon. ` +
             `Soatlar, sumkalar, ko'zoynaklar, parfyumeriya va aksessuarlar sotadi. ` +
             `Qisqa va foydali javoblar ber. Emoji ishlat. Sayt: ${config.SITE_URL}`;
 
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.0-flash',
-            systemInstruction: systemInstruction,
+            systemInstruction,
         });
 
-        // Get existing history
         const history = aiHistory.get(userId) || [];
-
         const chat = model.startChat({
             history: history.length > 0 ? history : undefined,
         });
 
         const result = await chat.sendMessage(message);
-        const response = result.response;
-        const aiText = response.text() || 'Uzr, tushunmadim. Qayta so\'ray olasizmi?';
+        const aiText = result.response.text() || (lang === 'ru' ? 'Извините, не понял.' : 'Uzr, tushunmadim.');
 
-        // Save to history (keep last 20 messages = 10 pairs)
         history.push({ role: 'user', parts: [{ text: message }] });
         history.push({ role: 'model', parts: [{ text: aiText }] });
         if (history.length > 20) history.splice(0, history.length - 20);
@@ -82,18 +67,16 @@ export async function handleAiMessage(ctx: Context) {
         await ctx.reply(aiText, {
             reply_markup: new InlineKeyboard()
                 .text('🔚 Chiqish', 'exit_ai')
-                .text('🏠 Bosh menyu', 'home'),
+                .text(t(userId, 'btn_home'), 'home'),
         });
     } catch (err: any) {
         console.error('AI error:', err?.message || err);
         await ctx.reply(
-            '❌ AI xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.\n\n' +
-            '_Chiqish uchun /start bosing_',
+            t(userId, 'ai_error'),
             {
-                parse_mode: 'Markdown',
                 reply_markup: new InlineKeyboard()
                     .text('🔄 Qayta urinish', 'menu:ai')
-                    .text('🏠 Bosh menyu', 'home'),
+                    .text(t(userId, 'btn_home'), 'home'),
             }
         );
     }
@@ -101,9 +84,8 @@ export async function handleAiMessage(ctx: Context) {
 
 export async function handleExitAi(ctx: Context) {
     if (ctx.callbackQuery) await ctx.answerCallbackQuery();
-    const userId = ctx.from?.id;
-    if (!userId) return;
+    const userId = ctx.from?.id || 0;
     clearAiMode(userId);
     aiHistory.delete(userId);
-    await ctx.reply('🤖 AI suhbat yakunlandi.');
+    await ctx.reply(t(userId, 'ai_exit'));
 }

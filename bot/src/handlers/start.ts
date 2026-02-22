@@ -1,45 +1,48 @@
 import { Context } from 'grammy';
 import { mainMenuKeyboard } from '../keyboards';
+import { t } from '../i18n';
 
 export async function handleStart(ctx: Context) {
+    const userId = ctx.from?.id || 0;
     const name = ctx.from?.first_name || 'Foydalanuvchi';
     await ctx.reply(
         `✨ *LUXECORE Premium Store*\n\n` +
         `Xush kelibsiz, ${name}!\n` +
-        `Quyidagi tugmalardan birini tanlang:`,
+        t(userId, 'welcome').split('\n').pop(),
         {
             parse_mode: 'Markdown',
-            reply_markup: mainMenuKeyboard(),
+            reply_markup: mainMenuKeyboard(userId),
         }
     );
 }
 
 export async function handleHome(ctx: Context) {
+    const userId = ctx.from?.id || 0;
     if (ctx.callbackQuery) {
         await ctx.answerCallbackQuery();
         try {
             await ctx.editMessageText(
-                `🏠 *LUXECORE Premium Store*\n\nQuyidagi tugmalardan birini tanlang:`,
+                t(userId, 'welcome'),
                 {
                     parse_mode: 'Markdown',
-                    reply_markup: mainMenuKeyboard(),
+                    reply_markup: mainMenuKeyboard(userId),
                 }
             );
         } catch {
             await ctx.reply(
-                `🏠 *LUXECORE Premium Store*\n\nQuyidagi tugmalardan birini tanlang:`,
+                t(userId, 'welcome'),
                 {
                     parse_mode: 'Markdown',
-                    reply_markup: mainMenuKeyboard(),
+                    reply_markup: mainMenuKeyboard(userId),
                 }
             );
         }
     } else {
         await ctx.reply(
-            `🏠 *LUXECORE Premium Store*\n\nQuyidagi tugmalardan birini tanlang:`,
+            t(userId, 'welcome'),
             {
                 parse_mode: 'Markdown',
-                reply_markup: mainMenuKeyboard(),
+                reply_markup: mainMenuKeyboard(userId),
             }
         );
     }

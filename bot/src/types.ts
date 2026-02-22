@@ -27,14 +27,7 @@ export interface Order {
     status: string;
     date: string;
     paymentMethod: string;
-}
-
-// Session data for user state
-export interface SessionData {
-    step?: 'idle' | 'search' | 'order_phone' | 'order_name' | 'ai_chat';
-    cart: CartItem[];
-    orderPhone?: string;
-    aiHistory: { role: 'user' | 'model'; text: string }[];
+    items?: CartItem[];
 }
 
 export interface CartItem {
@@ -44,3 +37,13 @@ export interface CartItem {
     quantity: number;
     image: string;
 }
+
+export interface PromoCode {
+    id: number;
+    code: string;
+    discount_percent: number;
+    active: boolean;
+    expires_at?: string;
+}
+
+export type Lang = 'uz' | 'ru';

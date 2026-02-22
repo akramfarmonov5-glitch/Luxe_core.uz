@@ -1,11 +1,17 @@
-import { Context } from 'grammy';
+import { Context, Bot } from 'grammy';
 import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
 import { CartItem } from '../types';
+import { t } from '../i18n';
+import { handlePromoCheck } from './promo';
+import { notifyAdmin } from './admin';
 
-// In-memory cart storage (per user)
+// In-memory storage
 const carts = new Map<number, CartItem[]>();
-const checkoutState = new Map<number, { step: string; phone?: string }>();
+const checkoutState = new Map<number, { step: string; phone?: string; name?: string; promo?: string; discount?: number }>();
+
+let botInstance: Bot | null = null;
+export function setBotInstance(bot: Bot) { botInstance = bot; }
 
 export function getUserCart(userId: number): CartItem[] {
     return carts.get(userId) || [];
@@ -20,16 +26,15 @@ export function clearCheckoutMode(userId: number) {
 }
 
 export async function handleAddToCart(ctx: Context) {
+    const userId = ctx.from?.id || 0;
     try {
-        await ctx.answerCallbackQuery('✅ Savatga qo\'shildi!');
+        await ctx.answerCallbackQuery(`✅ ${t(userId, 'cart_added')}`);
         const data = ctx.callbackQuery?.data;
         if (!data) return;
 
         const productId = parseInt(data.replace('addcart:', ''));
-        const userId = ctx.from?.id;
         if (!userId || isNaN(productId)) return;
 
-        // Fetch product
         const { data: product } = await supabase
             .from('products')
             .select('*')
@@ -56,14 +61,14 @@ export async function handleAddToCart(ctx: Context) {
         carts.set(userId, cart);
 
         await ctx.reply(
-            `🛒 *${product.name}* savatga qo'shildi!\n\n` +
+            `🛒 *${product.name}* ${t(userId, 'cart_added')}\n\n` +
             `Savatda: ${cart.length} xil, ${cart.reduce((s, i) => s + i.quantity, 0)} dona`,
             {
                 parse_mode: 'Markdown',
                 reply_markup: new InlineKeyboard()
-                    .text(`🛒 Savatni ko'rish (${cart.length})`, 'show_cart')
+                    .text(`🛒 ${t(userId, 'btn_cart')} (${cart.length})`, 'show_cart')
                     .row()
-                    .text('🏠 Davom etish', 'home'),
+                    .text(t(userId, 'btn_home'), 'home'),
             }
         );
     } catch (err) {
@@ -73,22 +78,20 @@ export async function handleAddToCart(ctx: Context) {
 
 export async function handleShowCart(ctx: Context) {
     if (ctx.callbackQuery) await ctx.answerCallbackQuery();
-
-    const userId = ctx.from?.id;
-    if (!userId) return;
+    const userId = ctx.from?.id || 0;
 
     const cart = getUserCart(userId);
     if (cart.length === 0) {
-        await ctx.reply('🛒 Savatingiz bo\'sh.', {
+        await ctx.reply(t(userId, 'cart_empty'), {
             reply_markup: new InlineKeyboard()
-                .text('📂 Kategoriyalar', 'show_categories')
-                .text('🏠 Bosh menyu', 'home'),
+                .text(t(userId, 'btn_categories'), 'show_categories')
+                .text(t(userId, 'btn_home'), 'home'),
         });
         return;
     }
 
     let total = 0;
-    let text = '🛒 *Savatingiz:*\n\n';
+    let text = t(userId, 'cart_title') + '\n\n';
     cart.forEach((item, i) => {
         const sum = item.price * item.quantity;
         total += sum;
@@ -96,43 +99,37 @@ export async function handleShowCart(ctx: Context) {
         text += `   ${item.quantity} x ${Number(item.price).toLocaleString('uz-UZ')} = *${Number(sum).toLocaleString('uz-UZ')} UZS*\n\n`;
     });
 
-    text += `\n💰 *Jami: ${Number(total).toLocaleString('uz-UZ')} UZS*`;
+    text += `\n${t(userId, 'cart_total')} ${Number(total).toLocaleString('uz-UZ')} UZS*`;
 
     await ctx.reply(text, {
         parse_mode: 'Markdown',
         reply_markup: new InlineKeyboard()
-            .text('✅ Buyurtma berish', 'checkout')
-            .text('🗑 Tozalash', 'clear_cart')
+            .text(t(userId, 'btn_checkout'), 'checkout')
+            .text(t(userId, 'btn_clear_cart'), 'clear_cart')
             .row()
-            .text('🏠 Bosh menyu', 'home'),
+            .text(t(userId, 'btn_home'), 'home'),
     });
 }
 
 export async function handleClearCart(ctx: Context) {
-    if (ctx.callbackQuery) await ctx.answerCallbackQuery('🗑 Savat tozalandi');
-    const userId = ctx.from?.id;
-    if (!userId) return;
+    const userId = ctx.from?.id || 0;
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery(t(userId, 'cart_cleared'));
     carts.delete(userId);
-    await ctx.reply('🗑 Savat tozalandi.');
+    await ctx.reply(t(userId, 'cart_cleared'));
 }
 
 export async function handleCheckout(ctx: Context) {
     if (ctx.callbackQuery) await ctx.answerCallbackQuery();
-
-    const userId = ctx.from?.id;
-    if (!userId) return;
+    const userId = ctx.from?.id || 0;
 
     const cart = getUserCart(userId);
     if (cart.length === 0) {
-        await ctx.reply('🛒 Savat bo\'sh, avval mahsulot qo\'shing.');
+        await ctx.reply(t(userId, 'cart_empty'));
         return;
     }
 
     checkoutState.set(userId, { step: 'phone' });
-    await ctx.reply(
-        '📱 Buyurtma berish uchun telefon raqamingizni yuboring:\n_(Masalan: +998901234567)_',
-        { parse_mode: 'Markdown' }
-    );
+    await ctx.reply(t(userId, 'checkout_phone'), { parse_mode: 'Markdown' });
 }
 
 export async function handleCheckoutInput(ctx: Context) {
@@ -144,38 +141,60 @@ export async function handleCheckoutInput(ctx: Context) {
 
     const text = ctx.message?.text?.trim() || '';
 
+    // STEP 1: Phone
     if (state.step === 'phone') {
         let phone = text.replace(/[\s\-\(\)]/g, '');
         if (!phone.startsWith('+')) phone = '+' + phone;
         state.phone = phone;
         state.step = 'name';
         checkoutState.set(userId, state);
-        await ctx.reply('👤 Ismingizni kiriting:');
+        await ctx.reply(t(userId, 'checkout_name'));
         return;
     }
 
+    // STEP 2: Name
     if (state.step === 'name') {
-        const customerName = text;
-        const phone = state.phone || '';
-        const cart = getUserCart(userId);
+        state.name = text;
+        state.step = 'promo';
+        checkoutState.set(userId, state);
+        await ctx.reply(t(userId, 'checkout_promo'), { parse_mode: 'Markdown' });
+        return;
+    }
 
-        if (cart.length === 0) {
-            clearCheckoutMode(userId);
-            await ctx.reply('❌ Savat bo\'sh.');
-            return;
+    // STEP 3: Promo code
+    if (state.step === 'promo') {
+        const cart = getUserCart(userId);
+        let total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+        let discount = 0;
+        let promoText = '';
+
+        if (text.toLowerCase() !== 'yo\'q' && text.toLowerCase() !== 'нет' && text.toLowerCase() !== 'yoq' && text.length > 0) {
+            const promo = await handlePromoCheck(text);
+            if (promo.valid) {
+                discount = promo.discount;
+                const discountAmount = Math.round(total * discount / 100);
+                total -= discountAmount;
+                promoText = `\n🎟 Promo: *${text.toUpperCase()}* (-${discount}%, -${discountAmount.toLocaleString('uz-UZ')} UZS)`;
+            } else {
+                if (promo.message === 'expired') {
+                    await ctx.reply(t(userId, 'promo_expired'));
+                } else {
+                    await ctx.reply(t(userId, 'promo_invalid'));
+                }
+                await ctx.reply(t(userId, 'checkout_promo'), { parse_mode: 'Markdown' });
+                return;
+            }
         }
 
-        const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-
-        // Create order in Supabase
+        // Create order
         try {
             const orderId = `LC${Date.now().toString(36).toUpperCase()}`;
             const { error } = await supabase
                 .from('orders')
                 .insert({
                     id: orderId,
-                    customerName: customerName,
-                    phone: phone,
+                    customerName: state.name || '',
+                    phone: state.phone || '',
                     total: total,
                     status: 'Kutilmoqda',
                     date: new Date().toISOString().split('T')[0],
@@ -185,7 +204,7 @@ export async function handleCheckoutInput(ctx: Context) {
 
             if (error) throw error;
 
-            // Clear
+            // Clear state
             carts.delete(userId);
             clearCheckoutMode(userId);
 
@@ -195,23 +214,28 @@ export async function handleCheckoutInput(ctx: Context) {
             });
 
             await ctx.reply(
-                `✅ *Buyurtma qabul qilindi!*\n\n` +
+                `${t(userId, 'checkout_success')}\n\n` +
                 `📋 Buyurtma: *#${orderId}*\n` +
-                `👤 Ism: ${customerName}\n` +
-                `📱 Tel: ${phone}\n` +
-                `💰 Jami: *${Number(total).toLocaleString('uz-UZ')} UZS*\n\n` +
+                `👤 Ism: ${state.name}\n` +
+                `📱 Tel: ${state.phone}\n` +
+                `💰 Jami: *${Number(total).toLocaleString('uz-UZ')} UZS*${promoText}\n\n` +
                 `📦 Mahsulotlar:\n${itemsText}\n` +
-                `Tez orada siz bilan bog'lanamiz! 🚀`,
+                t(userId, 'continue_msg'),
                 {
                     parse_mode: 'Markdown',
                     reply_markup: new InlineKeyboard()
-                        .text('🏠 Bosh menyu', 'home'),
+                        .text(t(userId, 'btn_home'), 'home'),
                 }
             );
+
+            // Notify admin
+            if (botInstance) {
+                await notifyAdmin(botInstance, orderId, state.name || '', state.phone || '', total, cart, userId);
+            }
         } catch (err) {
             console.error('Checkout error:', err);
             clearCheckoutMode(userId);
-            await ctx.reply('❌ Buyurtma berishda xatolik. Qaytadan urinib ko\'ring.');
+            await ctx.reply(t(userId, 'checkout_error'));
         }
     }
 }

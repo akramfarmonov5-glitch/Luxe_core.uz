@@ -1,83 +1,54 @@
 import { InlineKeyboard } from 'grammy';
 import { config } from '../config';
+import { t } from '../i18n';
 
-// ========== BOSH MENYU (Inline Keyboard) ==========
-export function mainMenuKeyboard() {
+// ========== BOSH MENYU (Inline Keyboard with i18n) ==========
+export function mainMenuKeyboard(userId: number) {
     return new InlineKeyboard()
-        .url('🛒 Do\'kon (Sayt)', config.SITE_URL)
-        .text('🔍 Qidirish', 'menu:search')
+        .webApp(t(userId, 'btn_shop'), config.SITE_URL)
+        .text(t(userId, 'btn_search'), 'menu:search')
         .row()
-        .text('📂 Kategoriyalar', 'menu:categories')
-        .text('📦 Buyurtmalarim', 'menu:orders')
+        .text(t(userId, 'btn_categories'), 'menu:categories')
+        .text(t(userId, 'btn_orders'), 'menu:orders')
         .row()
-        .text('🤖 AI Yordamchi', 'menu:ai')
-        .text('📞 Aloqa', 'menu:contact')
+        .text(t(userId, 'btn_ai'), 'menu:ai')
+        .text(t(userId, 'btn_contact'), 'menu:contact')
         .row()
-        .text('ℹ️ Yordam', 'menu:help')
-        .url('📢 Kanalimiz', config.CHANNEL_URL);
+        .text(t(userId, 'btn_help'), 'menu:help')
+        .url(t(userId, 'btn_channel'), config.CHANNEL_URL)
+        .row()
+        .text(t(userId, 'btn_lang'), 'menu:lang');
 }
 
-// ========== KATEGORIYALAR INLINE KEYBOARD ==========
-export function categoriesKeyboard(categories: { id: string; name: string; slug: string }[]) {
+// ========== KATEGORIYALAR ==========
+export function categoriesKeyboard(categories: { id: string; name: string; slug: string }[], userId: number) {
     const kb = new InlineKeyboard();
     categories.forEach((cat, i) => {
         kb.text(cat.name, `cat:${cat.slug}`);
         if (i % 2 === 1) kb.row();
     });
     if (categories.length % 2 !== 0) kb.row();
-    kb.text('🏠 Bosh menyu', 'home');
-    return kb;
-}
-
-// ========== MAHSULOT SAHIFALASH ==========
-export function productPaginationKeyboard(
-    currentPage: number,
-    totalPages: number,
-    prefix: string
-) {
-    const kb = new InlineKeyboard();
-    if (currentPage > 0) {
-        kb.text('◀️', `${prefix}:${currentPage - 1}`);
-    }
-    kb.text(`${currentPage + 1}/${totalPages}`, 'noop');
-    if (currentPage < totalPages - 1) {
-        kb.text('▶️', `${prefix}:${currentPage + 1}`);
-    }
-    kb.row();
-    kb.text('🛒 Savatga', `addcart:${currentPage}`);
-    kb.url('🌐 Saytda', `${config.SITE_URL}/#product/0`);
-    kb.row();
-    kb.text('🏠 Bosh menyu', 'home');
-    return kb;
-}
-
-// ========== MAHSULOT DETAIL ==========
-export function productDetailKeyboard(productId: number) {
-    const kb = new InlineKeyboard();
-    kb.text('🛒 Savatga', `addcart:${productId}`);
-    kb.url('🌐 Saytda ko\'rish', `${config.SITE_URL}/#product/${productId}`);
-    kb.row();
-    kb.text('🔙 Orqaga', 'back_to_list');
+    kb.text(t(userId, 'btn_home'), 'home');
     return kb;
 }
 
 // ========== SAVATCHA ==========
-export function cartKeyboard() {
-    const kb = new InlineKeyboard();
-    kb.text('✅ Buyurtma berish', 'checkout');
-    kb.text('🗑 Tozalash', 'clear_cart');
-    kb.row();
-    kb.text('🏠 Bosh menyu', 'home');
-    return kb;
+export function cartKeyboard(userId: number) {
+    return new InlineKeyboard()
+        .text(t(userId, 'btn_checkout'), 'checkout')
+        .text(t(userId, 'btn_clear_cart'), 'clear_cart')
+        .row()
+        .text(t(userId, 'btn_home'), 'home');
 }
 
-// ========== BUYURTMA HOLATI EMOJI ==========
+// ========== STATUS EMOJI ==========
 export function statusEmoji(status: string): string {
     const map: Record<string, string> = {
         'Kutilmoqda': '🟡',
         'To\'landi': '🟢',
         'Yetkazilmoqda': '🚚',
         'Yakunlandi': '✅',
+        'Bekor qilindi': '❌',
     };
     return map[status] || '⏳';
 }

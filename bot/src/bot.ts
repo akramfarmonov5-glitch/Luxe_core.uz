@@ -4,12 +4,19 @@ import { handleStart, handleHome } from './handlers/start';
 import { handleCategories, handleCategorySelect, handleCategoryPage } from './handlers/categories';
 import { handleSearchPrompt, handleSearchQuery, isInSearchMode, clearSearchMode } from './handlers/search';
 import { handleOrdersPrompt, handleOrderPhone, isInOrderPhoneMode, clearOrderPhoneMode } from './handlers/orders';
-import { handleAddToCart, handleShowCart, handleClearCart, handleCheckout, handleCheckoutInput, isInCheckoutMode, clearCheckoutMode } from './handlers/cart';
+import { handleAddToCart, handleShowCart, handleClearCart, handleCheckout, handleCheckoutInput, isInCheckoutMode, clearCheckoutMode, setBotInstance } from './handlers/cart';
 import { handleAiPrompt, handleAiMessage, handleExitAi, isInAiMode, clearAiMode } from './handlers/ai';
 import { handleContact, handleHelp, handleChannel } from './handlers/info';
+import { handleLangPrompt, handleLangSet } from './handlers/lang';
+import { handleAdminAccept, handleAdminReject, handleStats } from './handlers/admin';
+import { handleAddPromo, handleDelPromo } from './handlers/promo';
+import { handleBroadcast, handleBroadcastAll } from './handlers/broadcast';
 
 export function createBot() {
     const bot = new Bot(config.BOT_TOKEN);
+
+    // Set bot instance for admin notifications
+    setBotInstance(bot);
 
     // Error handler
     bot.catch((err) => {
@@ -28,11 +35,18 @@ export function createBot() {
         return handleStart(ctx);
     });
 
+    // Admin commands
+    bot.command('stats', handleStats);
+    bot.command('broadcast', handleBroadcast);
+    bot.command('broadcastall', handleBroadcastAll);
+    bot.command('addpromo', handleAddPromo);
+    bot.command('delpromo', handleDelPromo);
+
     // ========== INLINE MENU CALLBACKS ==========
     bot.callbackQuery('home', handleHome);
     bot.callbackQuery('noop', (ctx) => ctx.answerCallbackQuery());
 
-    // Main menu buttons (inline)
+    // Main menu
     bot.callbackQuery('menu:search', (ctx) => {
         ctx.answerCallbackQuery();
         return handleSearchPrompt(ctx);
@@ -57,8 +71,17 @@ export function createBot() {
         ctx.answerCallbackQuery();
         return handleHelp(ctx);
     });
+    bot.callbackQuery('menu:lang', handleLangPrompt);
 
-    // ========== OTHER CALLBACKS ==========
+    // Language
+    bot.callbackQuery(/^lang:/, handleLangSet);
+
+    // Admin order actions
+    bot.callbackQuery(/^admin_accept:/, handleAdminAccept);
+    bot.callbackQuery(/^admin_reject:/, handleAdminReject);
+    bot.callbackQuery(/^admin_call:/, (ctx) => ctx.answerCallbackQuery('📞 Telefon raqam nusxalandi'));
+
+    // Other callbacks
     bot.callbackQuery('show_categories', (ctx) => {
         ctx.answerCallbackQuery();
         return handleCategories(ctx);
@@ -72,35 +95,22 @@ export function createBot() {
         return handleCategories(ctx);
     });
 
-    // Category selection: cat:slug
+    // Category/product
     bot.callbackQuery(/^cat:/, handleCategorySelect);
-
-    // Category pagination: catpage:slug:page
     bot.callbackQuery(/^catpage:/, handleCategoryPage);
-
-    // Add to cart: addcart:id
     bot.callbackQuery(/^addcart:/, handleAddToCart);
 
-    // ========== FREE TEXT (state-based routing) ==========
+    // ========== TEXT MESSAGES ==========
     bot.on('message:text', (ctx) => {
         const userId = ctx.from?.id;
         if (!userId) return;
 
-        // Check states in priority order
-        if (isInCheckoutMode(userId)) {
-            return handleCheckoutInput(ctx);
-        }
-        if (isInOrderPhoneMode(userId)) {
-            return handleOrderPhone(ctx);
-        }
-        if (isInSearchMode(userId)) {
-            return handleSearchQuery(ctx);
-        }
-        if (isInAiMode(userId)) {
-            return handleAiMessage(ctx);
-        }
+        if (isInCheckoutMode(userId)) return handleCheckoutInput(ctx);
+        if (isInOrderPhoneMode(userId)) return handleOrderPhone(ctx);
+        if (isInSearchMode(userId)) return handleSearchQuery(ctx);
+        if (isInAiMode(userId)) return handleAiMessage(ctx);
 
-        // Default: treat as search
+        // Default
         return handleSearchQuery(ctx);
     });
 
