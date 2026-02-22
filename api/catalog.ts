@@ -1,19 +1,32 @@
-import { parseBody, serverSupabase } from './_utils';
+import { createClient } from '@supabase/supabase-js';
 
-export default async function handler(req, res) {
+const getEnv = (key: string): string => {
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return process.env[key] as string;
+  }
+  return '';
+};
+
+export default async function handler(req: any, res: any) {
   try {
-    // 1. Fetch products from Supabase
-    const { data: products, error } = await serverSupabase
+    const url = getEnv('SUPABASE_URL') || getEnv('VITE_SUPABASE_URL');
+    const key = getEnv('SUPABASE_SERVICE_ROLE_KEY') || getEnv('SUPABASE_ANON_KEY') || getEnv('VITE_SUPABASE_KEY');
+
+    if (!url || !key) {
+      return res.status(500).json({ error: 'Server config missing' });
+    }
+
+    const supabase = createClient(url, key, { auth: { persistSession: false } });
+
+    const { data: products, error } = await supabase
       .from('products')
       .select('*');
 
     if (error) throw error;
 
-    // 2. Base URL of your shop
     const BASE_URL = process.env.SITE_URL || 'https://luxecoreuz.vercel.app';
 
-    // 3. Generate XML
-    const xmlItems = products.map((product) => `
+    const xmlItems = (products || []).map((product: any) => `
     <item>
       <g:id>${product.id}</g:id>
       <g:title><![CDATA[${product.name}]]></g:title>
@@ -38,11 +51,9 @@ export default async function handler(req, res) {
   </channel>
 </rss>`;
 
-    // 4. Send Response
     res.setHeader('Content-Type', 'text/xml');
     res.status(200).send(xmlFeed);
-
-  } catch (err) {
+  } catch (err: any) {
     console.error('Feed generation error:', err);
     res.status(500).json({ error: 'Failed to generate feed' });
   }
