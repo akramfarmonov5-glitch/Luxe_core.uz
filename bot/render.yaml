@@ -1,0 +1,23 @@
+services:
+  - type: worker
+    name: luxecore-bot
+    runtime: docker
+    dockerfilePath: ./bot/Dockerfile
+    dockerContext: ./bot
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SITE_URL
+        value: https://luxe-core-uz-three.vercel.app
+      - key: CHANNEL_URL
+        value: https://t.me/luxecoreuz
+      - key: CONTACT_PHONE
+        value: "+998 90 123 45 67"
+      - key: CONTACT_USERNAME
+        value: "@luxecore_admin"
