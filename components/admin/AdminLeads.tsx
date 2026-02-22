@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Phone, Calendar, Search, MessageSquare } from 'lucide-react';
 import { ChatLead } from '../../types';
-import { supabase } from '../../lib/supabaseClient';
+import { adminRequest } from '../../lib/adminApi';
 
 const AdminLeads: React.FC = () => {
   const [leads, setLeads] = useState<ChatLead[]>([]);
@@ -26,13 +26,8 @@ const AdminLeads: React.FC = () => {
     }
 
     try {
-        const { data, error } = await supabase
-            .from('leads')
-            .select('*')
-            .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        setLeads(data || []);
+        const result = await adminRequest<{ data: ChatLead[] }>('/api/admin/leads', 'GET');
+        setLeads(result.data || []);
     } catch (error) {
         console.error("Error fetching leads:", error);
     } finally {

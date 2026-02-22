@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
+
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import FeaturedProducts from './components/FeaturedProducts';
@@ -42,6 +44,7 @@ const AppContent: React.FC = () => {
   const [navigationSettings, setNavigationSettings] = useState<NavigationSettings>(DEFAULT_NAVIGATION);
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([
     {
@@ -64,13 +67,123 @@ const AppContent: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isAdminAuthLoading, setIsAdminAuthLoading] = useState(true);
   const { toggleCart } = useCart();
 
-  useEffect(() => {
-    const adminSession = localStorage.getItem('luxecore_admin_session');
-    if (adminSession === 'active') {
-      setIsAdminAuthenticated(true);
+  const isAllowedAdmin = (user: any) => {
+    if (!user) return false;
+    const email = user.email as string | undefined;
+    const isRoleAdmin = user.app_metadata?.role === 'admin';
+    const env = import.meta.env || {};
+    const raw = env.VITE_ADMIN_EMAILS || '';
+    const allowedEmails = raw
+      .split(',')
+      .map((item: string) => item.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (allowedEmails.length === 0) {
+      return isRoleAdmin;
     }
+
+    return isRoleAdmin || (email ? allowedEmails.includes(email.toLowerCase()) : false);
+  };
+
+  useEffect(() => {
+    const initAdminSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Admin session read error:', error);
+          setIsAdminAuthenticated(false);
+          return;
+        }
+
+        const user = data.session?.user;
+        setIsAdminAuthenticated(Boolean(user && isAllowedAdmin(user)));
+      } catch (error) {
+        console.error('Admin auth init error:', error);
+        setIsAdminAuthenticated(false);
+      } finally {
+        setIsAdminAuthLoading(false);
+      }
+    };
+
+    initAdminSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      setIsAdminAuthenticated(Boolean(user && isAllowedAdmin(user)));
+      setIsAdminAuthLoading(false);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Sync state to URL Hash
+  useEffect(() => {
+    let hash = '';
+    switch (currentRoute.name) {
+      case 'HOME': hash = ''; break;
+      case 'PRODUCT': hash = `#product/${currentRoute.productId}`; break;
+      case 'BLOG_POST': hash = `#blog/${currentRoute.postId}`; break;
+      case 'CHECKOUT': hash = '#checkout'; break;
+      case 'ADMIN': hash = '#admin'; break;
+      case 'TRACKING': hash = '#tracking'; break;
+      case 'WISHLIST': hash = '#wishlist'; break;
+    }
+
+    if (window.location.hash !== hash) {
+      window.history.pushState(null, '', hash || '/');
+    }
+  }, [currentRoute]);
+
+  // Handle Home Section Hashes
+  useEffect(() => {
+    const handleInitialHash = () => {
+      const hash = window.location.hash;
+      if (hash === '#shop') {
+        setTimeout(() => {
+          document.getElementById('featured-products')?.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+      } else if (hash === '#blog-section') {
+        setTimeout(() => {
+          document.getElementById('blog-section')?.scrollIntoView({ behavior: 'smooth' });
+        }, 500);
+      }
+    };
+    handleInitialHash();
+  }, []);
+
+  // Sync URL Hash to state (Initial load & Back button)
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (!hash || hash === '#') {
+        setCurrentRoute({ name: 'HOME' });
+      } else if (hash.startsWith('#product/')) {
+        const id = Number(hash.replace('#product/', ''));
+        if (!isNaN(id)) setCurrentRoute({ name: 'PRODUCT', productId: id });
+      } else if (hash.startsWith('#blog/')) {
+        const id = hash.replace('#blog/', '');
+        setCurrentRoute({ name: 'BLOG_POST', postId: id });
+      } else if (hash === '#checkout') {
+        setCurrentRoute({ name: 'CHECKOUT' });
+      } else if (hash === '#admin') {
+        setCurrentRoute({ name: 'ADMIN' });
+      } else if (hash === '#tracking') {
+        setCurrentRoute({ name: 'TRACKING' });
+      } else if (hash === '#wishlist') {
+        setCurrentRoute({ name: 'WISHLIST' });
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    // Initial check
+    handleHashChange();
+
+    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   useEffect(() => {
@@ -86,59 +199,85 @@ const AppContent: React.FC = () => {
         }
 
         // Fetch products
-        const { data: productData, error: productError } = await supabase
-          .from('products')
-          .select('*');
+        try {
+          const { data: productData, error: productError } = await supabase
+            .from('products')
+            .select('*');
 
-        if (productError) throw productError;
-
-        if (productData && productData.length > 0) {
-          setProducts(productData as Product[]);
-        } else {
+          if (!productError && productData && productData.length > 0) {
+            const normalizedProducts = productData
+              .map((item: any) => ({
+                ...item,
+                id: Number(item.id),
+              }))
+              .filter((item: any) => Number.isFinite(item.id));
+            setProducts(normalizedProducts as Product[]);
+          } else {
+            if (productError) console.warn('Products fetch error:', productError.message);
+            setProducts(MOCK_PRODUCTS);
+          }
+        } catch (e) {
+          console.warn('Products fetch failed:', e);
           setProducts(MOCK_PRODUCTS);
         }
 
         // Fetch categories
-        const { data: categoryData, error: categoryError } = await supabase
-          .from('categories')
-          .select('*');
+        try {
+          const { data: categoryData, error: categoryError } = await supabase
+            .from('categories')
+            .select('*');
 
-        if (categoryError) throw categoryError;
-
-        if (categoryData && categoryData.length > 0) {
-          setCategories(categoryData as Category[]);
-        } else {
+          if (!categoryError && categoryData && categoryData.length > 0) {
+            setCategories(categoryData as Category[]);
+          } else {
+            if (categoryError) console.warn('Categories fetch error:', categoryError.message);
+            setCategories(MOCK_CATEGORIES);
+          }
+        } catch (e) {
+          console.warn('Categories fetch failed:', e);
           setCategories(MOCK_CATEGORIES);
         }
 
         // Fetch hero content
-        const { data: heroData } = await supabase
-          .from('hero_content')
-          .select('*')
-          .single();
+        try {
+          const { data: heroData } = await supabase
+            .from('hero_content')
+            .select('*')
+            .single();
 
-        if (heroData) {
-          setHeroContent(heroData as HeroContent);
+          if (heroData) {
+            setHeroContent(heroData as HeroContent);
+          }
+        } catch (e) {
+          console.warn('Hero content fetch failed:', e);
         }
 
         // Fetch blog posts
-        const { data: blogData } = await supabase
-          .from('blog_posts')
-          .select('*')
-          .order('date', { ascending: false });
+        try {
+          const { data: blogData } = await supabase
+            .from('blog_posts')
+            .select('*')
+            .order('date', { ascending: false });
 
-        if (blogData && blogData.length > 0) {
-          setBlogPosts(blogData as BlogPost[]);
+          if (blogData && blogData.length > 0) {
+            setBlogPosts(blogData as BlogPost[]);
+          }
+        } catch (e) {
+          console.warn('Blog posts fetch failed:', e);
         }
 
         // Fetch navigation settings
-        const { data: navData } = await supabase
-          .from('navigation_settings')
-          .select('*')
-          .single();
+        try {
+          const { data: navData } = await supabase
+            .from('navigation_settings')
+            .select('*')
+            .single();
 
-        if (navData) {
-          setNavigationSettings(navData as NavigationSettings);
+          if (navData) {
+            setNavigationSettings(navData as NavigationSettings);
+          }
+        } catch (e) {
+          console.warn('Navigation settings fetch failed:', e);
         }
 
       } catch (error) {
@@ -188,25 +327,47 @@ const AppContent: React.FC = () => {
   };
 
   const handleCategorySelect = (categoryName: string) => {
+    setSelectedCategory(categoryName);
     const element = document.getElementById('featured-products');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      window.history.pushState(null, '', '#shop');
     }
   };
 
-  const handleAdminLogin = () => {
-    setIsAdminAuthenticated(true);
-    localStorage.setItem('luxecore_admin_session', 'active');
+  const handleAdminLogin = async (email: string, password: string): Promise<string | null> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      return error.message || 'Kirishda xatolik yuz berdi.';
+    }
+
+    const { data } = await supabase.auth.getSession();
+    const authUser = data.session?.user;
+    if (!isAllowedAdmin(authUser)) {
+      await supabase.auth.signOut();
+      return 'Bu foydalanuvchiga admin kirish ruxsati berilmagan.';
+    }
+
+    return null;
   };
 
-  const handleAdminLogout = () => {
+  const handleAdminLogout = async () => {
+    await supabase.auth.signOut();
     setIsAdminAuthenticated(false);
-    localStorage.removeItem('luxecore_admin_session');
     navigateToHome();
   };
 
   const renderContent = () => {
     if (currentRoute.name === 'ADMIN') {
+      if (isAdminAuthLoading) {
+        return (
+          <div className="min-h-screen bg-black flex items-center justify-center text-gray-400">
+            Tekshirilmoqda...
+          </div>
+        );
+      }
+
       if (!isAdminAuthenticated) {
         return (
           <AdminLogin
@@ -258,6 +419,15 @@ const AppContent: React.FC = () => {
           />
         );
       }
+      return (
+        <div className="min-h-screen pt-24 pb-12 bg-black flex flex-col items-center justify-center text-center px-6">
+          <h2 className="text-3xl font-bold text-white mb-4">Mahsulot topilmadi</h2>
+          <p className="text-gray-400 mb-8">Ushbu mahsulot mavjud emas yoki o'chirilgan.</p>
+          <button onClick={navigateToHome} className="px-8 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors">
+            Bosh sahifaga qaytish
+          </button>
+        </div>
+      );
     }
 
     if (currentRoute.name === 'BLOG_POST') {
@@ -269,7 +439,17 @@ const AppContent: React.FC = () => {
 
     return (
       <main className="pb-20">
-        <Hero content={heroContent} />
+        <Hero
+          content={heroContent}
+          onShopClick={() => handleCategorySelect('All')}
+          onMoreClick={() => {
+            const blogSection = document.getElementById('blog-section');
+            if (blogSection) {
+              blogSection.scrollIntoView({ behavior: 'smooth' });
+              window.history.pushState(null, '', '#blog-section');
+            }
+          }}
+        />
         <CategoryGrid
           categories={categories}
           onSelectCategory={handleCategorySelect}
@@ -279,6 +459,7 @@ const AppContent: React.FC = () => {
           categories={categories}
           onNavigateToProduct={navigateToProduct}
           isLoading={isLoading}
+          initialCategory={selectedCategory}
         />
         <BlogGrid posts={blogPosts} onPostClick={navigateToBlogPost} />
       </main>
@@ -287,10 +468,15 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-gold-400 selection:text-black">
+      <Helmet>
+        <title>LUXECORE | Premium Store</title>
+        <meta name="description" content="O'zbekistondagi premium onlayn do'kon. Eksklyuziv mahsulotlar." />
+      </Helmet>
       <MetaPixel />
       {currentRoute.name !== 'CHECKOUT' && currentRoute.name !== 'ADMIN' && currentRoute.name !== 'TRACKING' && (
         <Navbar
           onNavigateHome={navigateToHome}
+          onCategorySelect={handleCategorySelect}
           navigationSettings={navigationSettings}
           onProfileClick={navigateToTracking}
           onSearchClick={() => setIsSearchOpen(true)}
@@ -325,7 +511,10 @@ const AppContent: React.FC = () => {
       />
 
       {currentRoute.name !== 'CHECKOUT' && currentRoute.name !== 'ADMIN' && currentRoute.name !== 'TRACKING' && currentRoute.name !== 'BLOG_POST' && currentRoute.name !== 'WISHLIST' && (
-        <Footer onAdminClick={navigateToAdmin} />
+        <Footer
+          onAdminClick={navigateToAdmin}
+          onCategorySelect={handleCategorySelect}
+        />
       )}
     </div>
   );
@@ -333,13 +522,15 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ToastProvider>
-      <WishlistProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </WishlistProvider>
-    </ToastProvider>
+    <HelmetProvider>
+      <ToastProvider>
+        <WishlistProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </WishlistProvider>
+      </ToastProvider>
+    </HelmetProvider>
   );
 };
 

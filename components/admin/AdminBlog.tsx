@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { BlogPost } from '../../types';
 import { Sparkles, Image as ImageIcon, Plus, Trash2, Calendar, Wand2, Search, Edit, X, Save } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
-import { supabase } from '../../lib/supabaseClient';
+import { adminRequest } from '../../lib/adminApi';
 
 interface AdminBlogProps {
   posts: BlogPost[];
@@ -41,7 +40,7 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
   const handleDelete = async (id: string) => {
     if (confirm("Bu maqolani o'chirmoqchimisiz?")) {
       try {
-        await supabase.from('blog_posts').delete().eq('id', id);
+        await adminRequest('/api/admin/blog', 'DELETE', { id });
         setPosts(prev => prev.filter(p => p.id !== id));
       } catch (error) {
         console.error('Delete error:', error);
@@ -57,48 +56,50 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
 
     setIsGenerating(true);
     try {
-      const env = import.meta.env || {};
-      const ai = new GoogleGenAI({ apiKey: env.VITE_API_KEY || '' });
-
       const prompt = `
-            You are a fashion blog writer for a luxury store.
-            Topic: "${formData.title}"
-            
-            Generate a blog post in **Uzbek** language:
-            1. Content: Engaging, sophisticated content (approx 150 words).
-            2. SEO Title: Short catchy title.
-            3. SEO Description: Meta description.
-            4. Keywords: Array of 5 strings.
+          You are a fashion blog writer for a luxury store.
+          Topic: "${formData.title}"
+          
+          Generate a blog post in **Uzbek** language:
+          1. Content: Engaging, sophisticated content (approx 150 words).
+          2. SEO Title: Short catchy title.
+          3. SEO Description: Meta description.
+          4. Keywords: Array of 5 strings.
 
-            Return JSON:
-            {
-                "content": "...",
-                "seo": {
-                    "title": "...",
-                    "description": "...",
-                    "keywords": ["...", "..."]
-                }
-            }
-        `;
+          Return JSON:
+          {
+              "content": "...",
+              "seo": {
+                  "title": "...",
+                  "description": "...",
+                  "keywords": ["...", "..."]
+              }
+          }
+      `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-preview-09-2025',
-        contents: prompt,
-        config: { responseMimeType: 'application/json' }
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          responseMimeType: 'application/json'
+        }),
       });
 
-      const text = response.text;
-      if (text) {
-        const data = JSON.parse(text);
+      if (!response.ok) throw new Error('Proxy error');
+      const data = await response.json();
+
+      if (data.text) {
+        const parsedData = JSON.parse(data.text);
         setFormData(prev => ({
           ...prev,
-          content: data.content,
-          seo: data.seo
+          content: parsedData.content,
+          seo: parsedData.seo
         }));
       }
     } catch (error) {
       console.error("AI Gen Error", error);
-      alert("AI xatolik yuz berdi. API kalitini tekshiring.");
+      alert("AI xatolik yuz berdi. Iltimos, keyinroq urinib ko'ring.");
     } finally {
       setIsGenerating(false);
     }
@@ -114,20 +115,11 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
 
     try {
       if (formData.id) {
-        // Update existing
-        const { error } = await supabase
-          .from('blog_posts')
-          .update(postData)
-          .eq('id', formData.id);
-        if (error) throw error;
-        setPosts(prev => prev.map(p => p.id === formData.id ? postData : p));
+        const result = await adminRequest<{ data: BlogPost }>('/api/admin/blog', 'PUT', postData);
+        setPosts(prev => prev.map(p => p.id === formData.id ? result.data : p));
       } else {
-        // Insert new
-        const { error } = await supabase
-          .from('blog_posts')
-          .insert([postData]);
-        if (error) throw error;
-        setPosts(prev => [postData, ...prev]);
+        const result = await adminRequest<{ data: BlogPost }>('/api/admin/blog', 'POST', postData);
+        setPosts(prev => [result.data, ...prev]);
       }
       setIsModalOpen(false);
     } catch (error) {

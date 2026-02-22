@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Package, Clock, Truck, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
-import { Order, OrderStatus } from '../types';
+import { Search, Package, Clock, Truck, CheckCircle, ArrowLeft } from 'lucide-react';
 
 interface OrderTrackerProps {
   onBack: () => void;
@@ -21,42 +19,23 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
     setSearched(true);
     
     try {
-        const env = import.meta.env || {};
-        if (!env.VITE_SUPABASE_URL) {
-            setTimeout(() => {
-                if (phoneNumber.includes('901234567')) {
-                    setOrders([
-                        {
-                            id: 'ORD-DEMO-1',
-                            created_at: new Date().toISOString(),
-                            status: 'Yetkazilmoqda',
-                            total_amount: 12500000,
-                            items: [{ name: 'Midnight Chronograph', quantity: 1 }]
-                        }
-                    ]);
-                } else {
-                    setOrders([]);
-                }
-                setLoading(false);
-            }, 1000);
-            return;
+        const response = await fetch('/api/orders/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: phoneNumber }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Tracking request failed');
         }
 
-        const { data, error } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('phone', phoneNumber)
-            .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        setOrders(data);
-
+        const json = await response.json();
+        setOrders(json.data || []);
     } catch (error) {
         console.error("Search error:", error);
         setOrders([]);
     } finally {
-        const env = import.meta.env || {};
-        if (env.VITE_SUPABASE_URL) setLoading(false);
+        setLoading(false);
     }
   };
 
@@ -152,16 +131,10 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
                                 </div>
 
                                 <div className="space-y-3">
-                                    {Array.isArray(order.items) && order.items.map((item: any, idx: number) => (
-                                        <div key={idx} className="flex justify-between items-center text-sm">
-                                            <span className="text-gray-300">{item.name} <span className="text-gray-600">x{item.quantity}</span></span>
-                                        </div>
-                                    ))}
-                                    
                                     <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-4">
                                         <span className="text-gray-400">Jami to'lov:</span>
                                         <span className="text-lg font-bold text-gold-400">
-                                            {new Intl.NumberFormat('uz-UZ').format(order.total_amount)} UZS
+                                            {new Intl.NumberFormat('uz-UZ').format(order.total || 0)} UZS
                                         </span>
                                     </div>
                                 </div>

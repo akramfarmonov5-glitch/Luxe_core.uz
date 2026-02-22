@@ -1,16 +1,16 @@
-import { supabase } from '../lib/supabaseClient';
+import { serverSupabase } from './admin/_utils';
 
 export default async function handler(req, res) {
   try {
     // 1. Fetch products from Supabase
-    const { data: products, error } = await supabase
+    const { data: products, error } = await serverSupabase
       .from('products')
       .select('*');
 
     if (error) throw error;
 
     // 2. Base URL of your shop
-    const BASE_URL = 'https://luxecore.uz'; // Change this to your actual Vercel domain
+    const BASE_URL = process.env.SITE_URL || 'https://luxecoreuz.vercel.app';
 
     // 3. Generate XML
     const xmlItems = products.map((product) => `

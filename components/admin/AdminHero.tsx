@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HeroContent } from '../../types';
-import { Save, Image as ImageIcon, Type, MousePointerClick, PlusCircle, MinusCircle, Loader2 } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
+import { Save, Image as ImageIcon, Type, MousePointerClick, PlusCircle, MinusCircle } from 'lucide-react';
+import { adminRequest } from '../../lib/adminApi';
 
 interface AdminHeroProps {
     heroContent: HeroContent;
@@ -22,12 +22,7 @@ const AdminHero: React.FC<AdminHeroProps> = ({ heroContent, setHeroContent }) =>
         setIsSaving(true);
 
         try {
-            // Upsert to Supabase (update if exists, insert if not)
-            const { error } = await supabase
-                .from('hero_content')
-                .upsert({ id: 'main', ...formData }, { onConflict: 'id' });
-
-            if (error) throw error;
+            await adminRequest('/api/admin/hero', 'PUT', formData);
 
             setHeroContent(formData);
             setIsSaved(true);

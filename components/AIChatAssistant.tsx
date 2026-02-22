@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, Send, MessageCircle, Mic, PhoneOff, User, Phone, ChevronRight } from 'lucide-react';
-import { GoogleGenAI, LiveServerMessage, Modality } from "@google/genai";
 import { Product } from '../types';
 import { supabase } from '../lib/supabaseClient';
 
@@ -113,29 +112,28 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
 
     const userMessage = input;
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+    const updatedMessages: Message[] = [...messages, { role: 'user' as const, text: userMessage }];
+    setMessages(updatedMessages);
     setIsLoading(true);
 
     try {
-      const env = import.meta.env || {};
-      const apiKey = env.VITE_GEMINI_API_KEY;
-      if (!apiKey) {
-        setMessages(prev => [...prev, { role: 'model', text: "Kechirasiz, AI tizimi hozircha mavjud emas (API Key topilmadi)." }]);
-        setIsLoading(false);
-        return;
-      }
-
-      const ai = new GoogleGenAI({ apiKey });
-      const chat = ai.chats.create({
-        model: 'gemini-2.5-flash-preview-09-2025',
-        config: {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage,
+          history: updatedMessages.slice(0, -1), // send previous messages as context
           systemInstruction: getSystemInstruction(),
-        }
+        }),
       });
 
-      const response = await chat.sendMessage({ message: userMessage });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'AI server xatosi');
+      }
 
-      const text = response.text || "Uzr, tushunmadim. Qayta so'ray olasizmi?";
+      const data = await response.json();
+      const text = data.text || "Uzr, tushunmadim. Qayta so'ray olasizmi?";
 
       setMessages(prev => [...prev, { role: 'model', text }]);
 
@@ -152,130 +150,10 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   };
 
   const connectLive = async () => {
-    const env = import.meta.env || {};
-    const apiKey = env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
-      setMessages(prev => [...prev, { role: 'model', text: "⚠️ API kalit topilmadi." }]);
-      return;
-    }
-
-    setIsLive(true);
-    setMessages(prev => [...prev, { role: 'model', text: "📞 Ovozli aloqa o'rnatilmoqda..." }]);
-
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      audioContextRef.current = new AudioContext({ sampleRate: 24000 });
-      inputAudioContextRef.current = new AudioContext({ sampleRate: 16000 });
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-
-      const ai = new GoogleGenAI({ apiKey });
-
-      const sessionPromise = ai.live.connect({
-        model: 'gemini-2.5-flash-native-audio-preview-12-2025',
-        config: {
-          responseModalities: [Modality.AUDIO],
-          speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
-          },
-          systemInstruction: getSystemInstruction(),
-          inputAudioTranscription: {},
-          outputAudioTranscription: {},
-        },
-        callbacks: {
-          onopen: () => {
-            console.log("Live session connected");
-
-            if (!inputAudioContextRef.current || !streamRef.current) return;
-
-            const source = inputAudioContextRef.current.createMediaStreamSource(streamRef.current);
-            const scriptProcessor = inputAudioContextRef.current.createScriptProcessor(4096, 1, 1);
-
-            scriptProcessor.onaudioprocess = (e) => {
-              const inputData = e.inputBuffer.getChannelData(0);
-              const pcmBlob = createBlob(inputData);
-
-              sessionPromise.then(session => {
-                session.sendRealtimeInput({ media: pcmBlob });
-              });
-            };
-
-            source.connect(scriptProcessor);
-            scriptProcessor.connect(inputAudioContextRef.current.destination);
-          },
-          onmessage: async (message: LiveServerMessage) => {
-            const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
-            if (base64Audio && audioContextRef.current) {
-              const ctx = audioContextRef.current;
-              nextStartTimeRef.current = Math.max(nextStartTimeRef.current, ctx.currentTime);
-
-              try {
-                const audioBuffer = await decodeAudioData(
-                  decode(base64Audio),
-                  ctx,
-                  24000,
-                  1
-                );
-
-                const source = ctx.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(ctx.destination);
-
-                source.addEventListener('ended', () => {
-                  sourceNodesRef.current.delete(source);
-                });
-
-                source.start(nextStartTimeRef.current);
-                nextStartTimeRef.current += audioBuffer.duration;
-                sourceNodesRef.current.add(source);
-              } catch (e) {
-                console.error("Audio decode error", e);
-              }
-            }
-
-            if (message.serverContent?.outputTranscription) {
-              currentOutputTranscription.current += message.serverContent.outputTranscription.text;
-            } else if (message.serverContent?.inputTranscription) {
-              currentInputTranscription.current += message.serverContent.inputTranscription.text;
-            }
-
-            if (message.serverContent?.turnComplete) {
-              if (currentInputTranscription.current.trim()) {
-                setMessages(prev => [...prev, { role: 'user', text: currentInputTranscription.current }]);
-                currentInputTranscription.current = '';
-              }
-              if (currentOutputTranscription.current.trim()) {
-                setMessages(prev => [...prev, { role: 'model', text: currentOutputTranscription.current }]);
-                currentOutputTranscription.current = '';
-              }
-            }
-
-            if (message.serverContent?.interrupted) {
-              sourceNodesRef.current.forEach(node => node.stop());
-              sourceNodesRef.current.clear();
-              nextStartTimeRef.current = 0;
-              currentOutputTranscription.current = '';
-            }
-          },
-          onclose: () => {
-            console.log("Live session closed");
-            disconnectLive();
-          },
-          onerror: (err) => {
-            console.error("Live session error", err);
-            disconnectLive();
-          }
-        }
-      });
-
-      sessionRef.current = sessionPromise;
-
-    } catch (e) {
-      console.error("Failed to connect live", e);
-      setIsLive(false);
-      setMessages(prev => [...prev, { role: 'model', text: "⚠️ Ovozli aloqaga ulanib bo'lmadi." }]);
-    }
+    setMessages(prev => [...prev, {
+      role: 'model',
+      text: "⚠️ Ovozli muloqot funksiyasi xavfsizlik maqsadida vaqtincha faqat test rejimida ishlaydi. Iltimos, matnli chatdan foydalaning, men sizga yordam berishga tayyorman! 😊"
+    }]);
   };
 
   const disconnectLive = () => {
@@ -430,8 +308,10 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                       <input
                         type="tel"
                         required
+                        pattern="[0-9]{9,12}"
+                        title="Telefon raqamni to'g'ri kiriting (masalan: 901234567)"
                         value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/[^0-9]/g, '') })}
                         className="w-full bg-black/40 border border-white/20 rounded-xl pl-24 pr-4 py-3 text-white focus:border-gold-400 focus:outline-none"
                         placeholder="90 123 45 67"
                       />

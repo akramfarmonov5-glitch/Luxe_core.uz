@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, ShieldCheck, CreditCard, Truck, Send, Wallet, Banknote, X, Smartphone, ExternalLink, Ticket, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { supabase } from '../lib/supabaseClient';
 import * as fpixel from '../lib/fpixel';
 import { useToast } from '../context/ToastContext';
 
@@ -14,9 +13,11 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const { cart, cartTotal, clearCart } = useCart();
   const { showToast } = useToast();
   const [isSuccess, setIsSuccess] = useState(false);
+  const [successNote, setSuccessNote] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'paynet' | 'cash'>('paynet');
   const [showPaynetModal, setShowPaynetModal] = useState(false);
+  const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
 
   const [promoCode, setPromoCode] = useState('');
   const [discountAmount, setDiscountAmount] = useState(0);
@@ -38,31 +39,45 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const QR_FALLBACK = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(PAYNET_URL)}&color=000000&bgcolor=ffffff`;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'phone') {
+      setFormData({ ...formData, [name]: value.replace(/[^0-9]/g, '') });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleApplyPromo = async () => {
     if (!promoCode.trim()) return;
     setIsCheckingPromo(true);
 
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      const response = await fetch('/api/promo/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: promoCode.trim(),
+          cartTotal,
+        }),
+      });
 
-    const code = promoCode.trim().toUpperCase();
-    if (code === 'LUXE2026') {
-      const discount = cartTotal * 0.1;
-      setDiscountAmount(discount);
-      setAppliedPromo(code);
-      showToast("Promo kod muvaffaqiyatli qo'llanildi!", "success");
-    } else if (code === 'ADMIN') {
-      const discount = cartTotal * 0.5;
-      setDiscountAmount(discount);
-      setAppliedPromo(code);
-      showToast("Maxsus chegirma qo'llanildi!", "success");
-    } else {
-      showToast("Bunday promo kod mavjud emas.", "error");
+      const data = await response.json();
+
+      if (data.valid) {
+        setDiscountAmount(data.discountAmount);
+        setAppliedPromo(promoCode.trim().toUpperCase());
+        showToast("Promo kod muvaffaqiyatli qo'llanildi!", "success");
+      } else {
+        showToast(data.error || "Bunday promo kod mavjud emas.", "error");
+        setDiscountAmount(0);
+        setAppliedPromo('');
+      }
+    } catch {
+      showToast("Server bilan bog'lanishda xatolik.", "error");
       setDiscountAmount(0);
       setAppliedPromo('');
     }
+
     setIsCheckingPromo(false);
   };
 
@@ -72,88 +87,45 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
     setPromoCode('');
   };
 
-  const saveOrderToDatabase = async () => {
-    const env = import.meta.env || {};
-    if (!env.VITE_SUPABASE_URL) return;
-
-    const orderId = `ORD-${Date.now()}`;
-    const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-
-    try {
-      const { error } = await supabase.from('orders').insert({
-        id: orderId,
-        "customerName": `${formData.firstName} ${formData.lastName}`,
+  const createOrder = async (orderId: string) => {
+    const response = await fetch('/api/orders/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderId,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         phone: formData.phone,
+        address: formData.address,
+        city: formData.city,
+        paymentMethod,
         total: finalTotal,
-        status: 'Kutilmoqda',
-        date: dateStr,
-        "paymentMethod": paymentMethod === 'paynet' ? 'Paynet' : 'Naqd'
-        // address, city, items columns currently missing in DB, skipping for now
-      });
+        cart,
+        promoCode: appliedPromo,
+        discountAmount,
+      }),
+    });
 
-      if (error) {
-        console.error("Error saving order to Supabase:", error);
-        showToast("Buyurtmani saqlashda xatolik: " + error.message, "error");
+    if (!response.ok) {
+      let message = 'Buyurtma yuborilmadi.';
+      try {
+        const json = await response.json();
+        if (json?.error) message = json.error;
+      } catch {
+        // ignore parse errors
       }
-    } catch (e) {
-      console.error("Supabase error:", e);
+      throw new Error(message);
     }
   };
 
-  const sendTelegramNotification = async () => {
-    const env = import.meta.env || {};
-    const token = env.VITE_TELEGRAM_BOT_TOKEN;
-    const chatId = env.VITE_TELEGRAM_CHAT_ID;
-
-    if (!token || !chatId) {
-      console.warn("Telegram credentials not found.");
-      return;
+  const completeOrder = async (orderId: string, trackPurchase: boolean, note: string) => {
+    if (trackPurchase) {
+      fpixel.trackPurchase(orderId, finalTotal, 'UZS');
     }
-
-    const itemsList = cart.map((item, index) =>
-      `${index + 1}. ${item.name} (x${item.quantity}) - ${new Intl.NumberFormat('uz-UZ').format(item.price * item.quantity)} UZS`
-    ).join('\n');
-
-    const totalFormatted = new Intl.NumberFormat('uz-UZ').format(finalTotal) + ' UZS';
-    const discountInfo = appliedPromo ? `\n🏷 <b>Promo:</b> ${appliedPromo} (-${new Intl.NumberFormat('uz-UZ').format(discountAmount)} UZS)` : '';
-    const paymentLabel = paymentMethod === 'paynet' ? '📲 Paynet (Onlayn)' : '💵 Naqd (Yetkazilganda)';
-
-    const message = `
-📦 <b>YANGI BUYURTMA! (LUXECORE)</b>
-
-👤 <b>Mijoz:</b> ${formData.firstName} ${formData.lastName}
-📞 <b>Tel:</b> ${formData.phone}
-📍 <b>Manzil:</b> ${formData.city}, ${formData.address}
-
-💳 <b>To'lov turi:</b> ${paymentLabel}
-
-🛒 <b>Mahsulotlar:</b>
-${itemsList}
-
-------------------
-${discountInfo}
-💰 <b>JAMI TO'LOV:</b> ${totalFormatted}
-    `;
-
-    try {
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
-      });
-    } catch (error) {
-      console.error("Failed to send Telegram message", error);
-    }
-  };
-
-  const completeOrder = async () => {
-    await saveOrderToDatabase();
-
-    const orderId = `ORD-${Date.now()}`;
-    fpixel.trackPurchase(orderId, finalTotal, 'UZS');
-
     setShowPaynetModal(false);
     setIsLoading(false);
+    setPendingOrderId(null);
+    setSuccessNote(note);
     setIsSuccess(true);
     clearCart();
   };
@@ -162,23 +134,38 @@ ${discountInfo}
     e.preventDefault();
     setIsLoading(true);
 
-    await sendTelegramNotification();
+    const orderId = `ORD-${Date.now()}`;
+    setPendingOrderId(orderId);
+
+    try {
+      await createOrder(orderId);
+    } catch (error: any) {
+      showToast(error?.message || 'Buyurtma yuborilmadi.', 'error');
+      setIsLoading(false);
+      setPendingOrderId(null);
+      return;
+    }
 
     if (paymentMethod === 'paynet') {
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
       if (isMobile) {
         window.open(PAYNET_URL, '_blank');
-        setTimeout(completeOrder, 2000);
+        setTimeout(
+          () => completeOrder(orderId, false, "To'lov tekshiruvga yuborildi. Menejer to'lovni tasdiqlagach buyurtma holati yangilanadi."),
+          2000
+        );
       } else {
         setShowPaynetModal(true);
         setIsLoading(false);
         return;
       }
     } else {
-      setTimeout(completeOrder, 1500);
+      setTimeout(
+        () => completeOrder(orderId, true, "Buyurtmangiz qabul qilindi. Menejerlarimiz tez orada siz bilan bog'lanishadi."),
+        1500
+      );
     }
   };
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('uz-UZ').format(price) + ' UZS';
   };
@@ -222,7 +209,7 @@ ${discountInfo}
                 <label className="text-sm text-gray-400">Telefon raqam</label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">+998</span>
-                  <input required name="phone" type="tel" value={formData.phone} onChange={handleInputChange} className="w-full bg-dark-800 border border-white/10 rounded-lg pl-16 pr-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all" placeholder="90 123 45 67" />
+                  <input required name="phone" type="tel" value={formData.phone} onChange={handleInputChange} pattern="[0-9]{9,12}" title="Telefon raqamni to'g'ri kiriting (masalan: 901234567)" className="w-full bg-dark-800 border border-white/10 rounded-lg pl-16 pr-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all" placeholder="90 123 45 67" />
                 </div>
               </div>
 
@@ -394,7 +381,12 @@ ${discountInfo}
                 <img src={PAYNET_QR_IMAGE} alt="Paynet QR Code" className="w-48 h-48 object-contain" onError={(e) => { e.currentTarget.src = QR_FALLBACK; }} />
               </div>
               <div className="flex flex-col gap-3 w-full">
-                <button onClick={completeOrder} className="w-full bg-gold-400 text-black font-bold py-3.5 rounded-xl hover:bg-gold-500 transition-colors">To'lov qildim</button>
+                <button
+                  onClick={() => pendingOrderId && completeOrder(pendingOrderId, false, "To'lov tekshiruvga yuborildi. Menejer siz bilan bog'lanadi.")}
+                  className="w-full bg-gold-400 text-black font-bold py-3.5 rounded-xl hover:bg-gold-500 transition-colors"
+                >
+                  To'lov qildim
+                </button>
                 <a href={PAYNET_URL} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-colors text-sm"><ExternalLink size={16} /> Havolani ochish</a>
               </div>
             </motion.div>
@@ -409,7 +401,7 @@ ${discountInfo}
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-dark-900 border border-white/10 rounded-3xl p-8 md:p-12 max-w-lg w-full text-center shadow-2xl">
               <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle2 size={40} className="text-green-500" /></div>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Buyurtmangiz qabul qilindi!</h2>
-              <p className="text-gray-400 mb-8 leading-relaxed">Rahmat, {formData.firstName}! Menejerlarimiz tez orada <b>{formData.phone}</b> raqami orqali siz bilan bog'lanishadi.</p>
+              <p className="text-gray-400 mb-8 leading-relaxed">Rahmat, {formData.firstName}! {successNote || <>Menejerlarimiz tez orada <b>{formData.phone}</b> raqami orqali siz bilan bog'lanishadi.</>}</p>
               <button onClick={onBack} className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">Bosh sahifaga qaytish</button>
             </motion.div>
           </div>

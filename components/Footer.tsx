@@ -3,14 +3,15 @@ import { Instagram, Twitter, Facebook, Mail, Lock } from 'lucide-react';
 
 interface FooterProps {
   onAdminClick?: () => void;
+  onCategorySelect: (categoryName: string) => void;
 }
 
-const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
+const Footer: React.FC<FooterProps> = ({ onAdminClick, onCategorySelect }) => {
   return (
     <footer className="bg-dark-900 border-t border-white/10 pt-16 pb-8">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-          
+
           <div className="space-y-4">
             <h3 className="text-2xl font-bold tracking-wider text-white">
               LUXE<span className="text-gold-400">CORE</span>
@@ -23,10 +24,10 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
           <div>
             <h4 className="text-white font-semibold mb-6">Kategoriyalar</h4>
             <ul className="space-y-3 text-sm text-gray-400">
-              <li><a href="#" className="hover:text-gold-400 transition-colors">Erkaklar</a></li>
-              <li><a href="#" className="hover:text-gold-400 transition-colors">Ayollar</a></li>
-              <li><a href="#" className="hover:text-gold-400 transition-colors">Soatlar</a></li>
-              <li><a href="#" className="hover:text-gold-400 transition-colors">Aksessuarlar</a></li>
+              <li><button onClick={() => onCategorySelect('Erkaklar')} className="hover:text-gold-400 transition-colors">Erkaklar</button></li>
+              <li><button onClick={() => onCategorySelect('Ayollar')} className="hover:text-gold-400 transition-colors">Ayollar</button></li>
+              <li><button onClick={() => onCategorySelect('Soatlar')} className="hover:text-gold-400 transition-colors">Soatlar</button></li>
+              <li><button onClick={() => onCategorySelect('Aksessuarlar')} className="hover:text-gold-400 transition-colors">Aksessuarlar</button></li>
             </ul>
           </div>
 
@@ -54,8 +55,8 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
               </a>
             </div>
             <div className="flex items-center gap-2 text-gray-400 text-sm">
-                <Mail size={16} />
-                <span>support@luxecore.uz</span>
+              <Mail size={16} />
+              <span>support@luxe_core.uz</span>
             </div>
           </div>
         </div>

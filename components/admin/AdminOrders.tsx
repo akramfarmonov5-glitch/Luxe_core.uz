@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Order, OrderStatus } from '../../types';
-import { Clock, CheckCircle, Truck, Package, Search } from 'lucide-react';
-
-import { supabase } from '../../lib/supabaseClient';
+import { Clock, CheckCircle, Truck, Package } from 'lucide-react';
+import { adminRequest } from '../../lib/adminApi';
 
 const AdminOrders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -14,16 +13,8 @@ const AdminOrders: React.FC = () => {
 
   const fetchOrders = async () => {
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-
-      if (data) {
-        setOrders(data as Order[]);
-      }
+      const result = await adminRequest<{ data: Order[] }>('/api/admin/orders', 'GET');
+      setOrders(result.data || []);
     } catch (error) {
       console.error('Error fetching orders:', error);
     } finally {
@@ -58,17 +49,10 @@ const AdminOrders: React.FC = () => {
     ));
 
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', id);
-
-      if (error) {
-        console.error("Status update failed:", error);
-        // Revert if needed
-      }
+      await adminRequest('/api/admin/orders', 'PATCH', { id, status: newStatus });
     } catch (err) {
       console.error(err);
+      fetchOrders();
     }
   };
 

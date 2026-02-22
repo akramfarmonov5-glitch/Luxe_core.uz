@@ -2,8 +2,7 @@
 import React, { useState } from 'react';
 import { Edit, Trash2, Plus, Search, X, Save, Image as ImageIcon, Globe, Type, Layout, Sparkles } from 'lucide-react';
 import { Category } from '../../types';
-import { GoogleGenAI } from "@google/genai";
-import { supabase } from '../../lib/supabaseClient';
+import { adminRequest } from '../../lib/adminApi';
 
 interface AdminCategoriesProps {
   categories: Category[];
@@ -45,8 +44,7 @@ const AdminCategories: React.FC<AdminCategoriesProps> = ({ categories, setCatego
   const handleDelete = async (id: string) => {
     if (confirm("Bu kategoriyani o'chirmoqchimisiz?")) {
       try {
-        const { error } = await supabase.from('categories').delete().eq('id', id);
-        if (error) throw error;
+        await adminRequest('/api/admin/categories', 'DELETE', { id });
         setCategories(prev => prev.filter(c => c.id !== id));
       } catch (error) {
         console.error("Delete error:", error);
@@ -63,10 +61,6 @@ const AdminCategories: React.FC<AdminCategoriesProps> = ({ categories, setCatego
 
     setIsGenerating(true);
     try {
-      const env = import.meta.env || {};
-      const apiKey = env.VITE_GEMINI_API_KEY;
-      const ai = new GoogleGenAI({ apiKey: apiKey || '' });
-
       const prompt = `
             Act as a luxury e-commerce content strategist.
             Category Name: "${formData.name}"
@@ -82,23 +76,29 @@ const AdminCategories: React.FC<AdminCategoriesProps> = ({ categories, setCatego
             }
         `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-preview-09-2025',
-        contents: prompt,
-        config: { responseMimeType: 'application/json' }
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          responseMimeType: 'application/json'
+        }),
       });
 
-      const text = response.text;
-      if (text) {
-        const data = JSON.parse(text);
+      if (!response.ok) throw new Error('Proxy error');
+      const data = await response.json();
+
+      if (data.text) {
+        const parsedData = JSON.parse(data.text);
         setFormData(prev => ({
           ...prev,
-          description: data.description,
-          slug: data.slug
+          description: parsedData.description,
+          slug: parsedData.slug
         }));
       }
     } catch (error) {
       console.error("AI Gen Error", error);
+      alert("AI xatolik yuz berdi. Iltimos, keyinroq urinib ko'ring.");
     } finally {
       setIsGenerating(false);
     }
@@ -119,29 +119,15 @@ const AdminCategories: React.FC<AdminCategoriesProps> = ({ categories, setCatego
 
     try {
       if (formData.id) {
-        // Update
-        const { data, error } = await supabase
-          .from('categories')
-          .update(dataToSave)
-          .eq('id', formData.id)
-          .select();
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setCategories(prev => prev.map(c => c.id === formData.id ? (data[0] as Category) : c));
-        }
+        const result = await adminRequest<{ data: Category }>('/api/admin/categories', 'PUT', {
+          id: formData.id,
+          ...dataToSave,
+        });
+        setCategories(prev => prev.map(c => c.id === formData.id ? result.data : c));
       } else {
-        // Insert - generate ID since DB doesn't auto-generate
         const newId = `cat_${Date.now()}`;
-        const { data, error } = await supabase
-          .from('categories')
-          .insert([{ id: newId, ...dataToSave }])
-          .select();
-
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setCategories(prev => [(data[0] as Category), ...prev]);
-        }
+        const result = await adminRequest<{ data: Category }>('/api/admin/categories', 'POST', { id: newId, ...dataToSave });
+        setCategories(prev => [result.data, ...prev]);
       }
       setIsModalOpen(false);
     } catch (error) {

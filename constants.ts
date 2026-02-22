@@ -1,4 +1,4 @@
-import { Product, Category, HeroContent, NavigationSettings } from './types';
+import { Product, Category, HeroContent, NavigationSettings, BlogPost } from './types';
 
 export const DEFAULT_HERO_CONTENT: HeroContent = {
   badge: "Yangi Mavsum",
@@ -187,6 +187,21 @@ export const MOCK_PRODUCTS: Product[] = [
       { label: "Sensorlar", value: "Yurak urishi, Uyqu" },
       { label: "Material", value: "Titan" },
       { label: "Suvga chidamli", value: "IP68" }
+    ]
+  },
+  {
+    id: 9,
+    name: "Velvet Night Pumps",
+    price: 2400000,
+    formattedPrice: "2 400 000 UZS",
+    category: "Poyabzal",
+    image: "https://images.unsplash.com/photo-1596702994230-a8839505ee4c?q=80&w=1000&auto=format&fit=crop",
+    shortDescription: "Oliy toifadagi baxmaldan tayyorlangan, kechki tadbirlar uchun ideal poyabzal.",
+    specs: [
+      { label: "Material", value: "Baxmal" },
+      { label: "Rang", value: "To'q ko'k" },
+      { label: "Turi", value: "Kechki" },
+      { label: "Asosi", value: "Yumshoq" }
     ]
   }
 ];

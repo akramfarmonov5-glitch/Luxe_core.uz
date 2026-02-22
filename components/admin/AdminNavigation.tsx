@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NavigationSettings, MenuItem, SocialLink, Category } from '../../types';
-import { Plus, Trash2, Menu, Share2, Save, GripVertical, Link as LinkIcon, Loader2 } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
+import { Plus, Trash2, Menu, Share2, Save, GripVertical, Link as LinkIcon } from 'lucide-react';
+import { adminRequest } from '../../lib/adminApi';
 
 interface AdminNavigationProps {
     navigationSettings: NavigationSettings;
@@ -60,12 +60,7 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ navigationSettings, s
         setIsSaving(true);
 
         try {
-            // Upsert navigation settings to Supabase
-            const { error } = await supabase
-                .from('navigation_settings')
-                .upsert({ id: 'main', ...formData }, { onConflict: 'id' });
-
-            if (error) throw error;
+            await adminRequest('/api/admin/navigation', 'PUT', formData);
 
             setNavigationSettings(formData);
             setIsSaved(true);

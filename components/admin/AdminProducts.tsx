@@ -2,8 +2,7 @@
 import React, { useState } from 'react';
 import { Edit, Trash2, Plus, Search, Check, X, Save, PlusCircle, MinusCircle, Image as ImageIcon, Youtube, Wand2, Sparkles } from 'lucide-react';
 import { Product, Category } from '../../types';
-import { GoogleGenAI } from "@google/genai";
-import { supabase } from '../../lib/supabaseClient';
+import { adminRequest } from '../../lib/adminApi';
 
 interface AdminProductsProps {
   products: Product[];
@@ -58,17 +57,11 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
   const handleDelete = async (id: number) => {
     if (confirm("Haqiqatan ham bu mahsulotni o'chirmoqchimisiz?")) {
       try {
-        const { error } = await supabase.from('products').delete().eq('id', id);
-
-        if (error) {
-          console.error('Error deleting product:', error);
-          alert("O'chirishda xatolik yuz berdi");
-          return;
-        }
-
+        await adminRequest('/api/admin/products', 'DELETE', { id });
         setProducts(prev => prev.filter(p => p.id !== id));
       } catch (err) {
         console.error('Error:', err);
+        alert("O'chirishda xatolik yuz berdi");
       }
     }
   };
@@ -81,42 +74,43 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
 
     setIsGenerating(true);
     try {
-      const env = import.meta.env || {};
-      const apiKey = env.VITE_GEMINI_API_KEY;
-      const ai = new GoogleGenAI({ apiKey: apiKey || '' });
-
       const prompt = `
-            You are a luxury product expert for an online store.
-            Product Name: "${formData.name}"
-            Category: "${formData.category}"
-            
-            Generate the following in Uzbek language (Latin script):
-            1. A short, premium, and catchy description (max 2 sentences).
-            2. 4 key technical specifications (specs) relevant to this product.
+          You are a luxury product expert for an online store.
+          Product Name: "${formData.name}"
+          Category: "${formData.category}"
+          
+          Generate the following in Uzbek language (Latin script):
+          1. A short, premium, and catchy description (max 2 sentences).
+          2. 4 key technical specifications (specs) relevant to this product.
 
-            Return JSON format:
-            {
-                "shortDescription": "...",
-                "specs": [
-                    {"label": "Material", "value": "..."},
-                    {"label": "...", "value": "..."}
-                ]
-            }
-        `;
+          Return JSON format:
+          {
+              "shortDescription": "...",
+              "specs": [
+                  {"label": "Material", "value": "..."},
+                  {"label": "...", "value": "..."}
+              ]
+          }
+      `;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-preview-09-2025',
-        contents: prompt,
-        config: { responseMimeType: 'application/json' }
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          responseMimeType: 'application/json'
+        }),
       });
 
-      const text = response.text;
-      if (text) {
-        const data = JSON.parse(text);
+      if (!response.ok) throw new Error('Proxy error');
+      const data = await response.json();
+
+      if (data.text) {
+        const parsedData = JSON.parse(data.text);
         setFormData(prev => ({
           ...prev,
-          shortDescription: data.shortDescription,
-          specs: data.specs
+          shortDescription: parsedData.shortDescription,
+          specs: parsedData.specs
         }));
       }
 
@@ -152,31 +146,16 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
 
     try {
       if (formData.id) {
-        // Update
-        const { data, error } = await supabase
-          .from('products')
-          .update(dataToSave)
-          .eq('id', formData.id)
-          .select();
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-          setProducts(prev => prev.map(p => p.id === formData.id ? (data[0] as Product) : p));
-        }
+        const result = await adminRequest<{ data: Product }>('/api/admin/products', 'PUT', {
+          id: formData.id,
+          ...dataToSave,
+        });
+        const saved = normalizeProduct(result.data);
+        setProducts(prev => prev.map(p => p.id === Number(formData.id) ? saved : p));
       } else {
-        // Insert - generate ID since DB doesn't auto-generate
-        const newId = `prod_${Date.now()}`;
-        const { data, error } = await supabase
-          .from('products')
-          .insert([{ id: newId, ...dataToSave }])
-          .select();
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-          setProducts(prev => [(data[0] as Product), ...prev]);
-        }
+        const result = await adminRequest<{ data: Product }>('/api/admin/products', 'POST', dataToSave);
+        const saved = normalizeProduct(result.data);
+        setProducts(prev => [saved, ...prev]);
       }
       setIsModalOpen(false);
     } catch (error) {
@@ -497,3 +476,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
 };
 
 export default AdminProducts;
+const normalizeProduct = (item: any): Product => ({
+  ...item,
+  id: Number(item.id),
+});

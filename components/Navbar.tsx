@@ -8,19 +8,20 @@ import { DEFAULT_NAVIGATION } from '../constants';
 
 interface NavbarProps {
   onNavigateHome: () => void;
+  onCategorySelect: (categoryName: string) => void;
   navigationSettings?: NavigationSettings;
   onProfileClick?: () => void;
   onSearchClick?: () => void;
   onWishlistClick?: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DEFAULT_NAVIGATION, onProfileClick, onSearchClick, onWishlistClick }) => {
+const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, onCategorySelect, navigationSettings = DEFAULT_NAVIGATION, onProfileClick, onSearchClick, onWishlistClick }) => {
   const { cartCount, toggleCart } = useCart();
   const { wishlist } = useWishlist();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleMobileLinkClick = () => {
-    onNavigateHome();
+  const handleMobileLinkClick = (label: string) => {
+    onCategorySelect(label);
     setIsMobileMenuOpen(false);
   };
 
@@ -59,7 +60,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
         {/* Desktop Links */}
         <div className="hidden md:flex gap-8 text-sm font-medium tracking-wide text-gray-300">
           {navigationSettings.menuItems.map((link) => (
-            <button key={link.id} onClick={onNavigateHome} className="hover:text-gold-400 transition-colors">
+            <button key={link.id} onClick={() => onCategorySelect(link.label)} className="hover:text-gold-400 transition-colors">
               {link.label}
             </button>
           ))}
@@ -137,7 +138,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
                   {navigationSettings.menuItems.map((link) => (
                     <button
                       key={link.id}
-                      onClick={handleMobileLinkClick}
+                      onClick={() => handleMobileLinkClick(link.label)}
                       className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 text-left text-white transition-colors group"
                     >
                       <span className="font-medium">{link.label}</span>
