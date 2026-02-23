@@ -12,7 +12,8 @@ export default async function handler(req: any, res: any) {
     }
 
     // Return the WebSocket URL with the key embedded
-    const model = 'gemini-2.5-flash-native-audio-preview-12-2025';
+    // Updated for February 2026: gemini-2.5-flash-native-audio is the stable choice
+    const model = 'gemini-2.5-flash-native-audio';
     const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
 
     res.status(200).json({ wsUrl, model });

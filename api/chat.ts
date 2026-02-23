@@ -37,8 +37,13 @@ export default async function handler(req: any, res: any) {
         return;
     }
 
-    // Try models in order of preference
-    const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    // Try models in order of preference (February 2026 update)
+    const models = [
+        'gemini-3-flash-preview',
+        'gemini-3.1-pro-preview',
+        'gemini-2.5-flash',
+        'gemini-2.0-flash'
+    ];
 
     for (const modelName of models) {
         try {

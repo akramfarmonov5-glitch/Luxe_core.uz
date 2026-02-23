@@ -20,7 +20,6 @@ import Wishlist from './components/Wishlist';
 import MetaPixel from './components/MetaPixel';
 import SearchModal from './components/SearchModal';
 import TelegramPopup from './components/TelegramPopup';
-import WhatsAppButton from './components/WhatsAppButton';
 import SaleBanner from './components/SaleBanner';
 import InstagramFeed from './components/InstagramFeed';
 import PushNotificationManager from './components/PushNotificationManager';
@@ -510,7 +509,6 @@ const AppContent: React.FC = () => {
       <AIChatAssistant products={products} />
 
       <TelegramPopup />
-      <WhatsAppButton />
 
       <SearchModal
         isOpen={isSearchOpen}
