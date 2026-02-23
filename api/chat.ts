@@ -39,7 +39,7 @@ export default async function handler(req: any, res: any) {
 
     try {
         const client = new GoogleGenAI({ apiKey });
-        const modelName = 'gemini-2.0-flash-exp'; // Using available model name for this SDK
+        const modelName = 'gemini-2.5-flash'; // Text chat model
 
         if (prompt) {
             // Static content generation (Product Detail, Admin, Blog)

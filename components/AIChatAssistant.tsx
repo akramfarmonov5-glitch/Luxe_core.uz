@@ -33,15 +33,13 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // Live audio refs
+  const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
-  const inputAudioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const sessionRef = useRef<any>(null);
+  const processorRef = useRef<ScriptProcessorNode | null>(null);
   const nextStartTimeRef = useRef<number>(0);
   const sourceNodesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
-
-  const currentInputTranscription = useRef<string>('');
-  const currentOutputTranscription = useRef<string>('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -124,7 +122,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
-          history: updatedMessages.slice(0, -1), // send previous messages as context
+          history: updatedMessages.slice(0, -1),
           systemInstruction: getSystemInstruction(),
         }),
       });
@@ -151,15 +149,197 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
     if (e.key === 'Enter') handleSend();
   };
 
+  // ========== GEMINI LIVE AUDIO ==========
   const connectLive = async () => {
-    setMessages(prev => [...prev, {
-      role: 'model',
-      text: t('chat.voice_test_only')
-    }]);
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+      setMessages(prev => [...prev, {
+        role: 'model',
+        text: language === 'uz'
+          ? '⚠️ Ovozli chat hozircha sozlanmagan. Iltimos, text chat ishlatib turing.'
+          : '⚠️ Голосовой чат пока не настроен. Пожалуйста, используйте текстовый чат.'
+      }]);
+      return;
+    }
+
+    try {
+      // Request microphone access
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+        }
+      });
+      streamRef.current = stream;
+
+      // Create audio context for playback
+      const playbackCtx = new AudioContext({ sampleRate: 24000 });
+      audioContextRef.current = playbackCtx;
+      nextStartTimeRef.current = 0;
+
+      // Connect WebSocket to Gemini Live API
+      const model = 'gemini-2.5-flash-native-audio-preview-12-2025';
+      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        console.log('[Live] WebSocket connected');
+
+        // Send setup message
+        const setupMsg = {
+          setup: {
+            model: `models/${model}`,
+            generationConfig: {
+              responseModalities: ['AUDIO'],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: {
+                    voiceName: 'Kore'
+                  }
+                }
+              }
+            },
+            systemInstruction: {
+              parts: [{ text: getSystemInstruction() }]
+            }
+          }
+        };
+        ws.send(JSON.stringify(setupMsg));
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.setupComplete) {
+            console.log('[Live] Setup complete, starting audio capture');
+            setIsLive(true);
+            setMessages(prev => [...prev, {
+              role: 'model',
+              text: language === 'uz'
+                ? '🎙️ Ovozli chat ulandi! Gaplashing...'
+                : '🎙️ Голосовой чат подключен! Говорите...'
+            }]);
+            startAudioCapture(ws, stream);
+            return;
+          }
+
+          // Handle audio response
+          if (data.serverContent?.modelTurn?.parts) {
+            for (const part of data.serverContent.modelTurn.parts) {
+              if (part.inlineData?.mimeType?.startsWith('audio/')) {
+                playAudioChunk(part.inlineData.data);
+              }
+              if (part.text) {
+                setMessages(prev => [...prev, { role: 'model', text: part.text }]);
+              }
+            }
+          }
+
+          // Handle turn complete
+          if (data.serverContent?.turnComplete) {
+            console.log('[Live] Turn complete');
+          }
+
+        } catch (err) {
+          console.error('[Live] Parse error:', err);
+        }
+      };
+
+      ws.onerror = (err) => {
+        console.error('[Live] WebSocket error:', err);
+        disconnectLive();
+      };
+
+      ws.onclose = () => {
+        console.log('[Live] WebSocket closed');
+        setIsLive(false);
+      };
+
+    } catch (error: any) {
+      console.error('[Live] Connection error:', error);
+      setMessages(prev => [...prev, {
+        role: 'model',
+        text: language === 'uz'
+          ? `⚠️ Mikrofonga ulanib bo'lmadi: ${error.message}`
+          : `⚠️ Не удалось подключить микрофон: ${error.message}`
+      }]);
+    }
+  };
+
+  const startAudioCapture = (ws: WebSocket, stream: MediaStream) => {
+    const inputCtx = new AudioContext({ sampleRate: 16000 });
+    const source = inputCtx.createMediaStreamSource(stream);
+    const processor = inputCtx.createScriptProcessor(4096, 1, 1);
+    processorRef.current = processor;
+
+    processor.onaudioprocess = (e) => {
+      if (ws.readyState !== WebSocket.OPEN) return;
+
+      const float32 = e.inputBuffer.getChannelData(0);
+      const int16 = new Int16Array(float32.length);
+      for (let i = 0; i < float32.length; i++) {
+        int16[i] = Math.max(-1, Math.min(1, float32[i])) * 32767;
+      }
+
+      const base64 = uint8ToBase64(new Uint8Array(int16.buffer));
+
+      const audioMsg = {
+        realtimeInput: {
+          mediaChunks: [{
+            data: base64,
+            mimeType: 'audio/pcm;rate=16000'
+          }]
+        }
+      };
+
+      ws.send(JSON.stringify(audioMsg));
+    };
+
+    source.connect(processor);
+    processor.connect(inputCtx.destination);
+  };
+
+  const playAudioChunk = (base64Data: string) => {
+    if (!audioContextRef.current) return;
+    const ctx = audioContextRef.current;
+
+    const bytes = base64ToUint8(base64Data);
+    const int16 = new Int16Array(bytes.buffer);
+    const float32 = new Float32Array(int16.length);
+
+    for (let i = 0; i < int16.length; i++) {
+      float32[i] = int16[i] / 32768.0;
+    }
+
+    const buffer = ctx.createBuffer(1, float32.length, 24000);
+    buffer.getChannelData(0).set(float32);
+
+    const sourceNode = ctx.createBufferSource();
+    sourceNode.buffer = buffer;
+    sourceNode.connect(ctx.destination);
+
+    const startTime = Math.max(ctx.currentTime, nextStartTimeRef.current);
+    sourceNode.start(startTime);
+    nextStartTimeRef.current = startTime + buffer.duration;
+
+    sourceNodesRef.current.add(sourceNode);
+    sourceNode.onended = () => {
+      sourceNodesRef.current.delete(sourceNode);
+    };
   };
 
   const disconnectLive = () => {
     setIsLive(false);
+
+    if (processorRef.current) {
+      processorRef.current.disconnect();
+      processorRef.current = null;
+    }
 
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
@@ -170,69 +350,35 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
-    if (inputAudioContextRef.current) {
-      inputAudioContextRef.current.close();
-      inputAudioContextRef.current = null;
+
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
     }
 
-    if (sessionRef.current) {
-      sessionRef.current.then((session: any) => {
-        if (session.close) session.close();
-      }).catch(() => { });
-      sessionRef.current = null;
-    }
-
+    sourceNodesRef.current.forEach(node => {
+      try { node.stop(); } catch { }
+    });
     sourceNodesRef.current.clear();
+    nextStartTimeRef.current = 0;
   };
 
-  function createBlob(data: Float32Array): { data: string, mimeType: string } {
-    const l = data.length;
-    const int16 = new Int16Array(l);
-    for (let i = 0; i < l; i++) {
-      int16[i] = Math.max(-1, Math.min(1, data[i])) * 32767;
-    }
-    return {
-      data: encode(new Uint8Array(int16.buffer)),
-      mimeType: 'audio/pcm;rate=16000',
-    };
-  }
-
-  function encode(bytes: Uint8Array) {
+  // Base64 helpers
+  function uint8ToBase64(bytes: Uint8Array): string {
     let binary = '';
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < bytes.byteLength; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
     return btoa(binary);
   }
 
-  function decode(base64: string) {
-    const binaryString = atob(base64);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
+  function base64ToUint8(base64: string): Uint8Array {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
     }
     return bytes;
-  }
-
-  async function decodeAudioData(
-    data: Uint8Array,
-    ctx: AudioContext,
-    sampleRate: number,
-    numChannels: number,
-  ): Promise<AudioBuffer> {
-    const dataInt16 = new Int16Array(data.buffer);
-    const frameCount = dataInt16.length / numChannels;
-    const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
-
-    for (let channel = 0; channel < numChannels; channel++) {
-      const channelData = buffer.getChannelData(channel);
-      for (let i = 0; i < frameCount; i++) {
-        channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
-      }
-    }
-    return buffer;
   }
 
   return (
