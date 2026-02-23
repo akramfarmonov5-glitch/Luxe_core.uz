@@ -102,8 +102,9 @@ export default async function handler(req: any, res: any) {
         .update(patch)
         .eq('id', id)
         .select()
-        .single();
+        .maybeSingle();
       if (error) throw error;
+      if (!data) return res.status(404).json({ error: 'Blog post not found' });
       return res.status(200).json({ data });
     }
 
