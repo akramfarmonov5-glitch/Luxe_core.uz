@@ -106,6 +106,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
 
   const videoId = getYoutubeId(product.videoUrl);
   const hasVideo = !!videoId;
+  const productUrl = `${window.location.origin}/product/${product.id}`;
 
   const handleOpenVideo = () => {
     setIsPlaying(false);
@@ -122,10 +123,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
       <Helmet>
         <title>{product.name} | LUXECORE Premium Store</title>
         <meta name="description" content={product.shortDescription || `Premium ${product.name} ${product.category} bo'limida. LUXECORE - O'zbekistondagi eksklyuziv do'kon.`} />
+        <link rel="canonical" href={productUrl} />
         <meta property="og:title" content={`${product.name} | LUXECORE`} />
         <meta property="og:description" content={product.shortDescription || `Sifatli ${product.name} mahsulotini LUXECORE do'konidan xarid qiling.`} />
         <meta property="og:image" content={product.image} />
-        <meta property="og:url" content={`${window.location.origin}/#product/${product.id}`} />
+        <meta property="og:url" content={productUrl} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org/",
@@ -139,8 +141,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
             },
             "offers": {
               "@type": "Offer",
-              "url": `${window.location.origin}/#product/${product.id}`,
-              "priceCurrency": "USD",
+              "url": productUrl,
+              "priceCurrency": "UZS",
               "price": product.price,
               "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
             }

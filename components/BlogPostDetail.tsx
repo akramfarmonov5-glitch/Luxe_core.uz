@@ -12,16 +12,18 @@ interface BlogPostDetailProps {
 
 const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
   const { t } = useLanguage();
+  const postUrl = `${window.location.origin}/blog/${post.id}`;
   return (
     <div className="pt-24 pb-20 min-h-screen bg-black text-white">
       <Helmet>
         <title>{post.title} | LUXECORE Blog</title>
         <meta name="description" content={post.seo?.description || post.content.substring(0, 160)} />
+        <link rel="canonical" href={postUrl} />
         <meta property="og:title" content={`${post.title} | LUXECORE`} />
         <meta property="og:description" content={post.seo?.description || post.content.substring(0, 160)} />
         <meta property="og:image" content={post.image} />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content={`${window.location.origin}/#blog/${post.id}`} />
+        <meta property="og:url" content={postUrl} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

@@ -43,14 +43,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
     >
       {/* Image Container */}
       <div
-        onClick={onNavigate}
         className="relative aspect-[3/4] w-full overflow-hidden bg-gray-900 cursor-pointer"
       >
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+        <a
+          href={`/product/${product.id}`}
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate();
+          }}
+          className="block w-full h-full"
+        >
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+        </a>
 
         {/* Product Badges */}
         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1.5 z-10">
@@ -82,11 +90,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
 
       {/* Content */}
       <div className="p-3 md:p-6 flex flex-col flex-grow">
-        <div className="flex-grow cursor-pointer" onClick={onNavigate}>
+        <div className="flex-grow">
           <span className="text-[9px] md:text-xs text-gray-500 uppercase tracking-wider">{product.category}</span>
-          <h3 className="text-sm md:text-lg font-medium text-white mt-0.5 md:mt-1 group-hover:text-gold-400 transition-colors line-clamp-1">
+          <a
+            href={`/product/${product.id}`}
+            onClick={(e) => {
+              e.preventDefault();
+              onNavigate();
+            }}
+            className="text-sm md:text-lg font-medium text-white mt-0.5 md:mt-1 group-hover:text-gold-400 transition-colors line-clamp-1 block"
+          >
             {product.name}
-          </h3>
+          </a>
         </div>
 
         <div className="flex items-center justify-between mt-2 md:mt-4">

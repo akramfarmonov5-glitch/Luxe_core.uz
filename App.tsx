@@ -73,7 +73,54 @@ const AppContent: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
   const [isAdminAuthLoading, setIsAdminAuthLoading] = useState(true);
+  const [isRouteHydrated, setIsRouteHydrated] = useState(false);
   const { toggleCart } = useCart();
+
+  const toCategorySlug = (value: string) => encodeURIComponent(
+    value.trim().toLowerCase().replace(/\s+/g, '-')
+  );
+
+  const fromCategorySlug = (slug: string): string | null => {
+    const normalized = slug.trim().toLowerCase();
+    let decoded = normalized;
+    try {
+      decoded = decodeURIComponent(normalized);
+    } catch {
+      decoded = normalized;
+    }
+    const matched = categories.find((cat) => {
+      const bySlug = toCategorySlug(cat.name).toLowerCase() === normalized;
+      const byName = cat.name.trim().toLowerCase() === decoded;
+      return bySlug || byName;
+    });
+    return matched?.name || null;
+  };
+
+  const routeToPath = (route: Route): string => {
+    switch (route.name) {
+      case 'HOME':
+        return '/';
+      case 'PRODUCT':
+        return `/product/${route.productId}`;
+      case 'BLOG_POST':
+        return `/blog/${route.postId}`;
+      case 'CHECKOUT':
+        return '/checkout';
+      case 'ADMIN':
+        return '/admin';
+      case 'TRACKING':
+        return '/tracking';
+      case 'WISHLIST':
+        return '/wishlist';
+    }
+  };
+
+  const isSameRoute = (a: Route, b: Route) => {
+    if (a.name !== b.name) return false;
+    if (a.name === 'PRODUCT' && b.name === 'PRODUCT') return a.productId === b.productId;
+    if (a.name === 'BLOG_POST' && b.name === 'BLOG_POST') return a.postId === b.postId;
+    return true;
+  };
 
   const isAllowedAdmin = (user: any) => {
     if (!user) return false;
@@ -126,29 +173,29 @@ const AppContent: React.FC = () => {
     };
   }, []);
 
-  // Sync state to URL Hash
+  // Sync state to URL Path
   useEffect(() => {
-    let hash = '';
-    switch (currentRoute.name) {
-      case 'HOME': hash = ''; break;
-      case 'PRODUCT': hash = `#product/${currentRoute.productId}`; break;
-      case 'BLOG_POST': hash = `#blog/${currentRoute.postId}`; break;
-      case 'CHECKOUT': hash = '#checkout'; break;
-      case 'ADMIN': hash = '#admin'; break;
-      case 'TRACKING': hash = '#tracking'; break;
-      case 'WISHLIST': hash = '#wishlist'; break;
+    if (!isRouteHydrated) return;
+
+    const targetPath = routeToPath(currentRoute);
+    const currentPath = window.location.pathname;
+
+    // Keep /shop (+query) for filtered home view.
+    if (currentRoute.name === 'HOME' && (currentPath === '/' || currentPath === '/shop')) {
+      return;
     }
 
-    if (window.location.hash !== hash) {
-      window.history.pushState(null, '', hash || '/');
+    if (currentPath !== targetPath) {
+      window.history.pushState(null, '', targetPath);
     }
-  }, [currentRoute]);
+  }, [currentRoute, isRouteHydrated]);
 
   // Handle Home Section Hashes
   useEffect(() => {
     const handleInitialHash = () => {
       const hash = window.location.hash;
-      if (hash === '#shop') {
+      const path = window.location.pathname;
+      if (hash === '#shop' || path === '/shop') {
         setTimeout(() => {
           document.getElementById('featured-products')?.scrollIntoView({ behavior: 'smooth' });
         }, 500);
@@ -161,35 +208,81 @@ const AppContent: React.FC = () => {
     handleInitialHash();
   }, []);
 
-  // Sync URL Hash to state (Initial load & Back button)
+  // Sync URL (path/hash) to state (initial load + back/forward)
   useEffect(() => {
-    const handleHashChange = () => {
+    const routeFromLocation = (): Route => {
       const hash = window.location.hash;
-      if (!hash || hash === '#') {
-        setCurrentRoute({ name: 'HOME' });
-      } else if (hash.startsWith('#product/')) {
+      const pathname = window.location.pathname;
+
+      // Legacy hash URLs -> path URLs
+      if (hash.startsWith('#product/')) {
         const id = Number(hash.replace('#product/', ''));
-        if (!isNaN(id)) setCurrentRoute({ name: 'PRODUCT', productId: id });
+        if (!isNaN(id)) {
+          window.history.replaceState(null, '', `/product/${id}`);
+          return { name: 'PRODUCT', productId: id };
+        }
       } else if (hash.startsWith('#blog/')) {
         const id = hash.replace('#blog/', '');
-        setCurrentRoute({ name: 'BLOG_POST', postId: id });
+        window.history.replaceState(null, '', `/blog/${id}`);
+        return { name: 'BLOG_POST', postId: id };
       } else if (hash === '#checkout') {
-        setCurrentRoute({ name: 'CHECKOUT' });
+        window.history.replaceState(null, '', '/checkout');
+        return { name: 'CHECKOUT' };
       } else if (hash === '#admin') {
-        setCurrentRoute({ name: 'ADMIN' });
+        window.history.replaceState(null, '', '/admin');
+        return { name: 'ADMIN' };
       } else if (hash === '#tracking') {
-        setCurrentRoute({ name: 'TRACKING' });
+        window.history.replaceState(null, '', '/tracking');
+        return { name: 'TRACKING' };
       } else if (hash === '#wishlist') {
-        setCurrentRoute({ name: 'WISHLIST' });
+        window.history.replaceState(null, '', '/wishlist');
+        return { name: 'WISHLIST' };
       }
+
+      if (pathname.startsWith('/product/')) {
+        const id = Number(pathname.replace('/product/', ''));
+        if (!isNaN(id)) return { name: 'PRODUCT', productId: id };
+      }
+
+      if (pathname.startsWith('/blog/')) {
+        const id = pathname.replace('/blog/', '');
+        return { name: 'BLOG_POST', postId: id };
+      }
+
+      if (pathname === '/checkout') return { name: 'CHECKOUT' };
+      if (pathname === '/admin') return { name: 'ADMIN' };
+      if (pathname === '/tracking') return { name: 'TRACKING' };
+      if (pathname === '/wishlist') return { name: 'WISHLIST' };
+
+      if (pathname === '/shop') {
+        const params = new URLSearchParams(window.location.search);
+        const slug = (params.get('category') || '').trim();
+        if (slug) {
+          const categoryName = fromCategorySlug(slug);
+          setSelectedCategory(categoryName || 'All');
+        } else {
+          setSelectedCategory('All');
+        }
+      }
+
+      return { name: 'HOME' };
     };
 
-    window.addEventListener('hashchange', handleHashChange);
-    // Initial check
-    handleHashChange();
+    const syncRouteFromLocation = () => {
+      const nextRoute = routeFromLocation();
+      setCurrentRoute(prev => (isSameRoute(prev, nextRoute) ? prev : nextRoute));
+      setIsRouteHydrated(true);
+    };
 
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+    window.addEventListener('popstate', syncRouteFromLocation);
+    window.addEventListener('hashchange', syncRouteFromLocation);
+    syncRouteFromLocation();
+
+    return () => {
+      window.removeEventListener('popstate', syncRouteFromLocation);
+      window.removeEventListener('hashchange', syncRouteFromLocation);
+    };
+  }, [categories]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -333,11 +426,25 @@ const AppContent: React.FC = () => {
 
   const handleCategorySelect = (categoryName: string) => {
     setSelectedCategory(categoryName);
-    const element = document.getElementById('featured-products');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      window.history.pushState(null, '', '#shop');
+
+    if (currentRoute.name !== 'HOME') {
+      setCurrentRoute({ name: 'HOME' });
     }
+
+    const url = categoryName === 'All'
+      ? '/shop'
+      : `/shop?category=${toCategorySlug(categoryName)}`;
+
+    if (`${window.location.pathname}${window.location.search}` !== url) {
+      window.history.pushState(null, '', url);
+    }
+
+    setTimeout(() => {
+      const element = document.getElementById('featured-products');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 80);
   };
 
   const handleAdminLogin = async (email: string, password: string): Promise<string | null> => {
@@ -474,11 +581,18 @@ const AppContent: React.FC = () => {
     );
   };
 
+  const canonicalPath = currentRoute.name === 'HOME' && window.location.pathname === '/shop'
+    ? `${window.location.pathname}${window.location.search}`
+    : routeToPath(currentRoute);
+  const canonicalUrl = `${window.location.origin}${canonicalPath}`;
+
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-gold-400 selection:text-black">
       <Helmet>
         <title>LUXECORE | Premium Store</title>
         <meta name="description" content={t('footer.about')} />
+        <link rel="canonical" href={canonicalUrl} />
+        <meta property="og:url" content={canonicalUrl} />
       </Helmet>
       <MetaPixel />
       {currentRoute.name !== 'CHECKOUT' && currentRoute.name !== 'ADMIN' && currentRoute.name !== 'TRACKING' && (

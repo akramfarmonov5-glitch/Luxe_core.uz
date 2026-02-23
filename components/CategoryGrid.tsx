@@ -11,6 +11,10 @@ interface CategoryGridProps {
 
 const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategory }) => {
   const { t } = useLanguage();
+  const toCategorySlug = (value: string) => encodeURIComponent(
+    value.trim().toLowerCase().replace(/\s+/g, '-')
+  );
+
   return (
     <section className="py-12 md:py-20 bg-black">
       <div className="container mx-auto px-4 md:px-6">
@@ -27,13 +31,17 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategor
         <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-6 auto-rows-[160px] md:auto-rows-[300px]">
           {/* Slice ko'paytirildi: 6 tagacha kategoriya sig'adi (1 ta katta + 5 ta kichik) */}
           {categories.slice(0, 6).map((category, index) => (
-            <motion.div
+            <motion.a
               key={category.id}
+              href={`/shop?category=${toCategorySlug(category.name)}`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
-              onClick={() => onSelectCategory(category.name)}
+              onClick={(e) => {
+                e.preventDefault();
+                onSelectCategory(category.name);
+              }}
               className={`group relative rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer border border-white/5 ${
                 // 1-element (index 0) 2x2 joy egallaydi. 3 ustunli gridda bu 2/3 qismni oladi.
                 index === 0 ? 'col-span-2 row-span-2' : 'col-span-1'
@@ -71,7 +79,7 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategor
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </motion.a>
           ))}
         </div>
       </div>

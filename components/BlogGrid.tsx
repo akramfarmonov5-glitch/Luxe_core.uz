@@ -35,13 +35,17 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick }) => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {displayPosts.map((post, index) => (
-            <motion.article
+            <motion.a
               key={post.id}
+              href={`/blog/${post.id}`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              onClick={() => onPostClick(post.id)}
+              onClick={(e) => {
+                e.preventDefault();
+                onPostClick(post.id);
+              }}
               className="group cursor-pointer flex flex-col h-full"
             >
               <div className="relative aspect-[16/10] overflow-hidden rounded-2xl mb-6">
@@ -68,7 +72,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick }) => {
                   {t('blog.read')} <ArrowRight size={16} className="text-gold-400" />
                 </span>
               </div>
-            </motion.article>
+            </motion.a>
           ))}
         </div>
 

@@ -12,31 +12,31 @@
 
   <!-- Categories -->
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#category/soatlar</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/shop?category=soatlar</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#category/sumkalar</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/shop?category=sumkalar</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#category/kozoynaklar</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/shop?category=kozoynaklar</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#category/parfyumeriya</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/shop?category=parfyumeriya</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#category/aksessuarlar</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/shop?category=aksessuarlar</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -44,7 +44,7 @@
 
   <!-- Products -->
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/1</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/1</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -54,7 +54,7 @@
     </image:image>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/2</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/2</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -64,43 +64,43 @@
     </image:image>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/3</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/3</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/4</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/4</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/5</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/5</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/6</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/6</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/7</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/7</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/8</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/8</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#product/9</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/product/9</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -108,7 +108,7 @@
 
   <!-- Tracking Page -->
   <url>
-    <loc>https://luxe-core-uz-three.vercel.app/#tracking</loc>
+    <loc>https://luxe-core-uz-three.vercel.app/tracking</loc>
     <lastmod>2026-02-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
