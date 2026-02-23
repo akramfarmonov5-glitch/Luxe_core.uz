@@ -151,18 +151,25 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
 
   // ========== GEMINI LIVE AUDIO ==========
   const connectLive = async () => {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
-      setMessages(prev => [...prev, {
-        role: 'model',
-        text: language === 'uz'
-          ? '⚠️ Ovozli chat hozircha sozlanmagan. Iltimos, text chat ishlatib turing.'
-          : '⚠️ Голосовой чат пока не настроен. Пожалуйста, используйте текстовый чат.'
-      }]);
-      return;
-    }
-
     try {
+      // Get WebSocket URL from server (keeps API key server-side)
+      const sessionRes = await fetch('/api/live-session');
+      if (!sessionRes.ok) {
+        throw new Error('Live session endpoint not available');
+      }
+      const sessionData = await sessionRes.json();
+      const { wsUrl, model } = sessionData;
+
+      if (!wsUrl) {
+        setMessages(prev => [...prev, {
+          role: 'model',
+          text: language === 'uz'
+            ? '⚠️ Ovozli chat hozircha sozlanmagan. Iltimos, text chat ishlatib turing.'
+            : '⚠️ Голосовой чат пока не настроен. Пожалуйста, используйте текстовый чат.'
+        }]);
+        return;
+      }
+
       // Request microphone access
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -180,9 +187,6 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
       nextStartTimeRef.current = 0;
 
       // Connect WebSocket to Gemini Live API
-      const model = 'gemini-2.5-flash-native-audio-preview-12-2025';
-      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
