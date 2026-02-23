@@ -42,10 +42,38 @@ export const trackAddToCart = (product: { id: number; name: string; price: numbe
   });
 };
 
-export const trackPurchase = (orderId: string, value: number, currency: string = 'UZS') => {
-  event('Purchase', {
+export const trackInitiateCheckout = (items: { id: number; name: string; price: number; quantity: number }[], total: number) => {
+  event('InitiateCheckout', {
+    content_ids: items.map(i => i.id.toString()),
+    contents: items.map(i => ({ id: i.id.toString(), quantity: i.quantity })),
+    content_type: 'product',
+    num_items: items.reduce((sum, i) => sum + i.quantity, 0),
+    value: total,
+    currency: 'UZS',
+  });
+};
+
+export const trackSearch = (searchQuery: string, resultsCount: number) => {
+  event('Search', {
+    search_string: searchQuery,
+    content_type: 'product',
+    contents: [],
+    value: 0,
+    currency: 'UZS',
+  });
+};
+
+export const trackPurchase = (orderId: string, value: number, currency: string = 'UZS', items?: { id: number; quantity: number }[]) => {
+  const params: any = {
     order_id: orderId,
     value: value,
     currency: currency,
-  });
+  };
+  if (items && items.length > 0) {
+    params.content_ids = items.map(i => i.id.toString());
+    params.contents = items.map(i => ({ id: i.id.toString(), quantity: i.quantity }));
+    params.content_type = 'product';
+    params.num_items = items.reduce((sum, i) => sum + i.quantity, 0);
+  }
+  event('Purchase', params);
 };

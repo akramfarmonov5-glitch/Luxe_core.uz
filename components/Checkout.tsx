@@ -123,7 +123,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
 
   const completeOrder = async (orderId: string, trackPurchase: boolean, note: string) => {
     if (trackPurchase) {
-      fpixel.trackPurchase(orderId, finalTotal, 'UZS');
+      fpixel.trackPurchase(orderId, finalTotal, 'UZS', cart.map(i => ({ id: i.id, quantity: i.quantity })));
     }
     setShowPaynetModal(false);
     setIsLoading(false);
@@ -136,6 +136,9 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
+    // Track InitiateCheckout event
+    fpixel.trackInitiateCheckout(cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })), finalTotal);
 
     const orderId = `ORD-${Date.now()}`;
     setPendingOrderId(orderId);
