@@ -6,8 +6,22 @@ interface ChatMessage {
 }
 
 export default async function handler(req: any, res: any) {
+    // GET = Live session (voice chat WebSocket URL)
+    if (req.method === 'GET') {
+        const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) {
+            res.status(500).json({ error: 'API key not configured' });
+            return;
+        }
+        const model = 'gemini-2.5-flash-native-audio';
+        const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
+        res.status(200).json({ wsUrl, model });
+        return;
+    }
+
+    // POST = Chat message
     if (req.method !== 'POST') {
-        res.setHeader('Allow', 'POST');
+        res.setHeader('Allow', 'GET, POST');
         res.status(405).json({ error: 'Method not allowed' });
         return;
     }

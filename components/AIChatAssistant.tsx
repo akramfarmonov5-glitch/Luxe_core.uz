@@ -153,7 +153,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   const connectLive = async () => {
     try {
       // Get WebSocket URL from server (keeps API key server-side)
-      const sessionRes = await fetch('/api/live-session');
+      const sessionRes = await fetch('/api/chat');
       if (!sessionRes.ok) {
         throw new Error('Live session endpoint not available');
       }
