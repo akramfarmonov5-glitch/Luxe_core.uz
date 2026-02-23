@@ -13,7 +13,6 @@ export async function handleContact(ctx: Context) {
         {
             parse_mode: 'Markdown',
             reply_markup: new InlineKeyboard()
-                .url('📞 Qo\'ng\'iroq', `tel:${config.CONTACT_PHONE}`)
                 .url('💬 Yozish', `https://t.me/${config.CONTACT_USERNAME.replace('@', '')}`)
                 .row()
                 .text(t(userId, 'btn_home'), 'home'),

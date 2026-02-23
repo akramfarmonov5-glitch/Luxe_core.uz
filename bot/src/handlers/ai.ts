@@ -47,7 +47,7 @@ export async function handleAiMessage(ctx: Context) {
             `Qisqa va foydali javoblar ber. Emoji ishlat. Sayt: ${config.SITE_URL}`;
 
         const model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-1.5-flash',
             systemInstruction,
         });
 
@@ -71,8 +71,17 @@ export async function handleAiMessage(ctx: Context) {
         });
     } catch (err: any) {
         console.error('AI error:', err?.message || err);
+        const lang = getLang(userId);
+        let errorMsg = t(userId, 'ai_error');
+
+        if (err?.message?.includes('429') || err?.message?.includes('quota')) {
+            errorMsg = lang === 'ru'
+                ? '😔 К сожалению, лимит запросов к ИИ на сегодня исчерпан. Пожалуйста, попробуйте завтра.'
+                : '😔 Afsuski, bugun uchun AI so\'rovlar limiti tugadi. Iltimos, ertaga qayta urinib ko\'ring.';
+        }
+
         await ctx.reply(
-            t(userId, 'ai_error'),
+            errorMsg,
             {
                 reply_markup: new InlineKeyboard()
                     .text('🔄 Qayta urinish', 'menu:ai')
