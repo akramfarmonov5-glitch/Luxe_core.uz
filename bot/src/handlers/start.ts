@@ -1,10 +1,15 @@
 import { Context } from 'grammy';
 import { mainMenuKeyboard } from '../keyboards';
 import { t } from '../i18n';
+import { ensureUser } from './profile';
 
 export async function handleStart(ctx: Context) {
     const userId = ctx.from?.id || 0;
     const name = ctx.from?.first_name || 'Foydalanuvchi';
+
+    // Register user in DB
+    await ensureUser(userId, name);
+
     await ctx.reply(
         `✨ *LUXECORE Premium Store*\n\n` +
         `Xush kelibsiz, ${name}!\n` +

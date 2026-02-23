@@ -28,6 +28,7 @@ export interface Order {
     date: string;
     paymentMethod: string;
     items?: CartItem[];
+    telegram_user_id?: number;
 }
 
 export interface CartItem {
@@ -44,6 +45,15 @@ export interface PromoCode {
     discount_percent: number;
     active: boolean;
     expires_at?: string;
+}
+
+export interface BotUser {
+    telegram_id: number;
+    name?: string;
+    phone?: string;
+    address?: string;
+    lang: string;
+    created_at?: string;
 }
 
 export type Lang = 'uz' | 'ru';

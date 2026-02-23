@@ -2,7 +2,7 @@ import { InlineKeyboard } from 'grammy';
 import { config } from '../config';
 import { t } from '../i18n';
 
-// ========== BOSH MENYU (Inline Keyboard with i18n) ==========
+// ========== BOSH MENYU ==========
 export function mainMenuKeyboard(userId: number) {
     return new InlineKeyboard()
         .webApp(t(userId, 'btn_shop'), config.SITE_URL)
@@ -11,12 +11,13 @@ export function mainMenuKeyboard(userId: number) {
         .text(t(userId, 'btn_categories'), 'menu:categories')
         .text(t(userId, 'btn_orders'), 'menu:orders')
         .row()
+        .text(t(userId, 'btn_profile'), 'menu:profile')
         .text(t(userId, 'btn_ai'), 'menu:ai')
+        .row()
         .text(t(userId, 'btn_contact'), 'menu:contact')
-        .row()
         .text(t(userId, 'btn_help'), 'menu:help')
-        .url(t(userId, 'btn_channel'), config.CHANNEL_URL)
         .row()
+        .url(t(userId, 'btn_channel'), config.CHANNEL_URL)
         .text(t(userId, 'btn_lang'), 'menu:lang');
 }
 
@@ -39,6 +40,18 @@ export function cartKeyboard(userId: number) {
         .text(t(userId, 'btn_clear_cart'), 'clear_cart')
         .row()
         .text(t(userId, 'btn_home'), 'home');
+}
+
+// ========== TO'LOV ==========
+export function paymentKeyboard(userId: number) {
+    const kb = new InlineKeyboard()
+        .text('💳 Kartadan kartaga', 'pay:card')
+        .row()
+        .text('💵 Naqd to\'lov', 'pay:cash');
+    if (config.PAYNET_LINK) {
+        kb.row().url('🏦 Paynet orqali', config.PAYNET_LINK);
+    }
+    return kb;
 }
 
 // ========== STATUS EMOJI ==========

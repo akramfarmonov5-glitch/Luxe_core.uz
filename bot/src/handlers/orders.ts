@@ -3,32 +3,20 @@ import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
 import { statusEmoji } from '../keyboards';
 import { t } from '../i18n';
-
-const orderPhoneState = new Map<number, boolean>();
-
-export function setOrderPhoneMode(userId: number) { orderPhoneState.set(userId, true); }
-export function isInOrderPhoneMode(userId: number): boolean { return orderPhoneState.has(userId); }
-export function clearOrderPhoneMode(userId: number) { orderPhoneState.delete(userId); }
+import { ensureUser } from './profile';
 
 export async function handleOrdersPrompt(ctx: Context) {
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     const userId = ctx.from?.id || 0;
-    setOrderPhoneMode(userId);
-    await ctx.reply(t(userId, 'orders_prompt'), { parse_mode: 'Markdown' });
-}
 
-export async function handleOrderPhone(ctx: Context) {
-    const userId = ctx.from?.id || 0;
-    let phone = ctx.message?.text?.trim() || '';
-    phone = phone.replace(/[\s\-\(\)]/g, '');
-    if (!phone.startsWith('+')) phone = '+' + phone;
-
-    clearOrderPhoneMode(userId);
+    await ensureUser(userId, ctx.from?.first_name);
 
     try {
+        // Now look up by telegram_user_id directly — no phone needed!
         const { data: orders, error } = await supabase
             .from('orders')
             .select('*')
-            .eq('phone', phone)
+            .eq('telegram_user_id', userId)
             .order('created_at', { ascending: false })
             .limit(10);
 
@@ -46,6 +34,7 @@ export async function handleOrderPhone(ctx: Context) {
             text += `${i + 1}. *#${o.id}*\n`;
             text += `   ${emoji} ${o.status}\n`;
             text += `   💰 ${Number(o.total).toLocaleString('uz-UZ')} UZS\n`;
+            text += `   💳 ${o.paymentMethod || '-'}\n`;
             text += `   📅 ${o.date}\n\n`;
         });
 

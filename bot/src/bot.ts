@@ -3,20 +3,22 @@ import { config } from './config';
 import { handleStart, handleHome } from './handlers/start';
 import { handleCategories, handleCategorySelect, handleCategoryPage } from './handlers/categories';
 import { handleSearchPrompt, handleSearchQuery, isInSearchMode, clearSearchMode } from './handlers/search';
-import { handleOrdersPrompt, handleOrderPhone, isInOrderPhoneMode, clearOrderPhoneMode } from './handlers/orders';
-import { handleAddToCart, handleShowCart, handleClearCart, handleCheckout, handleCheckoutInput, isInCheckoutMode, clearCheckoutMode, setBotInstance } from './handlers/cart';
+import { handleAddToCart, handleShowCart, handleClearCart, handleCheckout, handleCheckoutInput, isInCheckoutMode, clearCheckoutMode, setBotInstance, handleCartPlus, handleCartMinus, handleCartDelete, handlePayCard, handlePayCash } from './handlers/cart';
 import { handleAiPrompt, handleAiMessage, handleExitAi, isInAiMode, clearAiMode } from './handlers/ai';
 import { handleContact, handleHelp, handleChannel } from './handlers/info';
 import { handleLangPrompt, handleLangSet } from './handlers/lang';
-import { handleAdminAccept, handleAdminReject, handleStats } from './handlers/admin';
+import { handleAdminAccept, handleAdminReject, handleAdminShip, handleAdminDone, handleStats, handleUsers, handleAdminOrders, handleSetPrice, handleSetStock, setAdminBotRef } from './handlers/admin';
 import { handleAddPromo, handleDelPromo } from './handlers/promo';
 import { handleBroadcast, handleBroadcastAll } from './handlers/broadcast';
+import { handleProfile, handleProfileEdit, handleProfileInput, isInProfileMode, clearProfileMode } from './handlers/profile';
+import { handleNotifyAll } from './handlers/notify';
 
 export function createBot() {
     const bot = new Bot(config.BOT_TOKEN);
 
-    // Set bot instance for admin notifications
+    // Set bot instance for notifications
     setBotInstance(bot);
+    setAdminBotRef(bot);
 
     // Error handler
     bot.catch((err) => {
@@ -28,19 +30,24 @@ export function createBot() {
         const userId = ctx.from?.id;
         if (userId) {
             clearSearchMode(userId);
-            clearOrderPhoneMode(userId);
             clearCheckoutMode(userId);
             clearAiMode(userId);
+            clearProfileMode(userId);
         }
         return handleStart(ctx);
     });
 
     // Admin commands
     bot.command('stats', handleStats);
+    bot.command('users', handleUsers);
+    bot.command('orders', handleAdminOrders);
+    bot.command('setprice', handleSetPrice);
+    bot.command('setstock', handleSetStock);
     bot.command('broadcast', handleBroadcast);
     bot.command('broadcastall', handleBroadcastAll);
     bot.command('addpromo', handleAddPromo);
     bot.command('delpromo', handleDelPromo);
+    bot.command('notifyall', handleNotifyAll);
 
     // ========== INLINE MENU CALLBACKS ==========
     bot.callbackQuery('home', handleHome);
@@ -59,6 +66,10 @@ export function createBot() {
         ctx.answerCallbackQuery();
         return handleOrdersPrompt(ctx);
     });
+    bot.callbackQuery('menu:profile', (ctx) => {
+        ctx.answerCallbackQuery();
+        return handleProfile(ctx);
+    });
     bot.callbackQuery('menu:ai', (ctx) => {
         ctx.answerCallbackQuery();
         return handleAiPrompt(ctx);
@@ -76,10 +87,24 @@ export function createBot() {
     // Language
     bot.callbackQuery(/^lang:/, handleLangSet);
 
+    // Profile
+    bot.callbackQuery(/^profile:/, handleProfileEdit);
+
     // Admin order actions
     bot.callbackQuery(/^admin_accept:/, handleAdminAccept);
     bot.callbackQuery(/^admin_reject:/, handleAdminReject);
+    bot.callbackQuery(/^admin_ship:/, handleAdminShip);
+    bot.callbackQuery(/^admin_done:/, handleAdminDone);
     bot.callbackQuery(/^admin_call:/, (ctx) => ctx.answerCallbackQuery('📞 Telefon raqam nusxalandi'));
+
+    // Payment callbacks
+    bot.callbackQuery('pay:card', handlePayCard);
+    bot.callbackQuery('pay:cash', handlePayCash);
+
+    // Cart callbacks
+    bot.callbackQuery(/^cart_plus:/, handleCartPlus);
+    bot.callbackQuery(/^cart_minus:/, handleCartMinus);
+    bot.callbackQuery(/^cart_del:/, handleCartDelete);
 
     // Other callbacks
     bot.callbackQuery('show_categories', (ctx) => {
@@ -106,7 +131,7 @@ export function createBot() {
         if (!userId) return;
 
         if (isInCheckoutMode(userId)) return handleCheckoutInput(ctx);
-        if (isInOrderPhoneMode(userId)) return handleOrderPhone(ctx);
+        if (isInProfileMode(userId)) return handleProfileInput(ctx);
         if (isInSearchMode(userId)) return handleSearchQuery(ctx);
         if (isInAiMode(userId)) return handleAiMessage(ctx);
 
@@ -116,3 +141,6 @@ export function createBot() {
 
     return bot;
 }
+
+// Need to import handleOrdersPrompt
+import { handleOrdersPrompt } from './handlers/orders';

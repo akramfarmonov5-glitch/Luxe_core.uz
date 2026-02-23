@@ -9,4 +9,7 @@ export const config = {
     CONTACT_PHONE: process.env.CONTACT_PHONE || '+998996448444',
     CONTACT_USERNAME: process.env.CONTACT_USERNAME || '@Akramjon1984',
     ADMIN_ID: parseInt(process.env.ADMIN_ID || '819931801'),
+    CARD_NUMBER: process.env.CARD_NUMBER || '5614 6822 1912 1078',
+    CARD_HOLDER: process.env.CARD_HOLDER || 'AKRAMJON F.',
+    PAYNET_LINK: process.env.PAYNET_LINK || 'https://app.paynet.uz/?m=49156&i=4805742d-d76c-4b39-8c02-8ddf1c450f33&branchId=&actTypeId=',
 };
