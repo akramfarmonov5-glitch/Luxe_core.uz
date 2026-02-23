@@ -21,6 +21,7 @@ const getGeminiApiKey = (): string => {
 export default async function handler(req: any, res: any) {
     // GET = Live session (voice chat WebSocket URL)
     if (req.method === 'GET') {
+        res.setHeader('Cache-Control', 'no-store, max-age=0');
         const apiKey = getGeminiApiKey();
         if (!apiKey) {
             res.status(500).json({ error: 'API key not configured' });
@@ -63,12 +64,12 @@ export default async function handler(req: any, res: any) {
         return;
     }
 
-    // Try models in order of preference (February 2026 update)
+    // Try stable/cheaper models first to reduce quota failures on preview/pro tiers.
     const models = [
-        'gemini-3-flash-preview',
-        'gemini-3.1-pro-preview',
         'gemini-2.5-flash',
-        'gemini-2.0-flash'
+        'gemini-2.0-flash',
+        'gemini-3-flash-preview',
+        'gemini-3.1-pro-preview'
     ];
 
     for (const modelName of models) {
