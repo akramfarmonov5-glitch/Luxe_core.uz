@@ -18,8 +18,8 @@ messaging.onBackgroundMessage((payload) => {
     const notificationTitle = payload.notification?.title || 'LuxeCore';
     const notificationOptions = {
         body: payload.notification?.body || 'Yangi xabar!',
-        icon: '/logo.png',
-        badge: '/logo.png',
+        icon: '/logo.jpg',
+        badge: '/logo.jpg',
         data: payload.data
     };
 

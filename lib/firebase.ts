@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, getToken, onMessage, Messaging } from "firebase/messaging";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -11,17 +11,29 @@ const firebaseConfig = {
     measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+let app: any = null;
+let messaging: Messaging | null = null;
+
+try {
+    if (firebaseConfig.apiKey) {
+        app = initializeApp(firebaseConfig);
+        messaging = getMessaging(app);
+    }
+} catch (err) {
+    console.warn('Firebase initialization skipped:', err);
+}
 
 export const requestForToken = async () => {
+    if (!messaging) {
+        console.warn('Firebase messaging not initialized');
+        return null;
+    }
     try {
         const currentToken = await getToken(messaging, {
             vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
         });
         if (currentToken) {
             console.log('Current token for client: ', currentToken);
-            // In a real app, you'd send this to your server
             return currentToken;
         } else {
             console.log('No registration token available. Request permission to generate one.');
@@ -29,10 +41,15 @@ export const requestForToken = async () => {
     } catch (err) {
         console.log('An error occurred while retrieving token. ', err);
     }
+    return null;
 };
 
 export const onMessageListener = () =>
     new Promise((resolve) => {
+        if (!messaging) {
+            resolve(null);
+            return;
+        }
         onMessage(messaging, (payload) => {
             console.log("Payload received: ", payload);
             resolve(payload);
