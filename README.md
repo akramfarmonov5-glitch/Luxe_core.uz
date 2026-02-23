@@ -16,11 +16,14 @@ View your app in AI Studio: https://ai.studio/apps/drive/17_gOT7TjykOgLd5zG0BV24
 1. Install dependencies:
    `npm install`
 2. Set env values in `.env.local`:
-   - `VITE_GEMINI_API_KEY=...`
+   - `GEMINI_API_KEY=...` (required for `/api/chat`)
+   - `VITE_GEMINI_API_KEY=...` (optional fallback for browser-only/dev mode)
    - `VITE_SUPABASE_URL=...`
    - `VITE_SUPABASE_KEY=...`
    - `VITE_ADMIN_EMAILS=admin@example.com` (comma-separated if multiple)
-3. Run the app:
+3. Run with API routes (recommended):
+   `npx vercel dev`
+4. Frontend-only dev (no `/api/*` routes):
    `npm run dev`
 
 ## Security Setup (Supabase)

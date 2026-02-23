@@ -5,17 +5,29 @@ interface ChatMessage {
     text: string;
 }
 
+const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025';
+
+const getEnv = (key: string): string => {
+    if (typeof process !== 'undefined' && process.env && process.env[key]) {
+        return String(process.env[key]).trim();
+    }
+    return '';
+};
+
+const getGeminiApiKey = (): string => {
+    return getEnv('GEMINI_API_KEY') || getEnv('VITE_GEMINI_API_KEY');
+};
+
 export default async function handler(req: any, res: any) {
     // GET = Live session (voice chat WebSocket URL)
     if (req.method === 'GET') {
-        const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+        const apiKey = getGeminiApiKey();
         if (!apiKey) {
             res.status(500).json({ error: 'API key not configured' });
             return;
         }
-        const model = 'gemini-2.5-flash-native-audio-preview-12-2025';
         const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${apiKey}`;
-        res.status(200).json({ wsUrl, model });
+        res.status(200).json({ wsUrl, model: LIVE_MODEL });
         return;
     }
 
@@ -26,7 +38,7 @@ export default async function handler(req: any, res: any) {
         return;
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = getGeminiApiKey();
     if (!apiKey) {
         res.status(500).json({ error: 'AI tizimi sozlanmagan (API key topilmadi).' });
         return;

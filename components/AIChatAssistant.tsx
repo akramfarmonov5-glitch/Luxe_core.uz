@@ -15,6 +15,9 @@ interface AIChatAssistantProps {
   products: Product[];
 }
 
+const LIVE_MODEL = 'gemini-2.5-flash-native-audio-preview-12-2025';
+const LIVE_WS_BASE = 'wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent';
+
 const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +39,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   // Live audio refs
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const inputAudioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const nextStartTimeRef = useRef<number>(0);
@@ -116,14 +120,17 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
     setMessages(updatedMessages);
     setIsLoading(true);
 
+    const history = updatedMessages.slice(0, -1);
+    const systemInstruction = getSystemInstruction();
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
-          history: updatedMessages.slice(0, -1),
-          systemInstruction: getSystemInstruction(),
+          history,
+          systemInstruction,
         }),
       });
 
@@ -136,9 +143,25 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
       const text = data.text || t('chat.error_understanding');
 
       setMessages(prev => [...prev, { role: 'model', text }]);
-
     } catch (error) {
       console.error("AI Error:", error);
+
+      const fallbackKey = getLocalGeminiKey();
+      if (fallbackKey) {
+        try {
+          const text = await sendDirectTextChat({
+            apiKey: fallbackKey,
+            message: userMessage,
+            history,
+            systemInstruction
+          });
+          setMessages(prev => [...prev, { role: 'model', text }]);
+          return;
+        } catch (fallbackError) {
+          console.error('Direct Gemini fallback failed:', fallbackError);
+        }
+      }
+
       setMessages(prev => [...prev, { role: 'model', text: t('chat.error_generic') }]);
     } finally {
       setIsLoading(false);
@@ -149,24 +172,120 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
     if (e.key === 'Enter') handleSend();
   };
 
+  const pushLiveMessage = (uzText: string, ruText: string) => {
+    setMessages(prev => [...prev, {
+      role: 'model',
+      text: language === 'uz' ? uzText : ruText
+    }]);
+  };
+
+  const getLocalGeminiKey = () => {
+    const env = import.meta.env || {};
+    return (env.VITE_GEMINI_API_KEY || '').trim();
+  };
+
+  const sendDirectTextChat = async ({
+    apiKey,
+    message,
+    history,
+    systemInstruction
+  }: {
+    apiKey: string;
+    message: string;
+    history: Message[];
+    systemInstruction: string;
+  }): Promise<string> => {
+    const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+    const contents = [
+      ...history.map(msg => ({
+        role: msg.role === 'model' ? 'model' : 'user',
+        parts: [{ text: msg.text }]
+      })),
+      {
+        role: 'user',
+        parts: [{ text: message }]
+      }
+    ];
+
+    let lastError = 'Unknown error';
+
+    for (const modelName of models) {
+      try {
+        const directRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents,
+              systemInstruction: { parts: [{ text: systemInstruction }] }
+            })
+          }
+        );
+
+        if (!directRes.ok) {
+          const errPayload = await directRes.json().catch(() => ({}));
+          const errMsg = errPayload?.error?.message || `HTTP ${directRes.status}`;
+          lastError = `${modelName}: ${errMsg}`;
+          continue;
+        }
+
+        const payload = await directRes.json();
+        const text = (payload?.candidates?.[0]?.content?.parts || [])
+          .map((part: any) => part?.text || '')
+          .join('\n')
+          .trim();
+
+        if (text) {
+          return text;
+        }
+      } catch (err: any) {
+        lastError = `${modelName}: ${err?.message || String(err)}`;
+      }
+    }
+
+    throw new Error(lastError);
+  };
+
+  const resolveLiveSession = async (): Promise<{ wsUrl: string; model: string }> => {
+    try {
+      const sessionRes = await fetch('/api/chat');
+      if (sessionRes.ok) {
+        const sessionData = await sessionRes.json().catch(() => ({}));
+        if (sessionData?.wsUrl) {
+          return {
+            wsUrl: sessionData.wsUrl,
+            model: sessionData.model || LIVE_MODEL
+          };
+        }
+      } else {
+        console.warn('[Live] /api/chat returned', sessionRes.status);
+      }
+    } catch (err) {
+      console.warn('[Live] /api/chat fetch failed, trying VITE key fallback:', err);
+    }
+
+    const fallbackKey = getLocalGeminiKey();
+    if (fallbackKey) {
+      return {
+        wsUrl: `${LIVE_WS_BASE}?key=${fallbackKey}`,
+        model: LIVE_MODEL
+      };
+    }
+
+    throw new Error('Live session endpoint not available');
+  };
+
   // ========== GEMINI LIVE AUDIO ==========
   const connectLive = async () => {
     try {
-      // Get WebSocket URL from server (keeps API key server-side)
-      const sessionRes = await fetch('/api/chat');
-      if (!sessionRes.ok) {
-        throw new Error('Live session endpoint not available');
-      }
-      const sessionData = await sessionRes.json();
-      const { wsUrl, model } = sessionData;
+      const { wsUrl, model } = await resolveLiveSession();
 
       if (!wsUrl) {
-        setMessages(prev => [...prev, {
-          role: 'model',
-          text: language === 'uz'
-            ? '⚠️ Ovozli chat hozircha sozlanmagan. Iltimos, text chat ishlatib turing.'
-            : '⚠️ Голосовой чат пока не настроен. Пожалуйста, используйте текстовый чат.'
-        }]);
+        pushLiveMessage(
+          "Live chat sozlanmagan. Iltimos, matnli chatdan foydalaning.",
+          "Golosovoy chat ne nastroen. Pozhaluysta, ispol'zuyte tekstovyy chat."
+        );
         return;
       }
 
@@ -184,6 +303,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
       // Create audio context for playback
       const playbackCtx = new AudioContext({ sampleRate: 24000 });
       audioContextRef.current = playbackCtx;
+      await playbackCtx.resume();
       nextStartTimeRef.current = 0;
 
       // Connect WebSocket to Gemini Live API
@@ -219,15 +339,24 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
         try {
           const data = JSON.parse(event.data);
 
+          if (data.error) {
+            const errorText = data.error?.message || 'Unknown Live API error';
+            console.error('[Live] Server error:', data.error);
+            pushLiveMessage(
+              `Live chat xatosi: ${errorText}`,
+              `Oshibka golosovogo chata: ${errorText}`
+            );
+            disconnectLive();
+            return;
+          }
+
           if (data.setupComplete) {
             console.log('[Live] Setup complete, starting audio capture');
             setIsLive(true);
-            setMessages(prev => [...prev, {
-              role: 'model',
-              text: language === 'uz'
-                ? '🎙️ Ovozli chat ulandi! Gaplashing...'
-                : '🎙️ Голосовой чат подключен! Говорите...'
-            }]);
+            pushLiveMessage(
+              'Ovozli chat ulandi. Gaplashing.',
+              'Golosovoy chat podklyuchen. Govorite.'
+            );
             startAudioCapture(ws, stream);
             return;
           }
@@ -259,24 +388,25 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
         disconnectLive();
       };
 
-      ws.onclose = () => {
-        console.log('[Live] WebSocket closed');
+      ws.onclose = (event) => {
+        console.log('[Live] WebSocket closed', event.code, event.reason);
         setIsLive(false);
       };
 
     } catch (error: any) {
       console.error('[Live] Connection error:', error);
-      setMessages(prev => [...prev, {
-        role: 'model',
-        text: language === 'uz'
-          ? `⚠️ Mikrofonga ulanib bo'lmadi: ${error.message}`
-          : `⚠️ Не удалось подключить микрофон: ${error.message}`
-      }]);
+      pushLiveMessage(
+        `Mikrofonga ulanib bo'lmadi: ${error.message}`,
+        `Ne udalos' podklyuchit' mikrofon: ${error.message}`
+      );
     }
   };
 
   const startAudioCapture = (ws: WebSocket, stream: MediaStream) => {
     const inputCtx = new AudioContext({ sampleRate: 16000 });
+    inputAudioContextRef.current = inputCtx;
+    void inputCtx.resume().catch(() => { });
+
     const source = inputCtx.createMediaStreamSource(stream);
     const processor = inputCtx.createScriptProcessor(4096, 1, 1);
     processorRef.current = processor;
@@ -294,10 +424,10 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
 
       const audioMsg = {
         realtimeInput: {
-          mediaChunks: [{
+          audio: {
             data: base64,
             mimeType: 'audio/pcm;rate=16000'
-          }]
+          }
         }
       };
 
@@ -307,7 +437,6 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
     source.connect(processor);
     processor.connect(inputCtx.destination);
   };
-
   const playAudioChunk = (base64Data: string) => {
     if (!audioContextRef.current) return;
     const ctx = audioContextRef.current;
@@ -355,7 +484,15 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
       audioContextRef.current = null;
     }
 
+    if (inputAudioContextRef.current) {
+      inputAudioContextRef.current.close();
+      inputAudioContextRef.current = null;
+    }
+
     if (wsRef.current) {
+      if (wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({ realtimeInput: { audioStreamEnd: true } }));
+      }
       wsRef.current.close();
       wsRef.current = null;
     }
@@ -591,3 +728,4 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
 };
 
 export default AIChatAssistant;
+
