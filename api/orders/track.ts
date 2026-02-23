@@ -30,7 +30,9 @@ export default async function handler(req: any, res: any) {
   try {
     const body = parseBody(req);
     const phone = (body.phone || '').trim();
-    if (!phone) return res.status(400).json({ error: 'Phone is required' });
+    const orderId = (body.orderId || '').trim();
+
+    if (!phone && !orderId) return res.status(400).json({ error: 'Phone or Order ID is required' });
 
     const url = getEnv('SUPABASE_URL') || getEnv('VITE_SUPABASE_URL');
     const key = getEnv('SUPABASE_SERVICE_ROLE_KEY') || getEnv('SUPABASE_ANON_KEY') || getEnv('VITE_SUPABASE_KEY');
@@ -39,11 +41,20 @@ export default async function handler(req: any, res: any) {
 
     const supabase = createClient(url, key, { auth: { persistSession: false } });
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('orders')
-      .select('id, status, total, date, created_at, paymentMethod')
-      .eq('phone', phone)
+      .select('id, status, total, date, created_at, paymentMethod, customerName, items')
       .order('created_at', { ascending: false });
+
+    if (orderId) {
+      // Search by order ID (exact or partial match)
+      query = query.ilike('id', `%${orderId}%`);
+    } else {
+      // Search by phone
+      query = query.eq('phone', phone);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
     return res.status(200).json({ data: data || [] });

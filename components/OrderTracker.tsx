@@ -1,67 +1,94 @@
 import React, { useState } from 'react';
-import { Search, Package, Clock, Truck, CheckCircle, ArrowLeft } from 'lucide-react';
+import { Search, Package, Clock, Truck, CheckCircle, ArrowLeft, CreditCard, Banknote, Wallet, XCircle } from 'lucide-react';
 
 interface OrderTrackerProps {
   onBack: () => void;
 }
 
 const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState<'phone' | 'orderId'>('phone');
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<any[] | null>(null);
   const [searched, setSearched] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNumber) return;
+    if (!searchQuery) return;
 
     setLoading(true);
     setSearched(true);
-    
+
     try {
-        const response = await fetch('/api/orders/track', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: phoneNumber }),
-        });
+      const body: any = {};
+      if (searchType === 'phone') {
+        body.phone = searchQuery;
+      } else {
+        body.orderId = searchQuery;
+      }
 
-        if (!response.ok) {
-          throw new Error('Tracking request failed');
-        }
+      const response = await fetch('/api/orders/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
 
-        const json = await response.json();
-        setOrders(json.data || []);
+      if (!response.ok) {
+        throw new Error('Tracking request failed');
+      }
+
+      const json = await response.json();
+      setOrders(json.data || []);
     } catch (error) {
-        console.error("Search error:", error);
-        setOrders([]);
+      console.error("Search error:", error);
+      setOrders([]);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Kutilmoqda': return <Clock size={20} className="text-yellow-400" />;
+      case 'To\'landi': return <CheckCircle size={20} className="text-green-400" />;
       case 'Yetkazilmoqda': return <Truck size={20} className="text-blue-400" />;
       case 'Yakunlandi': return <CheckCircle size={20} className="text-green-400" />;
+      case 'Bekor qilindi': return <XCircle size={20} className="text-red-400" />;
       default: return <Package size={20} className="text-gray-400" />;
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Kutilmoqda': return 'text-yellow-400 bg-yellow-400/10';
+      case 'To\'landi': return 'text-green-400 bg-green-400/10';
+      case 'Yetkazilmoqda': return 'text-blue-400 bg-blue-400/10';
+      case 'Yakunlandi': return 'text-green-400 bg-green-400/10';
+      case 'Bekor qilindi': return 'text-red-400 bg-red-400/10';
+      default: return 'text-gray-400 bg-gray-400/10';
+    }
+  };
+
+  const getPaymentIcon = (method: string) => {
+    if (method?.includes('Paynet')) return <Wallet size={16} className="text-blue-400" />;
+    if (method?.includes('Karta')) return <CreditCard size={16} className="text-gold-400" />;
+    return <Banknote size={16} className="text-green-400" />;
+  };
+
   const formatDate = (dateString: string) => {
-      return new Date(dateString).toLocaleDateString('uz-UZ', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-      });
+    return new Date(dateString).toLocaleDateString('uz-UZ', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
     <div className="min-h-screen pt-24 pb-12 bg-black text-white">
       <div className="container mx-auto px-4 max-w-2xl">
-        <button 
+        <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors"
         >
@@ -72,85 +99,128 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Buyurtmani Kuzatish</h1>
           <p className="text-gray-400">
-            Buyurtma holatini tekshirish uchun xarid vaqtida kiritgan telefon raqamingizni yozing.
+            Buyurtma ID yoki telefon raqamingiz orqali buyurtmangiz holatini tekshiring.
           </p>
         </div>
 
         <div className="bg-zinc-900 border border-white/10 p-6 md:p-8 rounded-3xl shadow-2xl mb-10">
+          {/* Search type toggle */}
+          <div className="flex gap-2 mb-4">
+            <button
+              type="button"
+              onClick={() => { setSearchType('phone'); setSearchQuery(''); }}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${searchType === 'phone' ? 'bg-gold-400 text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+            >
+              📱 Telefon
+            </button>
+            <button
+              type="button"
+              onClick={() => { setSearchType('orderId'); setSearchQuery(''); }}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${searchType === 'orderId' ? 'bg-gold-400 text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+            >
+              📋 Buyurtma ID
+            </button>
+          </div>
+
           <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-lg">+998</span>
-               <input 
-                 type="tel" 
-                 value={phoneNumber}
-                 onChange={(e) => setPhoneNumber(e.target.value)}
-                 placeholder="90 123 45 67"
-                 className="w-full bg-black border border-white/20 rounded-xl pl-16 pr-4 py-4 text-lg text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all"
-                 required
-               />
+              {searchType === 'phone' && (
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-lg">+998</span>
+              )}
+              <input
+                type={searchType === 'phone' ? 'tel' : 'text'}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={searchType === 'phone' ? '90 123 45 67' : 'ORD-1234567890'}
+                className={`w-full bg-black border border-white/20 rounded-xl ${searchType === 'phone' ? 'pl-16' : 'pl-4'} pr-4 py-4 text-lg text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all`}
+                required
+              />
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="bg-gold-400 text-black font-bold py-4 px-8 rounded-xl hover:bg-gold-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
-                  <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
+                <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
               ) : (
-                  <>
-                    <Search size={20} /> Kuzatish
-                  </>
+                <>
+                  <Search size={20} /> Kuzatish
+                </>
               )}
             </button>
           </form>
         </div>
 
         {searched && !loading && (
-            <div className="space-y-6">
-                {orders && orders.length > 0 ? (
-                    <>
-                        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                            <Package className="text-gold-400" />
-                            Topilgan Buyurtmalar ({orders.length})
-                        </h2>
-                        {orders.map((order) => (
-                            <div key={order.id} className="bg-zinc-900 border border-white/10 rounded-2xl p-6 hover:border-gold-400/30 transition-all">
-                                <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-white/5 pb-4">
-                                    <div>
-                                        <span className="text-xs text-gray-500 block mb-1">Buyurtma ID</span>
-                                        <span className="font-mono text-white font-medium">{order.id.slice(0, 8)}...</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full w-fit">
-                                        {getStatusIcon(order.status || 'Kutilmoqda')}
-                                        <span className="text-sm font-medium">{order.status || 'Kutilmoqda'}</span>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="text-xs text-gray-500 block mb-1">Sana</span>
-                                        <span className="text-sm text-white">{formatDate(order.created_at)}</span>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-4">
-                                        <span className="text-gray-400">Jami to'lov:</span>
-                                        <span className="text-lg font-bold text-gold-400">
-                                            {new Intl.NumberFormat('uz-UZ').format(order.total || 0)} UZS
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </>
-                ) : (
-                    <div className="text-center py-12 bg-zinc-900/50 rounded-3xl border border-white/5 border-dashed">
-                        <Package size={48} className="text-gray-600 mx-auto mb-4" />
-                        <h3 className="text-xl font-medium text-white mb-2">Buyurtmalar topilmadi</h3>
-                        <p className="text-gray-400 max-w-xs mx-auto">
-                            Ushbu raqamga rasmiylashtirilgan buyurtmalar mavjud emas. Raqamni to'g'ri kiritganingizni tekshiring.
-                        </p>
+          <div className="space-y-6">
+            {orders && orders.length > 0 ? (
+              <>
+                <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <Package className="text-gold-400" />
+                  Topilgan Buyurtmalar ({orders.length})
+                </h2>
+                {orders.map((order) => (
+                  <div key={order.id} className="bg-zinc-900 border border-white/10 rounded-2xl p-6 hover:border-gold-400/30 transition-all">
+                    <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-white/5 pb-4">
+                      <div>
+                        <span className="text-xs text-gray-500 block mb-1">Buyurtma ID</span>
+                        <span className="font-mono text-white font-medium">{order.id}</span>
+                      </div>
+                      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full w-fit ${getStatusColor(order.status || 'Kutilmoqda')}`}>
+                        {getStatusIcon(order.status || 'Kutilmoqda')}
+                        <span className="text-sm font-medium">{order.status || 'Kutilmoqda'}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-gray-500 block mb-1">Sana</span>
+                        <span className="text-sm text-white">{formatDate(order.created_at)}</span>
+                      </div>
                     </div>
-                )}
-            </div>
+
+                    {/* Payment method */}
+                    {order.paymentMethod && (
+                      <div className="flex items-center gap-2 mb-3 text-sm text-gray-400">
+                        {getPaymentIcon(order.paymentMethod)}
+                        <span>To'lov: {order.paymentMethod}</span>
+                      </div>
+                    )}
+
+                    {/* Order items */}
+                    {order.items && Array.isArray(order.items) && order.items.length > 0 && (
+                      <div className="mb-4 bg-black/30 rounded-xl p-4 space-y-2">
+                        <span className="text-xs text-gray-500 block mb-2">Mahsulotlar:</span>
+                        {order.items.map((item: any, i: number) => (
+                          <div key={i} className="flex justify-between text-sm">
+                            <span className="text-gray-300">{item.name} x{item.quantity}</span>
+                            <span className="text-gray-400">{new Intl.NumberFormat('uz-UZ').format((item.price || 0) * (item.quantity || 1))} UZS</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-4">
+                        <span className="text-gray-400">Jami to'lov:</span>
+                        <span className="text-lg font-bold text-gold-400">
+                          {new Intl.NumberFormat('uz-UZ').format(order.total || 0)} UZS
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <div className="text-center py-12 bg-zinc-900/50 rounded-3xl border border-white/5 border-dashed">
+                <Package size={48} className="text-gray-600 mx-auto mb-4" />
+                <h3 className="text-xl font-medium text-white mb-2">Buyurtmalar topilmadi</h3>
+                <p className="text-gray-400 max-w-xs mx-auto">
+                  {searchType === 'phone'
+                    ? "Ushbu raqamga rasmiylashtirilgan buyurtmalar mavjud emas."
+                    : "Bunday ID bilan buyurtma topilmadi. ID ni to'g'ri kiritganingizni tekshiring."}
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

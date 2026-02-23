@@ -15,8 +15,9 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [successNote, setSuccessNote] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'paynet' | 'cash'>('paynet');
+  const [paymentMethod, setPaymentMethod] = useState<'paynet' | 'cash' | 'card'>('paynet');
   const [showPaynetModal, setShowPaynetModal] = useState(false);
+  const [showCardModal, setShowCardModal] = useState(false);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
 
   const [promoCode, setPromoCode] = useState('');
@@ -37,6 +38,8 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const PAYNET_URL = "https://app.paynet.uz/?m=49156&i=4805742d-d76c-4b39-8c02-8ddf1c450f33&branchId=&actTypeId=144";
   const PAYNET_QR_IMAGE = "/images/paynet-qr.jpg";
   const QR_FALLBACK = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(PAYNET_URL)}&color=000000&bgcolor=ffffff`;
+  const CARD_NUMBER = '5614 6822 1912 1078';
+  const CARD_HOLDER = 'AKRAMJON F.';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -159,6 +162,10 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
         setIsLoading(false);
         return;
       }
+    } else if (paymentMethod === 'card') {
+      setShowCardModal(true);
+      setIsLoading(false);
+      return;
     } else {
       setTimeout(
         () => completeOrder(orderId, true, "Buyurtmangiz qabul qilindi. Menejerlarimiz tez orada siz bilan bog'lanishadi."),
@@ -273,15 +280,20 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
 
               <div className="space-y-3 pt-2">
                 <label className="text-sm text-gray-400">To'lov usuli</label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                   <button type="button" onClick={() => setPaymentMethod('paynet')} className={`relative p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all duration-300 ${paymentMethod === 'paynet' ? 'bg-gold-500/10 border-gold-400 text-gold-400 ring-1 ring-gold-400' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'}`}>
-                    <Wallet size={24} />
-                    <span className="font-medium text-sm">Paynet (Onlayn)</span>
+                    <Wallet size={22} />
+                    <span className="font-medium text-xs">Paynet</span>
                     {paymentMethod === 'paynet' && <motion.div layoutId="check" className="absolute top-2 right-2 w-2 h-2 bg-gold-400 rounded-full" />}
                   </button>
+                  <button type="button" onClick={() => setPaymentMethod('card')} className={`relative p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all duration-300 ${paymentMethod === 'card' ? 'bg-gold-500/10 border-gold-400 text-gold-400 ring-1 ring-gold-400' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'}`}>
+                    <CreditCard size={22} />
+                    <span className="font-medium text-xs">Karta</span>
+                    {paymentMethod === 'card' && <motion.div layoutId="check" className="absolute top-2 right-2 w-2 h-2 bg-gold-400 rounded-full" />}
+                  </button>
                   <button type="button" onClick={() => setPaymentMethod('cash')} className={`relative p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all duration-300 ${paymentMethod === 'cash' ? 'bg-gold-500/10 border-gold-400 text-gold-400 ring-1 ring-gold-400' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'}`}>
-                    <Banknote size={24} />
-                    <span className="font-medium text-sm">Naqd (Qabulda)</span>
+                    <Banknote size={22} />
+                    <span className="font-medium text-xs">Naqd</span>
                     {paymentMethod === 'cash' && <motion.div layoutId="check" className="absolute top-2 right-2 w-2 h-2 bg-gold-400 rounded-full" />}
                   </button>
                 </div>
@@ -389,6 +401,43 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
                 </button>
                 <a href={PAYNET_URL} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-colors text-sm"><ExternalLink size={16} /> Havolani ochish</a>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Card-to-Card Payment Modal */}
+      <AnimatePresence>
+        {showCardModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCardModal(false)} className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-dark-900 border border-gold-400/30 rounded-3xl p-8 max-w-md w-full text-center shadow-[0_0_50px_rgba(251,191,36,0.1)] flex flex-col items-center">
+              <button onClick={() => setShowCardModal(false)} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+                <X size={20} />
+              </button>
+              <div className="w-16 h-16 bg-gold-400/10 rounded-full flex items-center justify-center mb-6 ring-1 ring-gold-400/30">
+                <CreditCard size={32} className="text-gold-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Kartadan kartaga</h2>
+              <p className="text-gray-400 text-sm mb-6">Quyidagi karta raqamiga to'lov qiling va "To'lov qildim" tugmasini bosing.</p>
+              <div className="w-full bg-black/50 border border-white/10 rounded-2xl p-6 mb-4">
+                <p className="text-gray-400 text-xs mb-2">Karta raqam</p>
+                <p className="text-2xl font-mono font-bold text-white tracking-wider mb-4">{CARD_NUMBER}</p>
+                <p className="text-gray-400 text-xs mb-1">Karta egasi</p>
+                <p className="text-lg font-medium text-gold-400">{CARD_HOLDER}</p>
+              </div>
+              <button
+                onClick={() => { navigator.clipboard?.writeText(CARD_NUMBER.replace(/\s/g, '')); showToast('Karta raqam nusxalandi!', 'success'); }}
+                className="w-full mb-3 py-3 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-colors text-sm"
+              >
+                📋 Raqamni nusxalash
+              </button>
+              <button
+                onClick={() => pendingOrderId && completeOrder(pendingOrderId, false, "To'lov tekshiruvga yuborildi. Menejer to'lovni tasdiqlagach buyurtma holati yangilanadi.")}
+                className="w-full bg-gold-400 text-black font-bold py-3.5 rounded-xl hover:bg-gold-500 transition-colors"
+              >
+                ✅ To'lov qildim
+              </button>
             </motion.div>
           </div>
         )}

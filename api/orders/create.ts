@@ -58,7 +58,7 @@ export default async function handler(req: any, res: any) {
     const phone = (body.phone || '').trim();
     const city = (body.city || '').trim();
     const address = (body.address || '').trim();
-    const paymentMethod = body.paymentMethod === 'paynet' ? 'Paynet' : 'Naqd';
+    const paymentMethod = body.paymentMethod === 'paynet' ? 'Paynet' : body.paymentMethod === 'card' ? 'Kartadan kartaga' : 'Naqd';
     const total = Number(body.total || 0);
     const cart = Array.isArray(body.cart) ? body.cart : [];
 
@@ -91,6 +91,7 @@ export default async function handler(req: any, res: any) {
         status: 'Kutilmoqda',
         date: dateStr,
         paymentMethod,
+        items: cart,
       });
 
     if (error) {
