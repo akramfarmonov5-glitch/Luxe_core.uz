@@ -11,6 +11,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
 import Breadcrumbs from './Breadcrumbs';
 import ProductCard from './ProductCard';
+import ProductReviews from './ProductReviews';
 import * as fpixel from '../lib/fpixel';
 
 interface ProductDetailProps {
@@ -356,6 +357,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
             </div>
           </motion.div>
         )}
+
+        {/* Product Reviews */}
+        <div className="container mx-auto max-w-6xl">
+          <ProductReviews productId={product.id} productName={product.name} />
+        </div>
       </div>
 
       <AnimatePresence>

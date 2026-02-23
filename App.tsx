@@ -20,6 +20,8 @@ import Wishlist from './components/Wishlist';
 import MetaPixel from './components/MetaPixel';
 import SearchModal from './components/SearchModal';
 import TelegramPopup from './components/TelegramPopup';
+import WhatsAppButton from './components/WhatsAppButton';
+import SaleBanner from './components/SaleBanner';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, DEFAULT_HERO_CONTENT, DEFAULT_NAVIGATION } from './constants';
 import { CartProvider, useCart } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -454,6 +456,7 @@ const AppContent: React.FC = () => {
           categories={categories}
           onSelectCategory={handleCategorySelect}
         />
+        <SaleBanner onShopNow={() => handleCategorySelect('All')} />
         <FeaturedProducts
           products={products}
           categories={categories}
@@ -501,6 +504,7 @@ const AppContent: React.FC = () => {
       <AIChatAssistant products={products} />
 
       <TelegramPopup />
+      <WhatsAppButton />
 
       <SearchModal
         isOpen={isSearchOpen}
