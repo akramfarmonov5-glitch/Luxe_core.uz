@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LayoutDashboard, Package, ShoppingCart, FileText, LogOut, Layers, Image as ImageIcon, Menu, Users } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCategories from './AdminCategories';
@@ -20,35 +21,36 @@ interface AdminLayoutProps {
   setHeroContent: React.Dispatch<React.SetStateAction<HeroContent>>;
   navigationSettings?: NavigationSettings;
   setNavigationSettings?: React.Dispatch<React.SetStateAction<NavigationSettings>>;
-  blogPosts?: BlogPost[]; 
+  blogPosts?: BlogPost[];
   setBlogPosts?: React.Dispatch<React.SetStateAction<BlogPost[]>>;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ 
-    onLogout, 
-    products, 
-    setProducts, 
-    categories, 
-    setCategories,
-    heroContent,
-    setHeroContent,
-    navigationSettings,
-    setNavigationSettings,
-    blogPosts,
-    setBlogPosts
+const AdminLayout: React.FC<AdminLayoutProps> = ({
+  onLogout,
+  products,
+  setProducts,
+  categories,
+  setCategories,
+  heroContent,
+  setHeroContent,
+  navigationSettings,
+  setNavigationSettings,
+  blogPosts,
+  setBlogPosts
 }) => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'orders' | 'leads' | 'blog' | 'hero' | 'navigation'>('dashboard');
 
   // Navigation Items
   const navItems = [
-    { id: 'dashboard', label: 'Statistika', icon: LayoutDashboard },
-    { id: 'orders', label: 'Buyurtmalar (CRM)', icon: ShoppingCart },
-    { id: 'leads', label: 'Mijozlar (Chat)', icon: Users }, // New Tab
-    { id: 'products', label: 'Mahsulotlar', icon: Package },
-    { id: 'categories', label: 'Kategoriyalar', icon: Layers },
-    { id: 'blog', label: 'SEO Blog & AI', icon: FileText },
-    { id: 'hero', label: 'Banner (Hero)', icon: ImageIcon },
-    { id: 'navigation', label: 'Navigatsiya', icon: Menu },
+    { id: 'dashboard', label: t('admin.stats'), icon: LayoutDashboard },
+    { id: 'orders', label: t('admin.orders'), icon: ShoppingCart },
+    { id: 'leads', label: t('admin.leads'), icon: Users }, // New Tab
+    { id: 'products', label: t('admin.products'), icon: Package },
+    { id: 'categories', label: t('admin.categories'), icon: Layers },
+    { id: 'blog', label: t('admin.blog_ai'), icon: FileText },
+    { id: 'hero', label: t('admin.hero_banner'), icon: ImageIcon },
+    { id: 'navigation', label: t('admin.navigation'), icon: Menu },
   ];
 
   const renderContent = () => {
@@ -59,13 +61,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         return <AdminHero heroContent={heroContent} setHeroContent={setHeroContent} />;
       case 'navigation':
         if (navigationSettings && setNavigationSettings) {
-            return (
-                <AdminNavigation 
-                    navigationSettings={navigationSettings} 
-                    setNavigationSettings={setNavigationSettings} 
-                    categories={categories} 
-                />
-            );
+          return (
+            <AdminNavigation
+              navigationSettings={navigationSettings}
+              setNavigationSettings={setNavigationSettings}
+              categories={categories}
+            />
+          );
         }
         return <div>Loading...</div>;
       case 'categories':
@@ -78,7 +80,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         return <AdminLeads />;
       case 'blog':
         if (blogPosts && setBlogPosts) {
-            return <AdminBlog posts={blogPosts} setPosts={setBlogPosts} />;
+          return <AdminBlog posts={blogPosts} setPosts={setBlogPosts} />;
         }
         return <div>Blog posts loading...</div>;
       default:
@@ -94,7 +96,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           <h1 className="text-2xl font-bold tracking-wider text-white">
             LUXE<span className="text-gold-400">ADMIN</span>
           </h1>
-          <p className="text-xs text-gray-500 mt-1">Management Console</p>
+          <p className="text-xs text-gray-500 mt-1">{t('admin.console')}</p>
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
@@ -102,11 +104,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id as any)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                activeTab === item.id 
-                  ? 'bg-gold-500/10 text-gold-400 border border-gold-500/20' 
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeTab === item.id
+                  ? 'bg-gold-500/10 text-gold-400 border border-gold-500/20'
                   : 'text-gray-400 hover:bg-white/5 hover:text-white'
-              }`}
+                }`}
             >
               <item.icon size={20} />
               <span className="font-medium">{item.label}</span>
@@ -115,12 +116,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         </nav>
 
         <div className="p-4 border-t border-white/10">
-          <button 
+          <button
             onClick={onLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-colors"
           >
             <LogOut size={20} />
-            <span>Chiqish</span>
+            <span>{t('admin.logout')}</span>
           </button>
         </div>
       </aside>

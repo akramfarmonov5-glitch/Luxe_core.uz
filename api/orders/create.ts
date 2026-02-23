@@ -26,6 +26,96 @@ const sendTelegram = async (text: string) => {
   });
 };
 
+const sendOrderEmail = async (orderData: any) => {
+  const apiKey = getEnv('RESEND_API_KEY') || getEnv('VITE_RESEND_API_KEY');
+  if (!apiKey) return;
+
+  const { orderId, firstName, lastName, phone, city, address, total, cart, email } = orderData;
+
+  const cartItemsHtml = cart.map((item: any) => `
+        <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.name}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">${item.quantity}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">${formatPrice(item.price * item.quantity)}</td>
+        </tr>
+    `).join('');
+
+  const html = `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e1e1e1; border-radius: 10px;">
+            <h2 style="color: #333; text-align: center;">LUXECORE</h2>
+            <p>Assalomu alaykum, <strong>${firstName} ${lastName}</strong>!</p>
+            <p>Buyurtmangiz muvaffaqiyatli qabul qilindi. Tez orada operatorlarimiz siz bilan bog'lanishadi.</p>
+            
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <p><strong>Buyurtma ID:</strong> ${orderId}</p>
+                <p><strong>Sana:</strong> ${new Date().toLocaleDateString('uz-UZ')}</p>
+                <p><strong>Telefon:</strong> ${phone}</p>
+                <p><strong>Manzil:</strong> ${city}, ${address}</p>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #333; color: #fff;">
+                        <th style="padding: 10px; text-align: left;">Mahsulot</th>
+                        <th style="padding: 10px; text-align: left;">Soni</th>
+                        <th style="padding: 10px; text-align: left;">Narxi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${cartItemsHtml}
+                </tbody>
+            </table>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <h3>Jami: ${formatPrice(total)}</h3>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0;" />
+            <p style="font-size: 12px; color: #666; text-align: center;">
+                Savollaringiz bo'lsa, @luxecore_admin bilan bog'laning.<br/>
+                Luxecore - Sifat va nafosat maskani.
+            </p>
+        </div>
+    `;
+
+  try {
+    // Customer email
+    if (email) {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'LUXECORE <onboarding@resend.dev>',
+          to: [email],
+          subject: `Buyurtmangiz qabul qilindi! (#${orderId})`,
+          html: html,
+        }),
+      });
+    }
+
+    // Admin notification email
+    const adminEmail = getEnv('ADMIN_EMAIL') || 'akramfarmonov5@gmail.com';
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: 'LUXECORE <onboarding@resend.dev>',
+        to: [adminEmail],
+        subject: `Yangi Buyurtma! (#${orderId})`,
+        html: html.replace('Assalomu alaykum', 'Yangi buyurtma tushdi'),
+      }),
+    });
+  } catch (error) {
+    console.error('Email sending failed:', error);
+  }
+};
+
 export default async function handler(req: any, res: any) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -126,8 +216,19 @@ export default async function handler(req: any, res: any) {
 
     try {
       await sendTelegram(telegramText);
+      await sendOrderEmail({
+        orderId,
+        firstName,
+        lastName,
+        phone,
+        city,
+        address,
+        total,
+        cart,
+        email: body.email || '', // Client pass email in payload
+      });
     } catch (notifyError) {
-      console.error('Telegram notify error:', notifyError);
+      console.error('Notification error:', notifyError);
     }
 
     res.status(200).json({ data: { orderId } });

@@ -22,12 +22,15 @@ import SearchModal from './components/SearchModal';
 import TelegramPopup from './components/TelegramPopup';
 import WhatsAppButton from './components/WhatsAppButton';
 import SaleBanner from './components/SaleBanner';
+import InstagramFeed from './components/InstagramFeed';
+import PushNotificationManager from './components/PushNotificationManager';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, DEFAULT_HERO_CONTENT, DEFAULT_NAVIGATION } from './constants';
 import { CartProvider, useCart } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { ToastProvider } from './context/ToastContext';
 import { supabase } from './lib/supabaseClient';
-import { Product, Category, HeroContent, NavigationSettings, BlogPost } from './types';
+import { BlogPost, Category, HeroContent, NavigationSettings, Product } from './types';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 
 type Route =
   | { name: 'HOME' }
@@ -39,6 +42,7 @@ type Route =
   | { name: 'BLOG_POST', postId: string };
 
 const AppContent: React.FC = () => {
+  const { t } = useLanguage();
   const [currentRoute, setCurrentRoute] = useState<Route>({ name: 'HOME' });
   const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
   const [categories, setCategories] = useState<Category[]>(MOCK_CATEGORIES);
@@ -341,14 +345,14 @@ const AppContent: React.FC = () => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      return error.message || 'Kirishda xatolik yuz berdi.';
+      return error.message || t('admin.login_error');
     }
 
     const { data } = await supabase.auth.getSession();
     const authUser = data.session?.user;
     if (!isAllowedAdmin(authUser)) {
       await supabase.auth.signOut();
-      return 'Bu foydalanuvchiga admin kirish ruxsati berilmagan.';
+      return t('admin.no_access');
     }
 
     return null;
@@ -365,7 +369,7 @@ const AppContent: React.FC = () => {
       if (isAdminAuthLoading) {
         return (
           <div className="min-h-screen bg-black flex items-center justify-center text-gray-400">
-            Tekshirilmoqda...
+            {t('common.checking')}
           </div>
         );
       }
@@ -423,10 +427,10 @@ const AppContent: React.FC = () => {
       }
       return (
         <div className="min-h-screen pt-24 pb-12 bg-black flex flex-col items-center justify-center text-center px-6">
-          <h2 className="text-3xl font-bold text-white mb-4">Mahsulot topilmadi</h2>
-          <p className="text-gray-400 mb-8">Ushbu mahsulot mavjud emas yoki o'chirilgan.</p>
+          <h2 className="text-3xl font-bold text-white mb-4">{t('product.out_of_stock')}</h2>
+          <p className="text-gray-400 mb-8">{t('featured.no_products')}</p>
           <button onClick={navigateToHome} className="px-8 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors">
-            Bosh sahifaga qaytish
+            {t('checkout.back_home')}
           </button>
         </div>
       );
@@ -456,6 +460,8 @@ const AppContent: React.FC = () => {
           categories={categories}
           onSelectCategory={handleCategorySelect}
         />
+        <InstagramFeed />
+        <PushNotificationManager />
         <SaleBanner onShopNow={() => handleCategorySelect('All')} />
         <FeaturedProducts
           products={products}
@@ -473,7 +479,7 @@ const AppContent: React.FC = () => {
     <div className="min-h-screen bg-black text-white font-sans selection:bg-gold-400 selection:text-black">
       <Helmet>
         <title>LUXECORE | Premium Store</title>
-        <meta name="description" content="O'zbekistondagi premium onlayn do'kon. Eksklyuziv mahsulotlar." />
+        <meta name="description" content={t('footer.about')} />
       </Helmet>
       <MetaPixel />
       {currentRoute.name !== 'CHECKOUT' && currentRoute.name !== 'ADMIN' && currentRoute.name !== 'TRACKING' && (
@@ -530,7 +536,9 @@ const App: React.FC = () => {
       <ToastProvider>
         <WishlistProvider>
           <CartProvider>
-            <AppContent />
+            <LanguageProvider>
+              <AppContent />
+            </LanguageProvider>
           </CartProvider>
         </WishlistProvider>
       </ToastProvider>

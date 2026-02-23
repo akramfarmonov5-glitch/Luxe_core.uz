@@ -1,9 +1,11 @@
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const WhatsAppButton: React.FC = () => {
+    const { t } = useLanguage();
     const phone = '998996448444'; // LuxeCore WhatsApp raqami
-    const message = encodeURIComponent("Salom! LUXECORE do'konidan buyurtma bermoqchiman.");
+    const message = encodeURIComponent(t('common.whatsapp_message'));
     const url = `https://wa.me/${phone}?text=${message}`;
 
     return (
@@ -27,7 +29,7 @@ const WhatsAppButton: React.FC = () => {
 
                 {/* Tooltip */}
                 <span className="absolute right-16 top-1/2 -translate-y-1/2 bg-white text-gray-800 text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    Yozing, javob beramiz! 💬
+                    {t('common.whatsapp_tooltip')}
                 </span>
             </div>
         </a>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, ArrowRight, TrendingUp } from 'lucide-react';
 import { Product, Category } from '../types';
 import * as fpixel from '../lib/fpixel';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SearchModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface SearchModalProps {
 const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, categories, onNavigateToProduct }) => {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
 
   // Auto focus input when modal opens
   useEffect(() => {
@@ -54,7 +56,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
   }, [query, filteredProducts.length]);
 
   // Popular searches suggestions
-  const suggestions = ['Soatlar', 'Sumkalar', 'Titan', 'Sovg\'a'];
+  const suggestions = [t('search.suggest_1', 'Soatlar'), t('search.suggest_2', 'Sumkalar'), t('search.suggest_3', 'Titan'), t('search.suggest_4', 'Sovg\'a')];
 
   const handleProductClick = (id: number) => {
     onNavigateToProduct(id);
@@ -87,7 +89,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
               <input
                 ref={inputRef}
                 type="text"
-                placeholder="Qidirish..."
+                placeholder={t('common.search')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="flex-1 bg-transparent text-xl text-white placeholder:text-gray-600 focus:outline-none"
@@ -105,7 +107,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
               {!query.trim() && (
                 <div>
                   <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <TrendingUp size={14} /> Ommabop qidiruvlar
+                    <TrendingUp size={14} /> {t('search.popular')}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {suggestions.map((item, idx) => (
@@ -125,14 +127,14 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
                 <div className="space-y-8">
                   {filteredProducts.length === 0 && filteredCategories.length === 0 && (
                     <div className="text-center text-gray-500 py-8">
-                      Hech narsa topilmadi.
+                      {t('search.no_results')}
                     </div>
                   )}
 
                   {/* Categories */}
                   {filteredCategories.length > 0 && (
                     <div>
-                      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Kategoriyalar</h3>
+                      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">{t('footer.categories')}</h3>
                       <div className="space-y-2">
                         {filteredCategories.map(cat => (
                           <div key={cat.id} className="flex items-center gap-3 p-3 hover:bg-white/5 rounded-xl cursor-pointer group">
@@ -150,7 +152,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
                   {/* Products */}
                   {filteredProducts.length > 0 && (
                     <div>
-                      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Mahsulotlar</h3>
+                      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">{t('featured.title')}</h3>
                       <div className="space-y-2">
                         {filteredProducts.map(product => (
                           <div
@@ -178,7 +180,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
             </div>
 
             <div className="p-4 border-t border-white/10 bg-black/20 text-center text-xs text-gray-500">
-              <span className="hidden md:inline">Tanlash uchun <kbd className="bg-white/10 px-1 rounded">Enter</kbd>, chiqish uchun <kbd className="bg-white/10 px-1 rounded">ESC</kbd> bosing</span>
+              <span className="hidden md:inline">{t('search.shortcuts')}</span>
             </div>
           </motion.div>
         </div>

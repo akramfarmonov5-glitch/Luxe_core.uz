@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, X, Send, MessageCircle, Mic, PhoneOff, User, Phone, ChevronRight } from 'lucide-react';
 import { Product } from '../types';
 import { supabase } from '../lib/supabaseClient';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Message {
   role: 'user' | 'model';
@@ -15,6 +16,7 @@ interface AIChatAssistantProps {
 }
 
 const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
+  const { t, language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
 
@@ -22,7 +24,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   const [formLoading, setFormLoading] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: "Assalomu alaykum! Men LUXECORE shaxsiy stilistingizman. Sizga qanday yordam bera olaman? Masalan, 'sovg'a uchun soat' yoki 'yozgi sumka' so'rashingiz mumkin." }
+    { role: 'model', text: t('chat.welcome') }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -92,11 +94,11 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
     ).join('\n');
 
     return `
-      Siz LUXECORE premium do'konining professional sotuvchi-konsultanti va stilistisiz.
+      ${t('chat.ai_role')}
       Mijozingizning ismi: ${formData.name}. Unga ismi bilan murojaat qiling.
-      Siz xushmuomala, "siz"lab va o'zbek tilida gaplashing.
+      Siz xushmuomala, "siz"lab va ${language === 'uz' ? 'o\'zbek' : 'rus'} tilida gaplashing.
       
-      Bizdagi mavjud mahsulotlar ro'yxati:
+      Bizdagi mavjud mahsulotlar ro'yxatdagidek:
       ${productContext}
 
       Qoidalaringiz:
@@ -129,17 +131,17 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
 
       if (!response.ok) {
         const err = await response.json().catch(() => ({}));
-        throw new Error(err.error || 'AI server xatosi');
+        throw new Error(err.error || t('chat.error_server'));
       }
 
       const data = await response.json();
-      const text = data.text || "Uzr, tushunmadim. Qayta so'ray olasizmi?";
+      const text = data.text || t('chat.error_understanding');
 
       setMessages(prev => [...prev, { role: 'model', text }]);
 
     } catch (error) {
       console.error("AI Error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "Kechirasiz, tizimda xatolik yuz berdi. Iltimos, keyinroq urinib ko'ring." }]);
+      setMessages(prev => [...prev, { role: 'model', text: t('chat.error_generic') }]);
     } finally {
       setIsLoading(false);
     }
@@ -152,7 +154,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   const connectLive = async () => {
     setMessages(prev => [...prev, {
       role: 'model',
-      text: "⚠️ Ovozli muloqot funksiyasi xavfsizlik maqsadida vaqtincha faqat test rejimida ishlaydi. Iltimos, matnli chatdan foydalaning, men sizga yordam berishga tayyorman! 😊"
+      text: t('chat.voice_test_only')
     }]);
   };
 
@@ -252,7 +254,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                   <h3 className="text-white font-bold text-sm">LUXE Assistant</h3>
                   <div className="flex items-center gap-1.5">
                     <span className={`w-2 h-2 rounded-full ${isLive ? 'bg-red-500 animate-pulse' : 'bg-green-500'} `}></span>
-                    <span className="text-xs text-gray-400">{isLive ? 'Voice Live' : 'Online | Gemini AI'}</span>
+                    <span className="text-xs text-gray-400">{isLive ? t('chat.voice_live') : t('chat.online_gemini')}</span>
                   </div>
                 </div>
               </div>
@@ -261,7 +263,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                   <button
                     onClick={isLive ? disconnectLive : connectLive}
                     className={`p-2 rounded-full transition-colors ${isLive ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30' : 'hover:bg-white/10 text-gray-400 hover:text-white'}`}
-                    title={isLive ? "Tugatish" : "Ovozli suhbat"}
+                    title={isLive ? t('chat.end_chat') : t('chat.voice_chat')}
                   >
                     {isLive ? <PhoneOff size={20} /> : <Mic size={20} />}
                   </button>
@@ -281,13 +283,13 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
             {!isRegistered ? (
               <div className="flex-1 p-6 flex flex-col justify-center">
                 <div className="text-center mb-8">
-                  <h4 className="text-xl font-bold text-white mb-2">Xush kelibsiz!</h4>
-                  <p className="text-gray-400 text-sm">Shaxsiy yordamchingizdan foydalanish uchun ma'lumotlaringizni kiriting.</p>
+                  <h4 className="text-xl font-bold text-white mb-2">{t('chat.welcome_title')}</h4>
+                  <p className="text-gray-400 text-sm">{t('chat.welcome_desc')}</p>
                 </div>
 
                 <form onSubmit={handleRegistration} className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm text-gold-400 font-medium ml-1">Ismingiz</label>
+                    <label className="text-sm text-gold-400 font-medium ml-1">{t('chat.name_label')}</label>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                       <input
@@ -296,12 +298,12 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full bg-black/40 border border-white/20 rounded-xl pl-12 pr-4 py-3 text-white focus:border-gold-400 focus:outline-none"
-                        placeholder="Ismingizni kiriting"
+                        placeholder={t('chat.name_placeholder')}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-gold-400 font-medium ml-1">Telefon raqam</label>
+                    <label className="text-sm text-gold-400 font-medium ml-1">{t('chat.phone_label')}</label>
                     <div className="relative">
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
                       <span className="absolute left-12 top-1/2 -translate-y-1/2 text-gray-400">+998</span>
@@ -327,13 +329,13 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                       <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
                     ) : (
                       <>
-                        Boshlash <ChevronRight size={18} />
+                        {t('chat.start_btn')} <ChevronRight size={18} />
                       </>
                     )}
                   </button>
                 </form>
                 <p className="text-xs text-gray-600 text-center mt-6">
-                  Ma'lumotlaringiz xavfsizligi kafolatlangan.
+                  {t('chat.security_note')}
                 </p>
               </div>
             ) : (
@@ -384,7 +386,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                   {isLive ? (
                     <div className="flex items-center justify-center gap-3 text-sm text-gold-400">
                       <Mic className="animate-pulse" size={16} />
-                      <span>Tinglanmoqda...</span>
+                      <span>{t('chat.listening')}</span>
                     </div>
                   ) : (
                     <div className="relative flex items-center">
@@ -393,7 +395,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyPress}
-                        placeholder="Masalan: Menga soat kerak..."
+                        placeholder={t('chat.input_placeholder')}
                         className="w-full bg-white/5 border border-white/10 rounded-full pl-5 pr-12 py-3.5 text-sm text-white focus:outline-none focus:border-gold-400/50 focus:ring-1 focus:ring-gold-400/50 transition-all placeholder:text-gray-600"
                       />
                       <button

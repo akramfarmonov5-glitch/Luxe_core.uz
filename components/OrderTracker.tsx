@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Search, Package, Clock, Truck, CheckCircle, ArrowLeft, CreditCard, Banknote, Wallet, XCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface OrderTrackerProps {
   onBack: () => void;
 }
 
 const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
+  const { t, language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState<'phone' | 'orderId'>('phone');
   const [loading, setLoading] = useState(false);
@@ -58,6 +60,17 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
     }
   };
 
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'Kutilmoqda': return t('tracking.status.pending');
+      case 'To\'landi': return t('tracking.status.paid');
+      case 'Yetkazilmoqda': return t('tracking.status.shipping');
+      case 'Yakunlandi': return t('tracking.status.completed');
+      case 'Bekor qilindi': return t('tracking.status.cancelled');
+      default: return status;
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Kutilmoqda': return 'text-yellow-400 bg-yellow-400/10';
@@ -76,7 +89,8 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('uz-UZ', {
+    const locale = language === 'uz' ? 'uz-UZ' : 'ru-RU';
+    return new Date(dateString).toLocaleDateString(locale, {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -93,13 +107,13 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors"
         >
           <ArrowLeft size={18} />
-          <span>Bosh sahifaga qaytish</span>
+          <span>{t('checkout.back_home')}</span>
         </button>
 
         <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Buyurtmani Kuzatish</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{t('tracking.title')}</h1>
           <p className="text-gray-400">
-            Buyurtma ID yoki telefon raqamingiz orqali buyurtmangiz holatini tekshiring.
+            {t('tracking.subtitle')}
           </p>
         </div>
 
@@ -111,14 +125,14 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
               onClick={() => { setSearchType('phone'); setSearchQuery(''); }}
               className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${searchType === 'phone' ? 'bg-gold-400 text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
             >
-              📱 Telefon
+              {t('tracking.phone')}
             </button>
             <button
               type="button"
               onClick={() => { setSearchType('orderId'); setSearchQuery(''); }}
               className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${searchType === 'orderId' ? 'bg-gold-400 text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
             >
-              📋 Buyurtma ID
+              {t('tracking.order_id')}
             </button>
           </div>
 
@@ -145,7 +159,7 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
                 <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
               ) : (
                 <>
-                  <Search size={20} /> Kuzatish
+                  <Search size={20} /> {t('tracking.track_btn')}
                 </>
               )}
             </button>
@@ -158,21 +172,21 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
               <>
                 <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                   <Package className="text-gold-400" />
-                  Topilgan Buyurtmalar ({orders.length})
+                  {t('tracking.found_orders')} ({orders.length})
                 </h2>
                 {orders.map((order) => (
                   <div key={order.id} className="bg-zinc-900 border border-white/10 rounded-2xl p-6 hover:border-gold-400/30 transition-all">
                     <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-white/5 pb-4">
                       <div>
-                        <span className="text-xs text-gray-500 block mb-1">Buyurtma ID</span>
+                        <span className="text-xs text-gray-500 block mb-1">{t('tracking.order_id')}</span>
                         <span className="font-mono text-white font-medium">{order.id}</span>
                       </div>
                       <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full w-fit ${getStatusColor(order.status || 'Kutilmoqda')}`}>
                         {getStatusIcon(order.status || 'Kutilmoqda')}
-                        <span className="text-sm font-medium">{order.status || 'Kutilmoqda'}</span>
+                        <span className="text-sm font-medium">{getStatusLabel(order.status || 'Kutilmoqda')}</span>
                       </div>
                       <div className="text-right">
-                        <span className="text-xs text-gray-500 block mb-1">Sana</span>
+                        <span className="text-xs text-gray-500 block mb-1">{t('tracking.date')}</span>
                         <span className="text-sm text-white">{formatDate(order.created_at)}</span>
                       </div>
                     </div>
@@ -181,14 +195,14 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
                     {order.paymentMethod && (
                       <div className="flex items-center gap-2 mb-3 text-sm text-gray-400">
                         {getPaymentIcon(order.paymentMethod)}
-                        <span>To'lov: {order.paymentMethod}</span>
+                        <span>{t('checkout.payment_method')}: {order.paymentMethod}</span>
                       </div>
                     )}
 
                     {/* Order items */}
                     {order.items && Array.isArray(order.items) && order.items.length > 0 && (
                       <div className="mb-4 bg-black/30 rounded-xl p-4 space-y-2">
-                        <span className="text-xs text-gray-500 block mb-2">Mahsulotlar:</span>
+                        <span className="text-xs text-gray-500 block mb-2">{t('tracking.items')}:</span>
                         {order.items.map((item: any, i: number) => (
                           <div key={i} className="flex justify-between text-sm">
                             <span className="text-gray-300">{item.name} x{item.quantity}</span>
@@ -200,9 +214,9 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
 
                     <div className="space-y-3">
                       <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-4">
-                        <span className="text-gray-400">Jami to'lov:</span>
+                        <span className="text-gray-400">{t('cart.total')}:</span>
                         <span className="text-lg font-bold text-gold-400">
-                          {new Intl.NumberFormat('uz-UZ').format(order.total || 0)} UZS
+                          {new Intl.NumberFormat(language === 'uz' ? 'uz-UZ' : 'ru-RU').format(order.total || 0)} UZS
                         </span>
                       </div>
                     </div>
@@ -212,11 +226,11 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
             ) : (
               <div className="text-center py-12 bg-zinc-900/50 rounded-3xl border border-white/5 border-dashed">
                 <Package size={48} className="text-gray-600 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-white mb-2">Buyurtmalar topilmadi</h3>
+                <h3 className="text-xl font-medium text-white mb-2">{t('tracking.no_orders')}</h3>
                 <p className="text-gray-400 max-w-xs mx-auto">
                   {searchType === 'phone'
-                    ? "Ushbu raqamga rasmiylashtirilgan buyurtmalar mavjud emas."
-                    : "Bunday ID bilan buyurtma topilmadi. ID ni to'g'ri kiritganingizni tekshiring."}
+                    ? t('tracking.no_orders_phone')
+                    : t('tracking.no_orders_id')}
                 </p>
               </div>
             )}

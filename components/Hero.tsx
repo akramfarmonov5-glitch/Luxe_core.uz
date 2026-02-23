@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { HeroContent } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface HeroProps {
   content?: HeroContent;
@@ -12,22 +13,24 @@ interface HeroProps {
 const Hero: React.FC<HeroProps> = ({ content, onShopClick, onMoreClick }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const { t } = useLanguage();
+
   // Fallback if content is missing
   const displayContent = content || {
-    badge: "Yangi Mavsum",
-    title: "Premium Collection 2026",
+    badge: t('hero.subtitle'),
+    title: t('hero.title'),
     description: "Elegentlik va zamonaviy dizayn uyg'unligi.",
-    buttonText: "Sotib olish",
+    buttonText: t('hero.cta'),
     images: [
-      "https://picsum.photos/800/1000?random=1",
-      "https://picsum.photos/800/1000?random=2",
-      "https://picsum.photos/800/1000?random=3"
+      "https://images.unsplash.com/photo-1547996160-81dfa63595aa?q=80&w=1000&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?q=80&w=1000&auto=format&fit=crop"
     ]
   };
 
   const images = displayContent.images && displayContent.images.length > 0
     ? displayContent.images
-    : ["https://picsum.photos/800/1000"];
+    : ["https://images.unsplash.com/photo-1547996160-81dfa63595aa?q=80&w=1000&auto=format&fit=crop"];
 
   useEffect(() => {
     if (images.length <= 1) return;
@@ -44,6 +47,10 @@ const Hero: React.FC<HeroProps> = ({ content, onShopClick, onMoreClick }) => {
     if (productsSection) {
       productsSection.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+  // ... rest of the functions
+  const handleMoreClickLocal = () => {
+    if (onMoreClick) onMoreClick();
   };
 
   return (
@@ -90,7 +97,7 @@ const Hero: React.FC<HeroProps> = ({ content, onShopClick, onMoreClick }) => {
               onClick={onMoreClick}
               className="px-6 py-3 md:px-8 md:py-4 border border-white/20 text-white font-medium rounded-full hover:bg-white/10 backdrop-blur-sm transition-all duration-300 text-sm md:text-base"
             >
-              Batafsil
+              {t('hero.more')}
             </button>
           </div>
         </motion.div>

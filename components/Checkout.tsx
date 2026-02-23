@@ -4,6 +4,7 @@ import { ArrowLeft, CheckCircle2, ShieldCheck, CreditCard, Truck, Send, Wallet, 
 import { useCart } from '../context/CartContext';
 import * as fpixel from '../lib/fpixel';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface CheckoutProps {
   onBack: () => void;
@@ -12,6 +13,7 @@ interface CheckoutProps {
 const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const { cart, cartTotal, clearCart } = useCart();
   const { showToast } = useToast();
+  const { language, t } = useLanguage();
   const [isSuccess, setIsSuccess] = useState(false);
   const [successNote, setSuccessNote] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +31,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
     firstName: '',
     lastName: '',
     phone: '',
+    email: '',
     address: '',
     city: 'Toshkent',
   });
@@ -106,6 +109,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
         cart,
         promoCode: appliedPromo,
         discountAmount,
+        email: formData.email,
       }),
     });
 
@@ -177,16 +181,17 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
     }
   };
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('uz-UZ').format(price) + ' UZS';
+    const locale = language === 'uz' ? 'uz-UZ' : 'ru-RU';
+    return new Intl.NumberFormat(locale).format(price) + ' UZS';
   };
 
   if (cart.length === 0 && !isSuccess) {
     return (
       <div className="min-h-screen pt-24 pb-12 bg-black flex flex-col items-center justify-center text-center px-6">
-        <h2 className="text-3xl font-bold text-white mb-4">Savatchangiz bo'sh</h2>
-        <p className="text-gray-400 mb-8">Buyurtma berish uchun avval mahsulot tanlang.</p>
+        <h2 className="text-3xl font-bold text-white mb-4">{t('cart.empty')}</h2>
+        <p className="text-gray-400 mb-8">{t('checkout.empty_desc')}</p>
         <button onClick={onBack} className="px-8 py-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors">
-          Do'konga qaytish
+          {t('checkout.back_to_shop')}
         </button>
       </div>
     );
@@ -197,26 +202,26 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
       <div className="container mx-auto px-6 max-w-6xl relative z-10">
         <button onClick={onBack} className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors">
           <ArrowLeft size={18} />
-          <span>Do'konga qaytish</span>
+          <span>{t('checkout.back_to_shop')}</span>
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <h1 className="text-3xl font-bold mb-8">Buyurtmani rasmiylashtirish</h1>
+            <h1 className="text-3xl font-bold mb-8">{t('checkout.title')}</h1>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-400">Ismingiz</label>
+                  <label className="text-sm text-gray-400">{t('reviews.name')}</label>
                   <input required name="firstName" type="text" value={formData.firstName} onChange={handleInputChange} className="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all" placeholder="Aziz" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-400">Familiyangiz</label>
+                  <label className="text-sm text-gray-400">{t('checkout.last_name')}</label>
                   <input required name="lastName" type="text" value={formData.lastName} onChange={handleInputChange} className="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all" placeholder="Rahimov" />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-gray-400">Telefon raqam</label>
+                <label className="text-sm text-gray-400">{t('checkout.phone')}</label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">+998</span>
                   <input required name="phone" type="tel" value={formData.phone} onChange={handleInputChange} pattern="[0-9]{9,12}" title="Telefon raqamni to'g'ri kiriting (masalan: 901234567)" className="w-full bg-dark-800 border border-white/10 rounded-lg pl-16 pr-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all" placeholder="90 123 45 67" />
@@ -224,7 +229,12 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-gray-400">Shahar</label>
+                <label className="text-sm text-gray-400">{t('checkout.email')}</label>
+                <input required name="email" type="email" value={formData.email} onChange={handleInputChange} className="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all" placeholder="example@mail.com" />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm text-gray-400">{t('checkout.city')}</label>
                 <select name="city" value={formData.city} onChange={handleInputChange} className="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all appearance-none">
                   <option className="bg-zinc-900 text-white" value="Toshkent">Toshkent</option>
                   <option className="bg-zinc-900 text-white" value="Samarqand">Samarqand</option>
@@ -237,7 +247,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-gray-400">Manzil</label>
+                <label className="text-sm text-gray-400">{t('checkout.address')}</label>
                 <input required name="address" type="text" value={formData.address} onChange={handleInputChange} className="w-full bg-dark-800 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all" placeholder="Amir Temur ko'chasi, 15-uy" />
               </div>
 
@@ -262,7 +272,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
                       disabled={!promoCode || isCheckingPromo}
                       className="bg-white/10 hover:bg-gold-400 hover:text-black text-white px-6 rounded-lg font-medium transition-colors disabled:opacity-50"
                     >
-                      {isCheckingPromo ? <Loader2 className="animate-spin" size={20} /> : "Qo'llash"}
+                      {isCheckingPromo ? <Loader2 className="animate-spin" size={20} /> : t('checkout.apply')}
                     </button>
                   ) : (
                     <button
@@ -282,21 +292,21 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
               </div>
 
               <div className="space-y-3 pt-2">
-                <label className="text-sm text-gray-400">To'lov usuli</label>
+                <label className="text-sm text-gray-400">{t('checkout.payment_method')}</label>
                 <div className="grid grid-cols-3 gap-3">
                   <button type="button" onClick={() => setPaymentMethod('paynet')} className={`relative p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all duration-300 ${paymentMethod === 'paynet' ? 'bg-gold-500/10 border-gold-400 text-gold-400 ring-1 ring-gold-400' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'}`}>
                     <Wallet size={22} />
-                    <span className="font-medium text-xs">Paynet</span>
+                    <span className="font-medium text-xs">{t('checkout.paynet')}</span>
                     {paymentMethod === 'paynet' && <motion.div layoutId="check" className="absolute top-2 right-2 w-2 h-2 bg-gold-400 rounded-full" />}
                   </button>
                   <button type="button" onClick={() => setPaymentMethod('card')} className={`relative p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all duration-300 ${paymentMethod === 'card' ? 'bg-gold-500/10 border-gold-400 text-gold-400 ring-1 ring-gold-400' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'}`}>
                     <CreditCard size={22} />
-                    <span className="font-medium text-xs">Karta</span>
+                    <span className="font-medium text-xs">{t('checkout.card')}</span>
                     {paymentMethod === 'card' && <motion.div layoutId="check" className="absolute top-2 right-2 w-2 h-2 bg-gold-400 rounded-full" />}
                   </button>
                   <button type="button" onClick={() => setPaymentMethod('cash')} className={`relative p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all duration-300 ${paymentMethod === 'cash' ? 'bg-gold-500/10 border-gold-400 text-gold-400 ring-1 ring-gold-400' : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:border-white/20'}`}>
                     <Banknote size={22} />
-                    <span className="font-medium text-xs">Naqd</span>
+                    <span className="font-medium text-xs">{t('checkout.cash')}</span>
                     {paymentMethod === 'cash' && <motion.div layoutId="check" className="absolute top-2 right-2 w-2 h-2 bg-gold-400 rounded-full" />}
                   </button>
                 </div>
@@ -307,25 +317,25 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
                   {isLoading ? (
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
-                      <span>Jarayonda...</span>
+                      <span>{t('checkout.processing')}</span>
                     </div>
                   ) : (
                     <>
-                      <span>{paymentMethod === 'paynet' ? "To'lash" : "Buyurtma berish"}</span>
+                      <span>{paymentMethod === 'paynet' ? t('checkout.pay') : t('cart.checkout_btn')}</span>
                       <span className="text-sm font-normal">({formatPrice(finalTotal)})</span>
                       <Send size={18} className="group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
                 </button>
                 <p className="text-center text-gray-500 text-sm mt-4 flex items-center justify-center gap-2">
-                  <ShieldCheck size={16} /> Xavfsiz to'lov va ma'lumotlar himoyasi
+                  <ShieldCheck size={16} /> {t('checkout.secure_payment')}
                 </p>
               </div>
             </form>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="bg-dark-900 border border-white/10 rounded-2xl p-8 h-fit sticky top-28">
-            <h3 className="text-xl font-bold mb-6">Buyurtma tarkibi</h3>
+            <h3 className="text-xl font-bold mb-6">{t('checkout.order_summary')}</h3>
             <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {cart.map((item) => (
                 <div key={item.id} className="flex gap-4">
@@ -346,21 +356,21 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
 
             <div className="space-y-3 pt-6 border-t border-white/10">
               <div className="flex justify-between text-gray-400">
-                <span>Mahsulotlar</span>
+                <span>{t('cart.items_count')}</span>
                 <span>{formatPrice(cartTotal)}</span>
               </div>
               {discountAmount > 0 && (
                 <div className="flex justify-between text-green-400">
-                  <span>Chegirma</span>
+                  <span>{t('checkout.discount')}</span>
                   <span>-{formatPrice(discountAmount)}</span>
                 </div>
               )}
               <div className="flex justify-between text-gray-400">
-                <span>Yetkazib berish</span>
-                <span className="text-green-400">Bepul</span>
+                <span>{t('cart.delivery')}</span>
+                <span className="text-green-400">{t('product.delivery')}</span>
               </div>
               <div className="flex justify-between text-xl font-bold text-white pt-4 border-t border-white/5">
-                <span>Jami to'lov</span>
+                <span>{t('cart.total')}</span>
                 <span>{formatPrice(finalTotal)}</span>
               </div>
             </div>
@@ -368,11 +378,11 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-xl border border-white/5">
                 <Truck className="text-gold-400 mb-2" size={24} />
-                <span className="text-xs text-center text-gray-300">Tezkor yetkazish</span>
+                <span className="text-xs text-center text-gray-300">{t('checkout.fast_delivery')}</span>
               </div>
               <div className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-xl border border-white/5">
                 <CreditCard className="text-gold-400 mb-2" size={24} />
-                <span className="text-xs text-center text-gray-300">Qulay to'lov</span>
+                <span className="text-xs text-center text-gray-300">{t('checkout.easy_payment')}</span>
               </div>
             </div>
           </motion.div>
@@ -397,10 +407,10 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
               </div>
               <div className="flex flex-col gap-3 w-full">
                 <button
-                  onClick={() => pendingOrderId && completeOrder(pendingOrderId, false, "To'lov tekshiruvga yuborildi. Menejer siz bilan bog'lanadi.")}
+                  onClick={() => pendingOrderId && completeOrder(pendingOrderId, false, t('checkout.paynet_note'))}
                   className="w-full bg-gold-400 text-black font-bold py-3.5 rounded-xl hover:bg-gold-500 transition-colors"
                 >
-                  To'lov qildim
+                  {t('checkout.pay_done')}
                 </button>
                 <a href={PAYNET_URL} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-colors text-sm"><ExternalLink size={16} /> Havolani ochish</a>
               </div>
@@ -452,9 +462,9 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-dark-900 border border-white/10 rounded-3xl p-8 md:p-12 max-w-lg w-full text-center shadow-2xl">
               <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle2 size={40} className="text-green-500" /></div>
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Buyurtmangiz qabul qilindi!</h2>
-              <p className="text-gray-400 mb-8 leading-relaxed">Rahmat, {formData.firstName}! {successNote || <>Menejerlarimiz tez orada <b>{formData.phone}</b> raqami orqali siz bilan bog'lanishadi.</>}</p>
-              <button onClick={onBack} className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">Bosh sahifaga qaytish</button>
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">{t('checkout.success_title')}</h2>
+              <p className="text-gray-400 mb-8 leading-relaxed">{t('checkout.thanks')}, {formData.firstName}! {successNote}</p>
+              <button onClick={onBack} className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">{t('checkout.back_home')}</button>
             </motion.div>
           </div>
         )}

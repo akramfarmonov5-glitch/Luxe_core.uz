@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, User, Send, ThumbsUp } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ProductReviewsProps {
     productId: number;
@@ -47,6 +48,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
     const [author, setAuthor] = useState('');
     const [comment, setComment] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const { language, t } = useLanguage();
 
     useEffect(() => {
         loadReviews();
@@ -96,7 +98,10 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
         ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
         : '0';
 
-    const formatDate = (d: string) => new Date(d).toLocaleDateString('uz-UZ', { day: 'numeric', month: 'short', year: 'numeric' });
+    const formatDate = (d: string) => {
+        const locale = language === 'uz' ? 'uz-UZ' : 'ru-RU';
+        return new Date(d).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+    };
 
     return (
         <div className="mt-12 pt-8 border-t border-white/10">
@@ -104,7 +109,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                     <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                        <Star className="text-gold-400" size={22} /> Izohlar
+                        <Star className="text-gold-400" size={22} /> {t('reviews.title')}
                         {reviews.length > 0 && <span className="text-sm font-normal text-gray-400">({reviews.length})</span>}
                     </h3>
                     {reviews.length > 0 && (
@@ -119,7 +124,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
                     onClick={() => setShowForm(!showForm)}
                     className="bg-gold-400 hover:bg-gold-500 text-black font-semibold px-5 py-2.5 rounded-xl text-sm flex items-center gap-2 transition-colors"
                 >
-                    <Send size={16} /> Izoh qoldirish
+                    <Send size={16} /> {t('reviews.add')}
                 </button>
             </div>
 
@@ -134,21 +139,21 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
                         className="bg-zinc-900 border border-white/10 rounded-2xl p-6 mb-8 space-y-4 overflow-hidden"
                     >
                         <div className="flex items-center gap-4">
-                            <span className="text-sm text-gray-400">Baho:</span>
+                            <span className="text-sm text-gray-400">{t('reviews.rating_label')}</span>
                             <StarRating rating={rating} size={24} interactive onChange={setRating} />
                         </div>
                         <input
                             required
                             value={author}
                             onChange={e => setAuthor(e.target.value)}
-                            placeholder="Ismingiz"
+                            placeholder={t('reviews.name')}
                             className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-gold-400 focus:outline-none"
                         />
                         <textarea
                             required
                             value={comment}
                             onChange={e => setComment(e.target.value)}
-                            placeholder={`${productName} haqida fikringiz...`}
+                            placeholder={`${productName} ${t('reviews.comment_placeholder')}`}
                             rows={3}
                             className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-gold-400 focus:outline-none resize-none"
                         />
@@ -157,7 +162,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
                             disabled={submitting}
                             className="bg-gold-400 hover:bg-gold-500 text-black font-bold px-6 py-3 rounded-xl transition-colors disabled:opacity-50"
                         >
-                            {submitting ? 'Yuborilmoqda...' : 'Yuborish'}
+                            {submitting ? t('reviews.submitting') : t('reviews.submit')}
                         </button>
                     </motion.form>
                 )}
@@ -173,7 +178,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId, productName 
             ) : reviews.length === 0 ? (
                 <div className="text-center py-12 bg-zinc-900/30 rounded-2xl border border-white/5 border-dashed">
                     <Star size={40} className="text-gray-700 mx-auto mb-3" />
-                    <p className="text-gray-500">Hali izoh yo'q. Birinchi bo'lib izoh qoldiring!</p>
+                    <p className="text-gray-500">{t('reviews.no_reviews')}</p>
                 </div>
             ) : (
                 <div className="space-y-4">

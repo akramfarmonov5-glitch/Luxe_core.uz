@@ -9,6 +9,7 @@ import { GoogleGenAI } from "@google/genai";
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 import Breadcrumbs from './Breadcrumbs';
 import ProductCard from './ProductCard';
 import ProductReviews from './ProductReviews';
@@ -26,6 +27,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { showToast } = useToast();
+  const { language, t } = useLanguage();
   const [aiDescription, setAiDescription] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [activeImage, setActiveImage] = useState<string>(product.image);
@@ -49,7 +51,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
 
     const generateAIDescription = async () => {
       try {
-        const prompt = `Write a short, sophisticated, and persuasive product description for a luxury e-commerce item named "${product.name}" in the "${product.category}" category. The description should be in Uzbek language. It should feel like an Apple product description: minimalist, impactful, and premium. Focus on craftsmanship and lifestyle. Max 3 sentences.`;
+        const langName = language === 'uz' ? 'Uzbek' : 'Russian';
+        const prompt = `Write a short, sophisticated, and persuasive product description for a luxury e-commerce item named "${product.name}" in the "${product.category}" category. The description should be in ${langName} language. It should feel like an Apple product description: minimalist, impactful, and premium. Focus on craftsmanship and lifestyle. Max 3 sentences.`;
 
         const response = await fetch('/api/chat', {
           method: 'POST',
@@ -74,16 +77,16 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
 
   const handleAddToCart = () => {
     addToCart(product);
-    showToast("Mahsulot savatchaga qo'shildi", 'success');
+    showToast(`${product.name} ${t('product.cart_added')}`, 'success');
     fpixel.trackAddToCart(product);
   };
 
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     if (!isLiked) {
-      showToast("Sevimlilarga qo'shildi", 'success');
+      showToast(`${product.name} ${t('product.wishlist_added')}`, 'success');
     } else {
-      showToast("Sevimlilardan olib tashlandi", 'info');
+      showToast(`${product.name} ${t('product.wishlist_removed')}`, 'info');
     }
   };
 
@@ -177,7 +180,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                     className="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md pl-3 pr-4 py-2 rounded-full text-white hover:bg-red-600 transition-colors border border-white/10 group/btn"
                   >
                     <PlayCircle size={18} className="text-white group-hover/btn:scale-110 transition-transform md:w-[22px] md:h-[22px]" />
-                    <span className="text-xs md:text-sm font-bold tracking-wide">VIDEO REVIEW</span>
+                    <span className="text-xs md:text-sm font-bold tracking-wide">{t('product.video_review')}</span>
                   </button>
                 )}
               </div>
@@ -234,7 +237,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                     className="flex items-center gap-1.5 text-[10px] md:text-xs font-bold text-red-500 bg-red-500/10 px-2 py-1 md:px-3 rounded hover:bg-red-500 hover:text-white transition-colors"
                   >
                     <Youtube size={12} className="md:w-[14px] md:h-[14px]" />
-                    VIDEO SHARH
+                    {t('product.video_review')}
                   </button>
                 )}
               </div>
@@ -260,7 +263,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   className="bg-white/5 text-white border border-white/10 font-bold py-3 md:py-4 rounded-xl hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
                 >
                   <ShoppingBag size={18} className="md:w-[20px] md:h-[20px]" />
-                  Savatga
+                  {t('product.add_to_cart')}
                 </button>
                 <button
                   onClick={handleBuyNow}
@@ -268,7 +271,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   className="bg-gold-400 text-black font-bold py-3 md:py-4 rounded-xl hover:bg-gold-500 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(251,191,36,0.3)] disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
                 >
                   <Zap size={18} className="md:w-[20px] md:h-[20px]" fill="currentColor" />
-                  Hozir olish
+                  {t('product.buy_now')}
                 </button>
               </div>
             </div>
@@ -278,7 +281,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
               <div className="pl-4 md:pl-6">
                 <div className="flex items-center gap-2 mb-2 md:mb-3">
                   <Sparkles size={14} className="text-gold-400 animate-pulse md:w-[16px] md:h-[16px]" />
-                  <h3 className="text-gray-300 text-xs md:text-sm font-semibold tracking-wide">GEMINI AI TAHLILI</h3>
+                  <h3 className="text-gray-300 text-xs md:text-sm font-semibold tracking-wide">{t('product.ai_analysis')}</h3>
                 </div>
                 {loading ? (
                   <div className="space-y-2 animate-pulse">
@@ -297,7 +300,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
             <div className="bg-white/5 rounded-2xl p-4 md:p-6 backdrop-blur-md border border-white/5">
               <h3 className="text-white text-sm font-semibold mb-4 flex items-center gap-2">
                 <Activity size={16} className="text-gold-400" />
-                Texnik Xususiyatlar
+                {t('product.specs')}
               </h3>
               <div className="grid grid-cols-2 gap-y-3 gap-x-4 md:gap-x-8">
                 {product.specs.map((spec, index) => (
@@ -312,15 +315,15 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
             <div className="mt-6 md:mt-8 flex flex-wrap gap-4 items-center justify-between text-gray-400 text-xs md:text-sm px-1">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-gold-400 md:w-[18px] md:h-[18px]" />
-                <span>Premium Kafolat</span>
+                <span>{t('product.guarantee')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Truck size={16} className="text-gold-400 md:w-[18px] md:h-[18px]" />
-                <span>Bepul Yetkazish</span>
+                <span>{t('product.delivery')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Box size={16} className="text-gold-400 md:w-[18px] md:h-[18px]" />
-                <span>Eko-qadoq</span>
+                <span>{t('product.eco')}</span>
               </div>
             </div>
 
@@ -340,7 +343,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   Tavsiyalar
                 </span>
                 <h2 className="text-2xl md:text-3xl font-bold text-white">
-                  O'xshash Mahsulotlar
+                  {t('product.related')}
                 </h2>
               </div>
             </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { BlogPost } from '../types';
 import { Calendar, ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 interface BlogGridProps {
   posts: BlogPost[];
@@ -9,6 +10,7 @@ interface BlogGridProps {
 }
 
 const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick }) => {
+  const { t } = useLanguage();
   // Faqat oxirgi 6 ta postni ko'rsatamiz
   const displayPosts = posts.slice(0, 6);
 
@@ -20,14 +22,14 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick }) => {
         <div className="flex flex-col md:flex-row justify-between items-end mb-12">
           <div className="space-y-2">
             <span className="text-gold-400 text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-              <Sparkles size={14} /> Blog & Yangiliklar
+              <Sparkles size={14} /> {t('blog.badge')}
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Moda Olamidan <span className="text-gray-500">Xabarlar</span>
+              {t('blog.title_prefix')} <span className="text-gray-500">{t('blog.title_suffix')}</span>
             </h2>
           </div>
           <button className="hidden md:flex items-center gap-2 text-white hover:text-gold-400 transition-colors text-sm font-medium">
-            Barcha maqolalar <ArrowRight size={16} />
+            {t('blog.all')} <ArrowRight size={16} />
           </button>
         </div>
 
@@ -63,7 +65,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick }) => {
                   {post.content}
                 </p>
                 <span className="inline-flex items-center gap-2 text-sm text-white font-medium group-hover:gap-3 transition-all">
-                  O'qish <ArrowRight size={16} className="text-gold-400" />
+                  {t('blog.read')} <ArrowRight size={16} className="text-gold-400" />
                 </span>
               </div>
             </motion.article>
@@ -71,7 +73,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick }) => {
         </div>
 
         <button className="md:hidden mt-10 w-full py-4 border border-white/10 rounded-xl text-white hover:bg-white/5 flex items-center justify-center gap-2">
-          Barcha maqolalar <ArrowRight size={16} />
+          {t('blog.all')} <ArrowRight size={16} />
         </button>
       </div>
     </section>

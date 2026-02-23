@@ -3,6 +3,7 @@ import ProductCard from './ProductCard';
 import { Product, Category } from '../types';
 import { Filter, X, Check, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 interface FeaturedProductsProps {
     products: Product[];
@@ -13,6 +14,7 @@ interface FeaturedProductsProps {
 }
 
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categories, onNavigateToProduct, isLoading, initialCategory }) => {
+    const { t } = useLanguage();
     const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'All');
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -38,10 +40,10 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                 <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-12 gap-4">
                     <div className="space-y-2 w-full md:w-auto">
                         <h2 className="text-2xl md:text-4xl font-bold">
-                            Premium <span className="text-gold-400">To'plam</span>
+                            {t('featured.title').split(' ').slice(0, 1).join(' ')} <span className="text-gold-400">{t('featured.title').split(' ').slice(1).join(' ')}</span>
                         </h2>
                         <p className="text-gray-400 text-sm md:text-base max-w-md">
-                            Eksklyuziv dizayn va yuqori sifat uyg'unligi.
+                            {t('featured.subtitle')}
                         </p>
                     </div>
 
@@ -51,7 +53,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                             <input
                                 type="text"
-                                placeholder="Qidirish..."
+                                placeholder={t('common.search')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full bg-dark-800 border border-white/10 rounded-full pl-10 pr-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-colors"
@@ -75,7 +77,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                         <div>
                             <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                                 <Filter size={18} className="text-gold-400" />
-                                Kategoriyalar
+                                {t('categories.title')}
                             </h3>
                             <div className="space-y-2">
                                 <button
@@ -112,10 +114,10 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                 {filteredProducts.length === 0 ? (
                                     <div className="py-20 text-center">
                                         <p className="text-gray-500 text-lg">
-                                            {searchQuery ? "So'rovingiz bo'yicha mahsulotlar topilmadi." : "Ushbu kategoriyada mahsulotlar topilmadi."}
+                                            {searchQuery ? t('featured.no_products') : t('featured.no_category_products')}
                                         </p>
                                         <button onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }} className="mt-4 text-gold-400 underline">
-                                            Barchasini ko'rish
+                                            {t('featured.reset')}
                                         </button>
                                     </div>
                                 ) : (
@@ -177,7 +179,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                     onClick={() => { setSelectedCategory('All'); setIsFilterOpen(false); }}
                                     className={`w-full text-left px-4 py-3 rounded-xl transition-all ${selectedCategory === 'All' ? 'bg-gold-400 text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
                                 >
-                                    Barchasi
+                                    {t('featured.all')}
                                 </button>
                                 {categories.map(cat => (
                                     <button

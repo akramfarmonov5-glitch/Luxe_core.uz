@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async';
 
 import { ArrowLeft, Calendar, User, Share2 } from 'lucide-react';
 import { BlogPost } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface BlogPostDetailProps {
   post: BlogPost;
@@ -10,6 +11,7 @@ interface BlogPostDetailProps {
 }
 
 const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
+  const { t } = useLanguage();
   return (
     <div className="pt-24 pb-20 min-h-screen bg-black text-white">
       <Helmet>
@@ -49,11 +51,11 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors"
         >
           <ArrowLeft size={18} />
-          <span>Ortga qaytish</span>
+          <span>{t('common.back')}</span>
         </button>
 
         <div className="mb-8">
-          <span className="text-gold-400 text-xs font-bold uppercase tracking-widest mb-3 block">Blog</span>
+          <span className="text-gold-400 text-xs font-bold uppercase tracking-widest mb-3 block">{t('nav.blog')}</span>
           <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-6">{post.title}</h1>
 
           <div className="flex items-center gap-6 text-sm text-gray-400 border-b border-white/10 pb-8">
@@ -63,7 +65,7 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
             </div>
             <div className="flex items-center gap-2">
               <User size={16} />
-              <span>LUXECORE Admin</span>
+              <span>{t('blog.author')}</span>
             </div>
           </div>
         </div>
@@ -78,10 +80,10 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
 
         {/* Share / Footer of post */}
         <div className="mt-12 pt-8 border-t border-white/10 flex justify-between items-center">
-          <p className="text-gray-500 italic">O'qiganingiz uchun rahmat.</p>
+          <p className="text-gray-500 italic">{t('blog.thanks_for_reading')}</p>
           <button className="flex items-center gap-2 text-gold-400 hover:text-gold-300 transition-colors">
             <Share2 size={18} />
-            <span className="font-medium">Ulashish</span>
+            <span className="font-medium">{t('blog.share')}</span>
           </button>
         </div>
       </article>

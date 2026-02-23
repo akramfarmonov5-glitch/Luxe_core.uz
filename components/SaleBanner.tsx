@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Flame, ArrowRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SaleBannerProps {
     onShopNow?: () => void;
 }
 
 const SaleBanner: React.FC<SaleBannerProps> = ({ onShopNow }) => {
+    const { t } = useLanguage();
     // Sale end date — 7 days from now
     const [saleEnd] = useState(() => {
         const stored = localStorage.getItem('luxecore_sale_end');
@@ -66,24 +68,24 @@ const SaleBanner: React.FC<SaleBannerProps> = ({ onShopNow }) => {
                     <div className="text-center md:text-left">
                         <div className="flex items-center gap-2 justify-center md:justify-start mb-2">
                             <Flame className="text-orange-400 animate-pulse" size={20} />
-                            <span className="text-orange-400 font-semibold text-sm uppercase tracking-widest">Cheklangan vaqt!</span>
+                            <span className="text-orange-400 font-semibold text-sm uppercase tracking-widest">{t('sale.badge')}</span>
                         </div>
                         <h3 className="text-xl md:text-2xl font-bold text-white">
-                            Barcha mahsulotlarga <span className="text-gold-400">20% chegirma</span>
+                            {t('sale.prefix')} <span className="text-gold-400">{t('sale.discount')}</span>
                         </h3>
-                        <p className="text-gray-400 text-sm mt-1">Fursatni qo'ldan boy bermang!</p>
+                        <p className="text-gray-400 text-sm mt-1">{t('sale.desc')}</p>
                     </div>
 
                     <div className="flex items-center gap-3">
                         <Clock size={18} className="text-gold-400 hidden md:block" />
                         <div className="flex gap-2">
-                            <TimeBox value={timeLeft.days} label="Kun" />
+                            <TimeBox value={timeLeft.days} label={t('sale.days')} />
                             <span className="text-gold-400 text-2xl font-bold self-start mt-3">:</span>
-                            <TimeBox value={timeLeft.hours} label="Soat" />
+                            <TimeBox value={timeLeft.hours} label={t('sale.hours')} />
                             <span className="text-gold-400 text-2xl font-bold self-start mt-3">:</span>
-                            <TimeBox value={timeLeft.minutes} label="Daq" />
+                            <TimeBox value={timeLeft.minutes} label={t('sale.minutes')} />
                             <span className="text-gold-400 text-2xl font-bold self-start mt-3">:</span>
-                            <TimeBox value={timeLeft.seconds} label="Son" />
+                            <TimeBox value={timeLeft.seconds} label={t('sale.seconds')} />
                         </div>
                     </div>
 
@@ -91,7 +93,7 @@ const SaleBanner: React.FC<SaleBannerProps> = ({ onShopNow }) => {
                         onClick={onShopNow}
                         className="bg-gold-400 hover:bg-gold-500 text-black font-bold px-6 py-3 rounded-xl flex items-center gap-2 transition-all group shrink-0"
                     >
-                        Xarid qilish
+                        {t('hero.cta')}
                         <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                     </button>
                 </div>

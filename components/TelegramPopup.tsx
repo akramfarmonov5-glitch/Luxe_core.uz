@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, Gift, Bell, Users } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const TelegramPopup: React.FC = () => {
+    const { t } = useLanguage();
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -70,26 +72,26 @@ const TelegramPopup: React.FC = () => {
                             </div>
 
                             <h2 className="text-2xl font-bold text-white mb-3">
-                                Telegram kanalimizga qo'shiling!
+                                {t('telegram.title')}
                             </h2>
 
                             <p className="text-white/80 text-sm mb-6 leading-relaxed">
-                                Yangi mahsulotlar, maxsus chegirmalar va eksklyuziv takliflardan birinchi bo'lib xabardor bo'ling!
+                                {t('telegram.desc')}
                             </p>
 
                             {/* Features */}
                             <div className="grid grid-cols-3 gap-3 mb-6">
                                 <div className="bg-white/10 rounded-xl p-3">
                                     <Gift className="text-white mx-auto mb-1" size={20} />
-                                    <span className="text-xs text-white/80 block">Chegirmalar</span>
+                                    <span className="text-xs text-white/80 block">{t('telegram.feature_1')}</span>
                                 </div>
                                 <div className="bg-white/10 rounded-xl p-3">
                                     <Bell className="text-white mx-auto mb-1" size={20} />
-                                    <span className="text-xs text-white/80 block">Yangiliklar</span>
+                                    <span className="text-xs text-white/80 block">{t('telegram.feature_2')}</span>
                                 </div>
                                 <div className="bg-white/10 rounded-xl p-3">
                                     <Users className="text-white mx-auto mb-1" size={20} />
-                                    <span className="text-xs text-white/80 block">Jamiyat</span>
+                                    <span className="text-xs text-white/80 block">{t('telegram.feature_3')}</span>
                                 </div>
                             </div>
 
@@ -100,13 +102,13 @@ const TelegramPopup: React.FC = () => {
                                     className="w-full bg-white text-[#0088cc] font-bold py-4 rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 shadow-lg"
                                 >
                                     <Send size={18} className="fill-[#0088cc]" />
-                                    Kanalga qo'shilish
+                                    {t('telegram.cta')}
                                 </button>
                                 <button
                                     onClick={handleClose}
                                     className="text-white/60 hover:text-white text-sm transition-colors"
                                 >
-                                    Keyinroq
+                                    {t('telegram.later')}
                                 </button>
                             </div>
                         </div>

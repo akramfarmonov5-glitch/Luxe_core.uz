@@ -5,6 +5,7 @@ import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +16,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { showToast } = useToast();
+  const { t } = useLanguage();
 
   const isLiked = isInWishlist(product.id);
 
@@ -22,16 +24,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
     e.stopPropagation();
     toggleWishlist(product);
     if (!isLiked) {
-      showToast(`${product.name} sevimlilarga qo'shildi`, 'success');
+      showToast(`${product.name} ${t('product.wishlist_added')}`, 'success');
     } else {
-      showToast(`${product.name} sevimlilardan olib tashlandi`, 'info');
+      showToast(`${product.name} ${t('product.wishlist_removed')}`, 'info');
     }
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     addToCart(product);
-    showToast(`${product.name} savatchaga qo'shildi`, 'success');
+    showToast(`${product.name} ${t('product.cart_added')}`, 'success');
   };
 
   return (
@@ -54,12 +56,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1.5 z-10">
           {product.stock !== undefined && product.stock > 15 && (
             <span className="bg-emerald-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shadow-lg">
-              🆕 Yangi
+              🆕 {t('product.new')}
             </span>
           )}
           {product.stock !== undefined && product.stock > 0 && product.stock <= 5 && (
             <span className="bg-orange-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shadow-lg animate-pulse">
-              🔥 Bestseller
+              🔥 {t('product.bestseller')}
             </span>
           )}
         </div>
@@ -69,8 +71,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
           <button
             onClick={handleWishlistClick}
             className={`p-2 md:p-3 backdrop-blur-md rounded-full transition-all shadow-lg ${isLiked
-                ? 'bg-gold-400 text-black scale-110'
-                : 'bg-black/40 text-white hover:bg-gold-400 hover:text-black border border-white/10'
+              ? 'bg-gold-400 text-black scale-110'
+              : 'bg-black/40 text-white hover:bg-gold-400 hover:text-black border border-white/10'
               }`}
           >
             <Heart size={16} className={`md:w-[18px] md:h-[18px] ${isLiked ? 'fill-black' : ''}`} />
@@ -98,7 +100,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
             aria-label="Add to cart"
           >
             <Plus size={14} className="md:w-[16px] md:h-[16px]" />
-            <span className="hidden md:inline">Savatga</span>
+            <span className="hidden md:inline">{t('product.add_to_cart')}</span>
           </button>
         </div>
       </div>

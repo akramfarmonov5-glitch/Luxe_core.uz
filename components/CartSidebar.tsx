@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface CartSidebarProps {
   onCheckout: () => void;
@@ -9,9 +10,11 @@ interface CartSidebarProps {
 
 const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
   const { cart, isCartOpen, toggleCart, removeFromCart, updateQuantity, cartTotal } = useCart();
+  const { language, t } = useLanguage();
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('uz-UZ').format(price) + ' UZS';
+    const locale = language === 'uz' ? 'uz-UZ' : 'ru-RU';
+    return new Intl.NumberFormat(locale).format(price) + ' UZS';
   };
 
   return (
@@ -39,9 +42,9 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
             <div className="flex items-center justify-between p-6 border-b border-white/10 bg-dark-900/50 backdrop-blur-md">
               <div className="flex items-center gap-3">
                 <ShoppingBag size={20} className="text-gold-400" />
-                <h2 className="text-xl font-bold text-white tracking-wide">Savatcha</h2>
+                <h2 className="text-xl font-bold text-white tracking-wide">{t('nav.cart')}</h2>
                 <span className="bg-white/10 text-xs px-2 py-1 rounded-full text-gray-300">
-                  {cart.length} ta mahsulot
+                  {cart.length} {t('cart.items_count')}
                 </span>
               </div>
               <button
@@ -59,9 +62,9 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                   <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4">
                     <ShoppingBag size={32} className="text-gray-600" />
                   </div>
-                  <p className="text-gray-400 text-lg">Savatchangiz bo'sh</p>
+                  <p className="text-gray-400 text-lg">{t('cart.empty')}</p>
                   <button onClick={toggleCart} className="text-gold-400 hover:text-gold-500 underline underline-offset-4">
-                    Xaridni davom ettirish
+                    {t('cart.continue_shopping')}
                   </button>
                 </div>
               ) : (
@@ -89,10 +92,10 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                         </div>
                         <p className="text-gray-400 text-xs mt-1">{item.category}</p>
                       </div>
-                      
+
                       <div className="flex items-end justify-between">
                         <p className="text-gold-400 font-medium">{formatPrice(item.price)}</p>
-                        
+
                         <div className="flex items-center gap-3 bg-white/5 rounded-full px-2 py-1 border border-white/5">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
@@ -120,19 +123,19 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
               <div className="p-6 border-t border-white/10 bg-dark-900">
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-gray-400 text-sm">
-                    <span>Mahsulotlar summasi</span>
+                    <span>{t('cart.subtotal')}</span>
                     <span>{formatPrice(cartTotal)}</span>
                   </div>
                   <div className="flex justify-between text-gray-400 text-sm">
-                    <span>Yetkazib berish</span>
-                    <span className="text-green-400">Bepul</span>
+                    <span>{t('cart.delivery')}</span>
+                    <span className="text-green-400">{t('product.delivery')}</span>
                   </div>
                   <div className="flex justify-between text-xl font-bold text-white pt-4 border-t border-white/5">
-                    <span>Jami</span>
+                    <span>{t('cart.total')}</span>
                     <span>{formatPrice(cartTotal)}</span>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => {
                     toggleCart();
@@ -140,7 +143,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                   }}
                   className="w-full py-4 bg-gold-400 text-black font-bold rounded-xl hover:bg-gold-500 transition-colors flex items-center justify-center gap-2 group"
                 >
-                  Buyurtma berish
+                  {t('cart.checkout_btn')}
                   <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>

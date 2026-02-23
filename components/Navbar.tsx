@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { NavigationSettings } from '../types';
 import { DEFAULT_NAVIGATION } from '../constants';
+import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
   onNavigateHome: () => void;
@@ -18,6 +19,7 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, onCategorySelect, navigationSettings = DEFAULT_NAVIGATION, onProfileClick, onSearchClick, onWishlistClick }) => {
   const { cartCount, toggleCart } = useCart();
   const { wishlist } = useWishlist();
+  const { language, setLanguage, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleMobileLinkClick = (label: string) => {
@@ -96,9 +98,25 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, onCategorySelect, navig
               </span>
             )}
           </button>
+
+          {/* Language Switcher */}
+          <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
+            <button
+              onClick={() => setLanguage('uz')}
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-all ${language === 'uz' ? 'bg-gold-400 text-black' : 'text-gray-400 hover:text-white'}`}
+            >
+              UZ
+            </button>
+            <button
+              onClick={() => setLanguage('ru')}
+              className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition-all ${language === 'ru' ? 'bg-gold-400 text-black' : 'text-gray-400 hover:text-white'}`}
+            >
+              RU
+            </button>
+          </div>
         </div >
 
-        {/* Mobile Spacer */}
+        {/* Mobile Spacer (for logo centering on mobile if needed) */}
         < div className="md:hidden w-8" ></div >
       </motion.nav >
 
@@ -149,7 +167,24 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, onCategorySelect, navig
 
                 {/* Social Media & Footer Info */}
                 <div className="mt-6 pt-6 border-t border-white/10">
-                  <p className="text-gray-400 text-xs mb-4 uppercase tracking-widest font-semibold">Bizni kuzating</p>
+                  <div className="flex justify-between items-center mb-6">
+                    <p className="text-gray-400 text-xs uppercase tracking-widest font-semibold">Til / Язык</p>
+                    <div className="flex bg-white/5 rounded-full p-1 border border-white/10">
+                      <button
+                        onClick={() => setLanguage('uz')}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${language === 'uz' ? 'bg-gold-400 text-black' : 'text-gray-400 hover:text-white'}`}
+                      >
+                        UZ
+                      </button>
+                      <button
+                        onClick={() => setLanguage('ru')}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${language === 'ru' ? 'bg-gold-400 text-black' : 'text-gray-400 hover:text-white'}`}
+                      >
+                        RU
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-gray-400 text-xs mb-4 uppercase tracking-widest font-semibold">{t('footer.follow_us')}</p>
                   <div className="flex gap-4 mb-8">
                     {navigationSettings.socialLinks.map((social) => (
                       <a
