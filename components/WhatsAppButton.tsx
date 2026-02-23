@@ -13,7 +13,7 @@ const WhatsAppButton: React.FC = () => {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
-            className="fixed bottom-6 right-6 z-50 group"
+            className="fixed bottom-44 md:bottom-20 right-4 md:right-6 z-[90] group"
             aria-label="WhatsApp orqali bog'lanish"
         >
             <div className="relative">
