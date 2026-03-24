@@ -232,6 +232,16 @@ export async function handleCheckoutInput(ctx: Context) {
     if (state.step === 'phone') {
         let phone = text.replace(/[\s\-\(\)]/g, '');
         if (!phone.startsWith('+')) phone = '+' + phone;
+
+        // Validate +998XXXXXXXXX format
+        if (!/^\+998\d{9}$/.test(phone)) {
+            await ctx.reply(
+                t(userId, 'phone_invalid') + '\n' + t(userId, 'checkout_phone'),
+                { parse_mode: 'Markdown' }
+            );
+            return;
+        }
+
         state.phone = phone;
         state.step = 'name';
         checkoutState.set(userId, state);

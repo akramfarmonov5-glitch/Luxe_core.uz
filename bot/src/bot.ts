@@ -1,13 +1,13 @@
 import { Bot } from 'grammy';
 import { config } from './config';
-import { handleStart, handleHome, handleContactMessage } from './handlers/start';
+import { handleStart, handleHome, handleContactMessage, handleStartLangSelect } from './handlers/start';
 import { handleCategories, handleCategorySelect, handleCategoryPage } from './handlers/categories';
 import { handleSearchPrompt, handleSearchQuery, isInSearchMode, clearSearchMode } from './handlers/search';
 import { handleAddToCart, handleShowCart, handleClearCart, handleCheckout, handleCheckoutInput, isInCheckoutMode, clearCheckoutMode, setBotInstance, handleCartPlus, handleCartMinus, handleCartDelete, handlePayCard, handlePayCash } from './handlers/cart';
 import { handleAiPrompt, handleAiMessage, handleExitAi, isInAiMode, clearAiMode } from './handlers/ai';
 import { handleContact, handleHelp, handleChannel } from './handlers/info';
 import { handleLangPrompt, handleLangSet } from './handlers/lang';
-import { handleAdminAccept, handleAdminReject, handleAdminShip, handleAdminDone, handleStats, handleUsers, handleAdminOrders, handleSetPrice, handleSetStock, setAdminBotRef } from './handlers/admin';
+import { handleAdminAccept, handleAdminReject, handleAdminShip, handleAdminDone, handleStats, handleUsers, handleAdminOrders, handleSetPrice, handleSetStock, setAdminBotRef, handleAdminDashboard } from './handlers/admin';
 import { handleAddPromo, handleDelPromo } from './handlers/promo';
 import { handleBroadcast, handleBroadcastAll } from './handlers/broadcast';
 import { handleProfile, handleProfileEdit, handleProfileInput, isInProfileMode, clearProfileMode } from './handlers/profile';
@@ -38,6 +38,7 @@ export function createBot() {
     });
 
     // Admin commands
+    bot.command('admin', handleAdminDashboard);
     bot.command('stats', handleStats);
     bot.command('users', handleUsers);
     bot.command('orders', handleAdminOrders);
@@ -86,6 +87,7 @@ export function createBot() {
 
     // Language
     bot.callbackQuery(/^lang:/, handleLangSet);
+    bot.callbackQuery(/^start_lang:/, handleStartLangSelect);
 
     // Profile
     bot.callbackQuery(/^profile:/, handleProfileEdit);

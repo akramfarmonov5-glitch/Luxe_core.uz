@@ -132,6 +132,9 @@ const translations: Record<string, Record<Lang, string>> = {
 
     notify_sent: { uz: '✅ Xabar {count} ta foydalanuvchiga yuborildi.', ru: '✅ Сообщение отправлено {count} пользователям.' },
 
+    phone_accepted: { uz: 'Rahmat! Raqamingiz qabul qilindi.', ru: 'Спасибо! Ваш номер принят.' },
+    phone_invalid: { uz: '❌ Noto\'g\'ri raqam. O\'zbekiston raqamini (+998...) yuboring.', ru: '❌ Неверный номер. Используйте узбекский номер (+998...).' },
+
     error: { uz: '❌ Xatolik yuz berdi.', ru: '❌ Произошла ошибка.' },
     continue_msg: { uz: 'Tez orada siz bilan bog\'lanamiz! 🚀', ru: 'Мы скоро с вами свяжемся! 🚀' },
 };

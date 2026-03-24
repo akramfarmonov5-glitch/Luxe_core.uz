@@ -352,3 +352,64 @@ export async function handleSetStock(ctx: Context) {
         await ctx.reply('❌ Xatolik.');
     }
 }
+
+// ========== /admin (combined dashboard) ==========
+export async function handleAdminDashboard(ctx: Context) {
+    if (ctx.from?.id !== config.ADMIN_ID) {
+        await ctx.reply('⛔ Bu komanda faqat admin uchun.');
+        return;
+    }
+
+    try {
+        const today = new Date().toISOString().split('T')[0];
+
+        // Parallel queries for speed
+        const [usersRes, ordersRes, todayOrdersRes, productsRes, pendingRes, revenueRes, todayRevenueRes, recentUsersRes] = await Promise.all([
+            supabase.from('bot_users').select('*', { count: 'exact', head: true }),
+            supabase.from('orders').select('*', { count: 'exact', head: true }),
+            supabase.from('orders').select('*', { count: 'exact', head: true }).eq('date', today),
+            supabase.from('products').select('*', { count: 'exact', head: true }),
+            supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'Kutilmoqda'),
+            supabase.from('orders').select('total'),
+            supabase.from('orders').select('total').eq('date', today),
+            supabase.from('bot_users').select('name, phone, created_at').order('created_at', { ascending: false }).limit(5),
+        ]);
+
+        const totalRevenue = revenueRes.data?.reduce((s: number, o: any) => s + Number(o.total), 0) || 0;
+        const todayRevenue = todayRevenueRes.data?.reduce((s: number, o: any) => s + Number(o.total), 0) || 0;
+
+        let recentText = '';
+        recentUsersRes.data?.forEach((u: any, i: number) => {
+            recentText += `  ${i + 1}. ${u.name || 'Nomsiz'} | 📱 ${u.phone || '-'}\n`;
+        });
+
+        const text =
+            `📊 *LUXECORE Admin Dashboard*\n` +
+            `📅 ${today}\n\n` +
+            `━━━━━ 👥 FOYDALANUVCHILAR ━━━━━\n` +
+            `Jami: *${usersRes.count || 0}*\n\n` +
+            `━━━━━ 📦 BUYURTMALAR ━━━━━\n` +
+            `Jami: *${ordersRes.count || 0}*\n` +
+            `Bugungi: *${todayOrdersRes.count || 0}*\n` +
+            `⏳ Kutilayotgan: *${pendingRes.count || 0}*\n\n` +
+            `━━━━━ 💰 TUSHUM ━━━━━\n` +
+            `Jami: *${totalRevenue.toLocaleString('uz-UZ')} UZS*\n` +
+            `Bugungi: *${todayRevenue.toLocaleString('uz-UZ')} UZS*\n\n` +
+            `━━━━━ 🏷 MAHSULOTLAR ━━━━━\n` +
+            `Soni: *${productsRes.count || 0}*\n\n` +
+            `🆕 *Oxirgi 5 mijoz:*\n${recentText || 'Hali yo\'q'}\n\n` +
+            `🛠 *Admin buyruqlari:*\n` +
+            `/stats — To'liq statistika\n` +
+            `/users — Foydalanuvchilar ro'yxati\n` +
+            `/orders — Oxirgi buyurtmalar\n` +
+            `/setprice ID NARX\n` +
+            `/setstock ID SONI\n` +
+            `/broadcast XABAR\n` +
+            `/notifyall XABAR`;
+
+        await ctx.reply(text, { parse_mode: 'Markdown' });
+    } catch (err) {
+        console.error('Admin dashboard error:', err);
+        await ctx.reply('❌ Dashboard yuklashda xatolik.');
+    }
+}
