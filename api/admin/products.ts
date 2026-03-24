@@ -89,6 +89,52 @@ export default async function handler(req: any, res: any) {
         .select()
         .single();
       if (error) throw error;
+
+      // Auto-post to Telegram channel
+      try {
+        const botToken = getEnv('BOT_TOKEN');
+        const channelId = getEnv('CHANNEL_ID') || '-1003605314914';
+        const siteUrl = getEnv('SITE_URL') || getEnv('VITE_SITE_URL') || 'https://luxe-core-uz-three.vercel.app';
+
+        if (botToken && data) {
+          const price = Number(data.price).toLocaleString('uz-UZ');
+          const caption =
+            `🆕 *Yangi mahsulot!*\n\n` +
+            `📦 *${data.name}*\n` +
+            `💰 Narxi: *${price} UZS*\n` +
+            `${data.shortDescription ? `📝 ${data.shortDescription}\n` : ''}` +
+            `\n🛒 Xarid qilish: ${siteUrl}`;
+
+          if (data.image) {
+            // Send with photo
+            await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: channelId,
+                photo: data.image,
+                caption,
+                parse_mode: 'Markdown',
+              }),
+            });
+          } else {
+            // Send text only
+            await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: channelId,
+                text: caption,
+                parse_mode: 'Markdown',
+              }),
+            });
+          }
+        }
+      } catch (postErr) {
+        console.error('Channel post error:', postErr);
+        // Don't fail the product creation if channel post fails
+      }
+
       return res.status(200).json({ data });
     }
 
