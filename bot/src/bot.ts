@@ -1,6 +1,6 @@
 import { Bot } from 'grammy';
 import { config } from './config';
-import { handleStart, handleHome } from './handlers/start';
+import { handleStart, handleHome, handleContactMessage } from './handlers/start';
 import { handleCategories, handleCategorySelect, handleCategoryPage } from './handlers/categories';
 import { handleSearchPrompt, handleSearchQuery, isInSearchMode, clearSearchMode } from './handlers/search';
 import { handleAddToCart, handleShowCart, handleClearCart, handleCheckout, handleCheckoutInput, isInCheckoutMode, clearCheckoutMode, setBotInstance, handleCartPlus, handleCartMinus, handleCartDelete, handlePayCard, handlePayCash } from './handlers/cart';
@@ -126,6 +126,8 @@ export function createBot() {
     bot.callbackQuery(/^addcart:/, handleAddToCart);
 
     // ========== TEXT MESSAGES ==========
+    bot.on('message:contact', handleContactMessage);
+
     bot.on('message:text', (ctx) => {
         const userId = ctx.from?.id;
         if (!userId) return;
