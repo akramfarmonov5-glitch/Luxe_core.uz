@@ -8,9 +8,9 @@ const profileEditState = new Map<number, string>();
 export function isInProfileMode(userId: number): boolean { return profileEditState.has(userId); }
 export function clearProfileMode(userId: number) { profileEditState.delete(userId); }
 
-export async function ensureUser(userId: number, name?: string) {
+export async function ensureUser(userId: number, name?: string, username?: string) {
     await supabase.from('bot_users').upsert(
-        { telegram_id: userId, name: name || undefined },
+        { telegram_id: userId, name: name || undefined, username: username || undefined },
         { onConflict: 'telegram_id' }
     );
 }
@@ -24,7 +24,7 @@ export async function handleProfile(ctx: Context) {
     if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     const userId = ctx.from?.id || 0;
 
-    await ensureUser(userId, ctx.from?.first_name);
+    await ensureUser(userId, ctx.from?.first_name, ctx.from?.username);
     const profile = await getUserProfile(userId);
     const noData = t(userId, 'profile_no_data');
 

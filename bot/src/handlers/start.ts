@@ -13,7 +13,7 @@ export async function handleStart(ctx: Context) {
     const name = ctx.from?.first_name || 'Foydalanuvchi';
 
     // Register user in DB
-    await ensureUser(userId, name);
+    await ensureUser(userId, name, ctx.from?.username);
 
     // Load user's language preference
     await loadLang(userId);

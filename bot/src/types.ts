@@ -50,6 +50,7 @@ export interface PromoCode {
 export interface BotUser {
     telegram_id: number;
     name?: string;
+    username?: string;
     phone?: string;
     address?: string;
     lang: string;

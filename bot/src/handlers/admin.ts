@@ -254,7 +254,7 @@ export async function handleUsers(ctx: Context) {
 
         let text = `👥 *Foydalanuvchilar (${count || users.length}):*\n\n`;
         users.forEach((u: any, i: number) => {
-            text += `${i + 1}. *${u.name || 'Nomsiz'}*\n`;
+            text += `${i + 1}. *${u.name || 'Nomsiz'}* ${u.username ? `(@${u.username})` : ''}\n`;
             text += `   📱 ${u.phone || '-'} | 🌐 ${u.lang}\n`;
             text += `   🆔 \`${u.telegram_id}\`\n\n`;
         });
@@ -372,7 +372,7 @@ export async function handleAdminDashboard(ctx: Context) {
             supabase.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'Kutilmoqda'),
             supabase.from('orders').select('total'),
             supabase.from('orders').select('total').eq('date', today),
-            supabase.from('bot_users').select('name, phone, created_at').order('created_at', { ascending: false }).limit(5),
+            supabase.from('bot_users').select('name, username, phone, created_at').order('created_at', { ascending: false }).limit(5),
         ]);
 
         const totalRevenue = revenueRes.data?.reduce((s: number, o: any) => s + Number(o.total), 0) || 0;
@@ -380,7 +380,7 @@ export async function handleAdminDashboard(ctx: Context) {
 
         let recentText = '';
         recentUsersRes.data?.forEach((u: any, i: number) => {
-            recentText += `  ${i + 1}. ${u.name || 'Nomsiz'} | 📱 ${u.phone || '-'}\n`;
+            recentText += `  ${i + 1}. ${u.name || 'Nomsiz'} ${u.username ? `(@${u.username})` : ''} | 📱 ${u.phone || '-'}\n`;
         });
 
         const text =
