@@ -7,6 +7,7 @@ export default {
     "./App.tsx",
     "./index.tsx"
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -14,16 +15,24 @@ export default {
       },
       colors: {
         gold: {
-          400: '#FBBF24', // Amber 400
-          500: '#F59E0B', // Amber 500
-          600: '#D97706', // Amber 600
+          400: '#EF4444', // Red 400
+          500: '#DC2626', // Red 500
+          600: '#B91C1C', // Red 600
         },
         dark: {
           900: '#0f0f0f',
           800: '#1a1a1a',
+        },
+        light: {
+          bg: '#FFFBF5',
+          card: '#F5F5F7',
+          text: '#1A1A1A',
+          muted: '#6B7280',
+          border: '#E5E5E5',
         }
       }
     },
   },
   plugins: [],
 }
+

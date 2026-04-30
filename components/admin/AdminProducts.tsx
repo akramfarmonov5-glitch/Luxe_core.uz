@@ -1,8 +1,14 @@
 
 import React, { useState } from 'react';
-import { Edit, Trash2, Plus, Search, Check, X, Save, PlusCircle, MinusCircle, Image as ImageIcon, Youtube, Wand2, Sparkles } from 'lucide-react';
+import { Edit, Trash2, Plus, Search, Check, X, Save, PlusCircle, MinusCircle, Image as ImageIcon, Youtube, Wand2, Sparkles, Box, Globe } from 'lucide-react';
 import { Product, Category } from '../../types';
-import { adminRequest } from '../../lib/adminApi';
+import { supabase } from '../../lib/supabaseClient';
+import { useToast } from '../../context/ToastContext';
+import CloudinaryUpload from '../CloudinaryUpload';
+import { requestGeminiJson } from '../../lib/geminiApi';
+import { getLocalizedText, parseLocalizedObject } from '../../lib/i18nUtils';
+import { getCategoryDisplayName, getCategorySlug, getProductCategoryKey } from '../../lib/categoryUtils';
+import { slugify } from '../../lib/slugify';
 
 interface AdminProductsProps {
   products: Product[];
@@ -11,12 +17,15 @@ interface AdminProductsProps {
 }
 
 const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, categories }) => {
+  const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [formData, setFormData] = useState<Partial<Product>>({
+  const [activeLang, setActiveLang] = useState<'uz' | 'ru' | 'en'>('uz');
+  const [formData, setFormData] = useState<any>({
     name: '',
+    slug: '',
     category: '',
     price: 0,
     image: '',
@@ -24,19 +33,22 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
     videoUrl: '',
     shortDescription: '',
     stock: 0,
+    itemsPerPackage: 1,
     specs: []
   });
 
   const handleOpenAdd = () => {
     setFormData({
       name: '',
-      category: categories.length > 0 ? categories[0].name : '',
+      slug: { uz: '', ru: '', en: '' },
+      category: categories.length > 0 ? getCategorySlug(categories[0]) : '',
       price: 0,
       image: '',
       images: [''],
       videoUrl: '',
       shortDescription: '',
       stock: 0,
+      itemsPerPackage: 1,
       specs: [{ label: '', value: '' }]
     });
     setIsModalOpen(true);
@@ -49,6 +61,14 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
 
     setFormData({
       ...product,
+      name: parseLocalizedObject(product.name),
+      slug: parseLocalizedObject(product.slug),
+      shortDescription: parseLocalizedObject(product.shortDescription),
+      specs: (product.specs || []).map(spec => ({
+        label: parseLocalizedObject(spec.label),
+        value: parseLocalizedObject(spec.value),
+      })),
+      category: getProductCategoryKey(product.category, categories),
       images: images
     });
     setIsModalOpen(true);
@@ -57,66 +77,127 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
   const handleDelete = async (id: number) => {
     if (confirm("Haqiqatan ham bu mahsulotni o'chirmoqchimisiz?")) {
       try {
-        await adminRequest('/api/admin/products', 'DELETE', { id });
+        const { error } = await supabase.from('products').delete().eq('id', id);
+
+        if (error) {
+          console.error('Error deleting product:', error);
+          showToast("O'chirishda xatolik yuz berdi", 'error');
+          return;
+        }
+
         setProducts(prev => prev.filter(p => p.id !== id));
       } catch (err) {
         console.error('Error:', err);
-        alert("O'chirishda xatolik yuz berdi");
       }
     }
   };
 
   const generateProductDetails = async () => {
-    if (!formData.name || !formData.category) {
-      alert("Iltimos, avval Mahsulot nomi va Kategoriyani tanlang.");
+    const productName = getLocalizedText(formData.name, activeLang) || getLocalizedText(formData.name, 'uz');
+    const categoryName = getCategoryDisplayName(formData.category, categories, activeLang) || getCategoryDisplayName(formData.category, categories, 'uz');
+
+    if (!productName || !formData.category) {
+      showToast("Iltimos, avval Mahsulot nomi va Kategoriyani tanlang.", 'warning');
       return;
     }
 
     setIsGenerating(true);
     try {
-      const prompt = `
-          You are a luxury product expert for an online store.
-          Product Name: "${formData.name}"
-          Category: "${formData.category}"
-          
-          Generate the following in Uzbek language (Latin script):
-          1. A short, premium, and catchy description (max 2 sentences).
-          2. 4 key technical specifications (specs) relevant to this product.
+      const data = await requestGeminiJson<{
+        nameUz: string;
+        nameRu: string;
+        nameEn: string;
+        slugUz: string;
+        slugRu: string;
+        slugEn: string;
+        shortDescriptionUz: string;
+        shortDescriptionRu: string;
+        shortDescriptionEn: string;
+        specs: {
+          labelUz: string;
+          labelRu: string;
+          labelEn: string;
+          valueUz: string;
+          valueRu: string;
+          valueEn: string;
+        }[];
+      }>({
+        systemInstruction: 'You are a multilingual ecommerce product content expert for a packaging materials and wholesale store in Uzbekistan. Always answer in valid JSON only.',
+        message: `
+          Product name: "${productName}"
+          Category: "${categoryName}"
+          Stock/items context: ${formData.stock || 0} units in stock, ${formData.itemsPerPackage || 1} items per package.
 
-          Return JSON format:
+          Generate multilingual product content in:
+          1. Uzbek Latin script
+          2. Russian
+          3. English
+
+          Rules:
+          - Keep descriptions concise, sales-friendly, and relevant to packaging/disposable tableware/wholesale.
+          - Each shortDescription must be max 2 sentences.
+          - Generate 4 key specifications.
+          - Slugs must be lowercase latin kebab-case.
+          - Do not mix languages inside one field.
+
+          Return JSON with this exact shape:
           {
-              "shortDescription": "...",
-              "specs": [
-                  {"label": "Material", "value": "..."},
-                  {"label": "...", "value": "..."}
-              ]
+            "nameUz": "...",
+            "nameRu": "...",
+            "nameEn": "...",
+            "slugUz": "...",
+            "slugRu": "...",
+            "slugEn": "...",
+            "shortDescriptionUz": "...",
+            "shortDescriptionRu": "...",
+            "shortDescriptionEn": "...",
+            "specs": [
+              {
+                "labelUz": "...",
+                "labelRu": "...",
+                "labelEn": "...",
+                "valueUz": "...",
+                "valueRu": "...",
+                "valueEn": "..."
+              }
+            ]
           }
-      `;
-
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt,
-          responseMimeType: 'application/json'
-        }),
+        `,
       });
 
-      if (!response.ok) throw new Error('Proxy error');
-      const data = await response.json();
-
-      if (data.text) {
-        const parsedData = JSON.parse(data.text);
-        setFormData(prev => ({
-          ...prev,
-          shortDescription: parsedData.shortDescription,
-          specs: parsedData.specs
-        }));
-      }
-
+      setFormData(prev => ({
+        ...prev,
+        name: {
+          uz: data.nameUz || prev.name?.uz || '',
+          ru: data.nameRu || prev.name?.ru || '',
+          en: data.nameEn || prev.name?.en || '',
+        },
+        slug: {
+          uz: data.slugUz || slugify(data.nameUz || prev.name?.uz || ''),
+          ru: data.slugRu || slugify(data.nameRu || prev.name?.ru || ''),
+          en: data.slugEn || slugify(data.nameEn || prev.name?.en || ''),
+        },
+        shortDescription: {
+          uz: data.shortDescriptionUz || prev.shortDescription?.uz || '',
+          ru: data.shortDescriptionRu || prev.shortDescription?.ru || '',
+          en: data.shortDescriptionEn || prev.shortDescription?.en || '',
+        },
+        specs: data.specs.map(spec => ({
+          label: {
+            uz: spec.labelUz || '',
+            ru: spec.labelRu || '',
+            en: spec.labelEn || '',
+          },
+          value: {
+            uz: spec.valueUz || '',
+            ru: spec.valueRu || '',
+            en: spec.valueEn || '',
+          },
+        }))
+      }));
     } catch (error) {
       console.error("AI Error:", error);
-      alert("AI ma'lumot yaratishda xatolik yuz berdi.");
+      showToast("AI ma'lumot yaratishda xatolik yuz berdi.", 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -131,44 +212,78 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
     const mainImage = validImages.length > 0 ? validImages[0] : (formData.image || 'https://via.placeholder.com/400');
 
     // Tayyorlash
-    const dataToSave = {
-      name: formData.name,
-      category: formData.category,
+    const dataToSave: Record<string, any> = {
+      name: JSON.stringify(formData.name),
+      slug: JSON.stringify({
+        uz: formData.slug?.uz?.trim() || slugify(getLocalizedText(formData.name, 'uz')),
+        ru: formData.slug?.ru?.trim() || slugify(getLocalizedText(formData.name, 'ru') || getLocalizedText(formData.name, 'uz')),
+        en: formData.slug?.en?.trim() || slugify(getLocalizedText(formData.name, 'en') || getLocalizedText(formData.name, 'uz')),
+      }),
+      category: getProductCategoryKey(formData.category, categories),
       price: Number(formData.price),
-      formattedPrice,
       image: mainImage,
       images: validImages,
-      videoUrl: formData.videoUrl?.trim(),
-      shortDescription: formData.shortDescription,
+      description: JSON.stringify(formData.shortDescription),
       stock: Number(formData.stock),
-      specs: formData.specs
+      "itemsPerPackage": Number(formData.itemsPerPackage || 1),
+      specifications: formData.specs
     };
+
+    // videoUrl mavjud bo'lsa qo'shamiz
+    if (formData.videoUrl && formData.videoUrl.trim() !== '') {
+      dataToSave["videoUrl"] = formData.videoUrl.trim();
+    } else {
+      dataToSave["videoUrl"] = null;
+    }
 
     try {
       if (formData.id) {
-        const result = await adminRequest<{ data: Product }>('/api/admin/products', 'PUT', {
-          id: formData.id,
-          ...dataToSave,
-        });
-        const saved = normalizeProduct(result.data);
-        setProducts(prev => prev.map(p => p.id === Number(formData.id) ? saved : p));
+        // Update
+        const { data, error } = await supabase
+          .from('products')
+          .update(dataToSave)
+          .eq('id', formData.id)
+          .select();
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const newProduct = {
+            ...data[0],
+            formattedPrice: new Intl.NumberFormat('uz-UZ').format(Number(data[0].price)) + ' UZS',
+            shortDescription: data[0].description || '',
+            specs: data[0].specifications || [],
+            videoUrl: data[0].videoUrl || ''
+          };
+          setProducts(prev => prev.map(p => p.id === formData.id ? (newProduct as Product) : p));
+        }
       } else {
-        const result = await adminRequest<{ data: Product }>('/api/admin/products', 'POST', dataToSave);
-        const saved = normalizeProduct(result.data);
-        setProducts(prev => [saved, ...prev]);
+        // Insert - DB will auto-generate ID
+        const { data, error } = await supabase
+          .from('products')
+          .insert([dataToSave])
+          .select();
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          const newProduct = {
+            ...data[0],
+            formattedPrice: new Intl.NumberFormat('uz-UZ').format(Number(data[0].price)) + ' UZS',
+            shortDescription: data[0].description || '',
+            specs: data[0].specifications || [],
+            videoUrl: data[0].videoUrl || ''
+          };
+          setProducts(prev => [(newProduct as Product), ...prev]);
+        }
       }
       setIsModalOpen(false);
     } catch (error) {
       console.error('Error saving product:', error);
-      alert("Saqlashda xatolik yuz berdi: " + (error as any).message);
+      showToast("Saqlashda xatolik yuz berdi: " + (error as any).message, 'error');
     }
   };
 
-  const updateSpec = (index: number, field: 'label' | 'value', value: string) => {
-    const newSpecs = [...(formData.specs || [])];
-    newSpecs[index] = { ...newSpecs[index], [field]: value };
-    setFormData({ ...formData, specs: newSpecs });
-  };
   const addSpec = () => {
     setFormData({ ...formData, specs: [...(formData.specs || []), { label: '', value: '' }] });
   };
@@ -195,8 +310,8 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
   };
 
   const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    p.category.toLowerCase().includes(searchTerm.toLowerCase())
+    (typeof p.name === 'string' ? p.name : JSON.stringify(p.name)).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    getCategoryDisplayName(p.category, categories, 'uz').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -227,7 +342,8 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
       </div>
 
       <div className="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden">
-        <table className="w-full text-left">
+        <div className="overflow-x-auto">
+        <table className="w-full text-left min-w-[700px]">
           <thead className="bg-white/5 border-b border-white/5">
             <tr>
               <th className="p-4 text-sm font-medium text-gray-400">Rasm</th>
@@ -242,8 +358,8 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
             {filteredProducts.map((product) => (
               <tr key={product.id} className="hover:bg-white/5 transition-colors">
                 <td className="p-4">
-                  <div className="w-12 h-12 rounded-lg bg-gray-800 overflow-hidden relative">
-                    <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                  <div className="w-12 aspect-[4/5] rounded-lg bg-gray-800 overflow-hidden relative">
+                    <img src={product.image} alt={getLocalizedText(product.name, 'uz')} className="w-full h-full object-cover" />
                     {product.images && product.images.length > 1 && (
                       <div className="absolute bottom-0 right-0 bg-black/60 text-white text-[10px] px-1 rounded-tl">
                         +{product.images.length - 1}
@@ -251,10 +367,10 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                     )}
                   </div>
                 </td>
-                <td className="p-4 font-medium text-white">{product.name}</td>
+                <td className="p-4 font-medium text-white">{getLocalizedText(product.name, 'uz')}</td>
                 <td className="p-4 text-gray-400 text-sm">
                   <span className="bg-white/5 px-2 py-1 rounded text-xs border border-white/10">
-                    {product.category}
+                    {getCategoryDisplayName(product.category, categories, 'uz')}
                   </span>
                 </td>
                 <td className="p-4 text-gold-400 text-sm">{product.formattedPrice}</td>
@@ -283,6 +399,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {isModalOpen && (
@@ -304,24 +421,53 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                   AI To'ldirish
                 </button>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
-                <X size={24} />
-              </button>
+              <div className="flex items-center gap-3">
+                <div className="flex bg-black p-1 rounded-xl border border-white/10">
+                  {(['uz', 'ru', 'en'] as const).map(l => (
+                    <button key={l} type="button" onClick={() => setActiveLang(l)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${activeLang === l ? 'bg-gold-400 text-black' : 'text-gray-400 hover:text-white'}`}
+                    >{l}</button>
+                  ))}
+                </div>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white">
+                  <X size={24} />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-400 text-sm mb-4">
+              <Globe size={18} />
+              <span>Siz hozir <b>{activeLang.toUpperCase()}</b> tili uchun ma'lumot kiritmoqdasiz.</span>
             </div>
 
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-400">Nomi</label>
+                  <label className="text-sm text-gray-400">Nomi ({activeLang.toUpperCase()})</label>
                   <input
-                    required
+                    required={activeLang === 'uz'}
                     type="text"
-                    value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    value={formData.name?.[activeLang] || ''}
+                    onChange={e => setFormData({ ...formData, name: { ...formData.name, [activeLang]: e.target.value } })}
                     className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none"
                     placeholder="Masalan: Rolex Submariner"
                   />
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm text-gray-400 flex items-center gap-2">
+                    <Globe size={14} /> Slug ({activeLang.toUpperCase()})
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.slug?.[activeLang] || ''}
+                    onChange={e => setFormData({ ...formData, slug: { ...formData.slug, [activeLang]: e.target.value } })}
+                    className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none font-mono text-sm"
+                    placeholder={activeLang === 'uz' ? 'polietilen-paket' : activeLang === 'ru' ? 'polietilenovyy-paket' : 'polyethylene-bag'}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm text-gray-400">Kategoriya</label>
                   <select
@@ -332,7 +478,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                   >
                     <option className="bg-zinc-900 text-white" value="" disabled>Tanlang</option>
                     {categories.map(cat => (
-                      <option className="bg-zinc-900 text-white" key={cat.id} value={cat.name}>{cat.name}</option>
+                      <option className="bg-zinc-900 text-white" key={cat.id} value={getCategorySlug(cat)}>{getLocalizedText(cat.name, 'uz')}</option>
                     ))}
                   </select>
                 </div>
@@ -361,6 +507,23 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm text-gray-400 flex items-center gap-2">
+                    <Box size={14} className="text-gold-400" /> Qadoqdagi soni
+                  </label>
+                  <input
+                    required
+                    type="number"
+                    min="1"
+                    value={formData.itemsPerPackage}
+                    onChange={e => setFormData({ ...formData, itemsPerPackage: Number(e.target.value) })}
+                    className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none"
+                    placeholder="Masalan: 100"
+                  />
+                </div>
+              </div>
+
               <div className="space-y-3 bg-black/40 p-4 rounded-xl border border-white/5">
                 <div className="flex justify-between items-center">
                   <label className="text-sm text-gray-400 flex items-center gap-2">
@@ -372,20 +535,21 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                     </button>
                   )}
                 </div>
-                <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-3">
                   {formData.images?.map((url, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                      <span className="text-xs text-gray-600 w-4">{index + 1}.</span>
-                      <input
-                        type="text"
-                        value={url}
-                        onChange={(e) => updateImage(index, e.target.value)}
-                        className="flex-1 bg-black border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:border-gold-400 outline-none"
-                        placeholder="https://..."
+                    <div key={index} className="relative">
+                      <CloudinaryUpload
+                        currentImage={url}
+                        label={`Rasm ${index + 1}`}
+                        onUpload={(newUrl) => updateImage(index, newUrl)}
                       />
                       {index > 0 && (
-                        <button type="button" onClick={() => removeImage(index)} className="text-red-400 hover:text-red-300 p-2">
-                          <MinusCircle size={18} />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-lg text-xs z-10"
+                        >
+                          <MinusCircle size={14} />
                         </button>
                       )}
                     </div>
@@ -408,16 +572,16 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
 
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <label className="text-sm text-gray-400">Qisqa Tavsif</label>
-                  {formData.shortDescription && (
+                  <label className="text-sm text-gray-400">Qisqa Tavsif ({activeLang.toUpperCase()})</label>
+                  {formData.shortDescription?.[activeLang] && (
                     <span className="text-[10px] text-purple-400 flex items-center gap-1">
                       <Wand2 size={10} /> AI Assisted
                     </span>
                   )}
                 </div>
                 <textarea
-                  value={formData.shortDescription}
-                  onChange={e => setFormData({ ...formData, shortDescription: e.target.value })}
+                  value={formData.shortDescription?.[activeLang] || ''}
+                  onChange={e => setFormData({ ...formData, shortDescription: { ...formData.shortDescription, [activeLang]: e.target.value } })}
                   className="w-full h-24 bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none resize-none"
                   placeholder="Tavsif yozing yoki 'AI To'ldirish' tugmasini bosing..."
                 />
@@ -436,15 +600,23 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                       <input
                         type="text"
                         placeholder="Nomi"
-                        value={spec.label}
-                        onChange={(e) => updateSpec(index, 'label', e.target.value)}
+                        value={spec.label?.[activeLang] || ''}
+                        onChange={(e) => {
+                          const newSpecs = [...(formData.specs || [])];
+                          newSpecs[index] = { ...newSpecs[index], label: { ...newSpecs[index].label, [activeLang]: e.target.value } };
+                          setFormData({ ...formData, specs: newSpecs });
+                        }}
                         className="flex-1 bg-black border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:border-gold-400 outline-none"
                       />
                       <input
                         type="text"
                         placeholder="Qiymati"
-                        value={spec.value}
-                        onChange={(e) => updateSpec(index, 'value', e.target.value)}
+                        value={spec.value?.[activeLang] || ''}
+                        onChange={(e) => {
+                          const newSpecs = [...(formData.specs || [])];
+                          newSpecs[index] = { ...newSpecs[index], value: { ...newSpecs[index].value, [activeLang]: e.target.value } };
+                          setFormData({ ...formData, specs: newSpecs });
+                        }}
                         className="flex-1 bg-black border border-white/20 rounded-lg px-3 py-2 text-sm text-white focus:border-gold-400 outline-none"
                       />
                       <button type="button" onClick={() => removeSpec(index)} className="text-red-400 hover:text-red-300 p-2">
@@ -476,7 +648,3 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
 };
 
 export default AdminProducts;
-const normalizeProduct = (item: any): Product => ({
-  ...item,
-  id: Number(item.id),
-});

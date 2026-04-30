@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { NavigationSettings, MenuItem, SocialLink, Category } from '../../types';
-import { Plus, Trash2, Menu, Share2, Save, GripVertical, Link as LinkIcon } from 'lucide-react';
-import { adminRequest } from '../../lib/adminApi';
+import { Plus, Trash2, Menu, Share2, Save, GripVertical, Link as LinkIcon, Loader2 } from 'lucide-react';
+import { supabase } from '../../lib/supabaseClient';
+import { useToast } from '../../context/ToastContext';
+import { getLocalizedText } from '../../lib/i18nUtils';
+import { getCategorySlug } from '../../lib/categoryUtils';
 
 interface AdminNavigationProps {
     navigationSettings: NavigationSettings;
@@ -10,6 +13,7 @@ interface AdminNavigationProps {
 }
 
 const AdminNavigation: React.FC<AdminNavigationProps> = ({ navigationSettings, setNavigationSettings, categories }) => {
+    const { showToast } = useToast();
     const [formData, setFormData] = useState<NavigationSettings>({ ...navigationSettings });
     const [isSaved, setIsSaved] = useState(false);
 
@@ -17,7 +21,7 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ navigationSettings, s
     const addMenuItem = () => {
         setFormData(prev => ({
             ...prev,
-            menuItems: [...prev.menuItems, { id: `nav_${Date.now()}`, label: '', href: '#' }]
+            menuItems: [...prev.menuItems, { id: Date.now(), label: '', href: '#' }]
         }));
     };
 
@@ -37,7 +41,7 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ navigationSettings, s
     const addSocialLink = () => {
         setFormData(prev => ({
             ...prev,
-            socialLinks: [...prev.socialLinks, { id: `soc_${Date.now()}`, platform: 'instagram', url: '' }]
+            socialLinks: [...prev.socialLinks, { id: Date.now(), platform: 'instagram', url: '' }]
         }));
     };
 
@@ -60,14 +64,19 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ navigationSettings, s
         setIsSaving(true);
 
         try {
-            await adminRequest('/api/admin/navigation', 'PUT', formData);
+            // Upsert navigation settings to Supabase
+            const { error } = await supabase
+                .from('navigation_settings')
+                .upsert({ id: 'main', ...formData }, { onConflict: 'id' });
+
+            if (error) throw error;
 
             setNavigationSettings(formData);
             setIsSaved(true);
             setTimeout(() => setIsSaved(false), 2000);
         } catch (error) {
             console.error('Save error:', error);
-            alert('Saqlashda xatolik: ' + (error as any).message);
+            showToast('Saqlashda xatolik: ' + (error as any).message, 'error');
         } finally {
             setIsSaving(false);
         }
@@ -106,7 +115,7 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ navigationSettings, s
                                     <input
                                         type="text"
                                         placeholder="Nomi (Masalan: Erkaklar)"
-                                        value={item.label}
+                                        value={getLocalizedText(item.label, 'uz')}
                                         onChange={(e) => updateMenuItem(index, 'label', e.target.value)}
                                         className="w-full bg-transparent border-b border-white/10 text-sm text-white focus:outline-none focus:border-gold-400 pb-1"
                                     />
@@ -138,8 +147,8 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ navigationSettings, s
                                             </optgroup>
                                             <optgroup label="Kategoriyalar">
                                                 {categories.map(cat => (
-                                                    <option key={cat.id} value={`#category-${cat.name}`}>
-                                                        {cat.name}
+                                                    <option key={cat.id} value={`#category-${getCategorySlug(cat)}`}>
+                                                        {getLocalizedText(cat.name, 'uz')}
                                                     </option>
                                                 ))}
                                             </optgroup>

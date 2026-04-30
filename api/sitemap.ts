@@ -1,0 +1,231 @@
+import { createClient } from '@supabase/supabase-js';
+
+const BASE_URL = 'https://luxe-core-uz-three.vercel.app';
+const LANGUAGES = ['uz', 'ru', 'en'] as const;
+
+interface SitemapImageData {
+  image?: string;
+  imageTitle?: string;
+  imageCaption?: string;
+}
+
+export default async function handler(req, res) {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_KEY;
+  const today = new Date().toISOString().split('T')[0];
+
+  try {
+    let products = [];
+    let categories = [];
+    let blogPosts = [];
+
+    if (supabaseUrl && supabaseKey) {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      const [prodRes, catRes, blogRes] = await Promise.all([
+        supabase.from('products').select('*'),
+        supabase.from('categories').select('*'),
+        supabase.from('blog_posts').select('*').order('date', { ascending: false }),
+      ]);
+
+      if (prodRes.data) products = prodRes.data;
+      if (catRes.data) categories = catRes.data;
+      if (blogRes.data) blogPosts = blogRes.data;
+    }
+
+    if (products.length === 0) products = getFallbackProducts();
+    if (categories.length === 0) categories = getFallbackCategories();
+
+    let urls = '';
+
+    urls += renderLocalizedUrl('/', today, 'daily', '1.0');
+
+    for (const cat of categories) {
+      urls += renderLocalizedCategoryUrl(cat, today, 'weekly', '0.9', {
+        image: cat.image,
+        imageTitle: getLocalizedText(cat.name, 'uz'),
+      });
+    }
+
+    for (const product of products) {
+      urls += renderLocalizedEntityUrl('product', product, today, 'weekly', '0.8', {
+        image: product.image,
+        imageTitle: getLocalizedText(product.name, 'uz'),
+        imageCaption: getLocalizedText(product.shortDescription || product.description || product.name, 'uz'),
+      });
+    }
+
+    for (const post of blogPosts) {
+      urls += renderLocalizedEntityUrl('blog', post, post.date || today, 'monthly', '0.7', {
+        image: post.image,
+        imageTitle: getLocalizedText(post.title, 'uz'),
+      });
+    }
+
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls}
+</urlset>`;
+
+    res.setHeader('Content-Type', 'application/xml');
+    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+    res.status(200).send(sitemap);
+  } catch (err) {
+    console.error('Sitemap Generation Error:', err);
+    const fallback = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${BASE_URL}/uz</loc>
+    <lastmod>${today}</lastmod>
+    <priority>1.0</priority>
+  </url>
+</urlset>`;
+    res.setHeader('Content-Type', 'application/xml');
+    res.status(200).send(fallback);
+  }
+}
+
+function renderLocalizedUrl(path, lastmod, changefreq, priority, imageData: SitemapImageData = {}) {
+  return LANGUAGES.map((lang) => {
+    const loc = localizedUrl(path, lang);
+    const alternates = LANGUAGES.map((altLang) =>
+      `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${localizedUrl(path, altLang)}" />`
+    ).join('\n');
+    const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${localizedUrl(path, 'uz')}" />`;
+    const image = imageData.image ? `
+    <image:image>
+      <image:loc>${escapeXml(imageData.image)}</image:loc>
+      <image:title>${escapeXml(imageData.imageTitle || '')}</image:title>${imageData.imageCaption ? `
+      <image:caption>${escapeXml(imageData.imageCaption)}</image:caption>` : ''}
+    </image:image>` : '';
+
+    return `
+  <url>
+    <loc>${loc}</loc>
+${alternates}
+${xDefault}
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>${image}
+  </url>`;
+  }).join('');
+}
+
+function renderLocalizedCategoryUrl(category, lastmod, changefreq, priority, imageData: SitemapImageData = {}) {
+  return LANGUAGES.map((lang) => {
+    const loc = localizedUrl(`/category/${getCategorySlug(category, lang)}`, lang);
+    const alternates = LANGUAGES.map((altLang) =>
+      `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${localizedUrl(`/category/${getCategorySlug(category, altLang)}`, altLang)}" />`
+    ).join('\n');
+    const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${localizedUrl(`/category/${getCategorySlug(category, 'uz')}`, 'uz')}" />`;
+    const image = imageData.image ? `
+    <image:image>
+      <image:loc>${escapeXml(imageData.image)}</image:loc>
+      <image:title>${escapeXml(imageData.imageTitle || '')}</image:title>${imageData.imageCaption ? `
+      <image:caption>${escapeXml(imageData.imageCaption)}</image:caption>` : ''}
+    </image:image>` : '';
+
+    return `
+  <url>
+    <loc>${loc}</loc>
+${alternates}
+${xDefault}
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>${image}
+  </url>`;
+  }).join('');
+}
+
+function renderLocalizedEntityUrl(entityType, entity, lastmod, changefreq, priority, imageData: SitemapImageData = {}) {
+  return LANGUAGES.map((lang) => {
+    const path = `/${entityType}/${getEntitySlug(entityType, entity, lang)}`;
+    const loc = localizedUrl(path, lang);
+    const alternates = LANGUAGES.map((altLang) =>
+      `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${localizedUrl(`/${entityType}/${getEntitySlug(entityType, entity, altLang)}`, altLang)}" />`
+    ).join('\n');
+    const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${localizedUrl(`/${entityType}/${getEntitySlug(entityType, entity, 'uz')}`, 'uz')}" />`;
+    const image = imageData.image ? `
+    <image:image>
+      <image:loc>${escapeXml(imageData.image)}</image:loc>
+      <image:title>${escapeXml(imageData.imageTitle || '')}</image:title>${imageData.imageCaption ? `
+      <image:caption>${escapeXml(imageData.imageCaption)}</image:caption>` : ''}
+    </image:image>` : '';
+
+    return `
+  <url>
+    <loc>${loc}</loc>
+${alternates}
+${xDefault}
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>${image}
+  </url>`;
+  }).join('');
+}
+
+function localizedUrl(path, lang) {
+  return `${BASE_URL}${path === '/' ? `/${lang}` : `/${lang}${path}`}`;
+}
+
+function getCategorySlug(category, lang) {
+  return getLocalizedText(category.slug, lang) || slugify(getLocalizedText(category.name, lang));
+}
+
+function getEntitySlug(entityType, entity, lang) {
+  const source = entityType === 'blog' ? entity.title : entity.name;
+  return `${getLocalizedText(entity.slug, lang) || slugify(getLocalizedText(source, lang))}-${entity.id}`;
+}
+
+function getLocalizedText(text, lang) {
+  if (!text) return '';
+  if (typeof text === 'string') {
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed && (parsed.uz !== undefined || parsed.ru !== undefined || parsed.en !== undefined)) {
+        return parsed[lang] || parsed.uz || '';
+      }
+    } catch {
+      return text;
+    }
+  }
+  if (typeof text === 'object') {
+    return text[lang] || text.uz || '';
+  }
+  return String(text);
+}
+
+function slugify(text) {
+  if (!text) return '';
+  return text.toString().toLowerCase().trim()
+    .replace(/['`']/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function escapeXml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function getFallbackProducts() {
+  return [
+    { id: 1, name: { uz: 'Midnight Chronograph', ru: 'Midnight Chronograph', en: 'Midnight Chronograph' }, category: 'soatlar', image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=1000&auto=format&fit=crop', shortDescription: { uz: 'Eksklyuziv premium soat.', ru: 'Eksklyuziv premium soat.', en: 'Exclusive premium watch.' } },
+  ];
+}
+
+function getFallbackCategories() {
+  return [
+    { slug: 'soatlar', name: { uz: 'Soatlar', ru: 'Soatlar', en: 'Watches' } },
+    { slug: 'sumkalar', name: { uz: 'Sumkalar', ru: 'Sumkalar', en: 'Bags' } },
+    { slug: 'parfyumeriya', name: { uz: 'Parfyumeriya', ru: 'Parfyumeriya', en: 'Perfume' } },
+  ];
+}

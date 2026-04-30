@@ -1,34 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Universal Environment Variable o'quvchi (Vite + Node.js)
-const getEnv = (key: string) => {
-  // 1. Vite (Frontend) tekshiruvi
-  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[key]) {
-    return import.meta.env[key];
-  }
-  // 2. Node.js (Vercel Serverless Function) tekshiruvi
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
-    return process.env[key];
-  }
-  return ''; // Agar topilmasa bo'sh qaytaradi
-};
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-const supabaseUrl = getEnv('VITE_SUPABASE_URL') || getEnv('SUPABASE_URL');
-const supabaseAnonKey = getEnv('VITE_SUPABASE_KEY') || getEnv('SUPABASE_ANON_KEY');
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase URL/KEY topilmadi. Loyihada mock fallback ishlatiladi.');
-}
+export const hasSupabaseCredentials = Boolean(supabaseUrl && supabaseAnonKey);
 
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder',
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      storageKey: 'luxecore_auth',
-    },
-  }
+  supabaseAnonKey || 'placeholder'
 );

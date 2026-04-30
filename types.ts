@@ -1,24 +1,31 @@
+export interface LocalizedString {
+  uz: string;
+  ru: string;
+  en: string;
+}
 
 export interface Product {
   id: number;
-  name: string;
+  name: string | LocalizedString;
+  slug?: string | LocalizedString;
   price: number;
   formattedPrice: string;
   category: string; // This will link to Category.slug or name
   image: string;
   images?: string[]; // Qo'shimcha rasmlar (max 4)
   videoUrl?: string; // YouTube video link
-  shortDescription: string;
-  specs: { label: string; value: string }[];
+  shortDescription: string | LocalizedString;
+  specs: { label: string | LocalizedString; value: string | LocalizedString }[];
   stock?: number;
+  itemsPerPackage?: number;
 }
 
 export interface Category {
-  id: string;
-  name: string;
-  slug: string;
+  id: number | string;
+  name: string | LocalizedString;
+  slug: string | LocalizedString;
   image: string;
-  description?: string;
+  description?: string | LocalizedString;
   googleProductCategory?: string; // For FB/Google Catalog mapping
 }
 
@@ -31,13 +38,13 @@ export interface HeroContent {
 }
 
 export interface MenuItem {
-  id: string;
-  label: string;
+  id: number | string;
+  label: string | LocalizedString;
   href: string; // Masalan: "#" yoki "/category/soatlar"
 }
 
 export interface SocialLink {
-  id: string;
+  id: number | string;
   platform: 'instagram' | 'telegram' | 'facebook' | 'youtube' | 'twitter';
   url: string;
 }
@@ -48,7 +55,7 @@ export interface NavigationSettings {
 }
 
 export interface NavItem {
-  label: string;
+  label: string | LocalizedString;
   href: string;
 }
 
@@ -58,6 +65,13 @@ export interface CartItem extends Product {
 
 export type OrderStatus = 'Kutilmoqda' | 'To\'landi' | 'Yetkazilmoqda' | 'Yakunlandi';
 
+export interface OrderItem {
+  id?: number;
+  name: string | LocalizedString;
+  quantity: number;
+  price?: number;
+}
+
 export interface Order {
   id: string;
   customerName: string;
@@ -66,17 +80,20 @@ export interface Order {
   status: OrderStatus;
   date: string;
   paymentMethod: 'Paynet' | 'Naqd';
+  items?: OrderItem[];
+  created_at?: string;
 }
 
 export interface BlogPost {
-  id: string;
-  title: string;
+  id: number;
+  title: string | LocalizedString;
+  slug?: string | LocalizedString;
   image: string;
-  content: string;
+  content: string | LocalizedString;
   seo: {
-    title: string;
-    description: string;
-    keywords: string[];
+    title: string | LocalizedString;
+    description: string | LocalizedString;
+    keywords: string[] | LocalizedString; // LocalizedString can contain stringified arrays if needed
   };
   date: string;
 }
@@ -87,6 +104,15 @@ export interface ChatLead {
   phone: string;
   created_at: string;
   last_message?: string;
+}
+
+export interface Review {
+  id: string;
+  product_id: number;
+  user_name: string;
+  rating: number; // 1 to 5
+  comment: string;
+  created_at: string;
 }
 
 declare global {

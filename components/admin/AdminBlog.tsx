@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { BlogPost } from '../../types';
 import { Sparkles, Image as ImageIcon, Plus, Trash2, Calendar, Wand2, Search, Edit, X, Save } from 'lucide-react';
-import { adminRequest } from '../../lib/adminApi';
+import { supabase } from '../../lib/supabaseClient';
+import { useToast } from '../../context/ToastContext';
+import { requestGeminiJson } from '../../lib/geminiApi';
+import { parseLocalizedObject, getLocalizedText } from '../../lib/i18nUtils';
+import { Globe } from 'lucide-react';
+import { slugify } from '../../lib/slugify';
 
 interface AdminBlogProps {
   posts: BlogPost[];
@@ -9,12 +14,16 @@ interface AdminBlogProps {
 }
 
 const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
+  const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [activeLang, setActiveLang] = useState<'uz' | 'ru' | 'en'>('uz');
 
-  const [formData, setFormData] = useState<Partial<BlogPost>>({
+  const [formData, setFormData] = useState<any>({
     title: '',
+    slug: '',
     image: '',
     content: '',
     seo: { title: '', description: '', keywords: [] },
@@ -24,6 +33,7 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
   const handleOpenAdd = () => {
     setFormData({
       title: '',
+      slug: { uz: '', ru: '', en: '' },
       image: '',
       content: '',
       seo: { title: '', description: '', keywords: [] },
@@ -33,14 +43,24 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
   };
 
   const handleOpenEdit = (post: BlogPost) => {
-    setFormData(post);
+    setFormData({
+      ...post,
+      title: parseLocalizedObject(post.title),
+      slug: parseLocalizedObject(post.slug),
+      content: parseLocalizedObject(post.content),
+      seo: {
+         title: parseLocalizedObject(post.seo?.title),
+         description: parseLocalizedObject(post.seo?.description),
+         keywords: parseLocalizedObject(post.seo?.keywords)
+      }
+    });
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (confirm("Bu maqolani o'chirmoqchimisiz?")) {
       try {
-        await adminRequest('/api/admin/blog', 'DELETE', { id });
+        await supabase.from('blog_posts').delete().eq('id', id);
         setPosts(prev => prev.filter(p => p.id !== id));
       } catch (error) {
         console.error('Delete error:', error);
@@ -49,57 +69,118 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
   };
 
   const generateContent = async () => {
-    if (!formData.title) {
-      alert("Iltimos, avval maqola mavzusi (Title)ni yozing.");
+    const topic = getLocalizedText(formData.title, activeLang) || getLocalizedText(formData.title, 'uz');
+
+    if (!topic) {
+      showToast("Iltimos, avval maqola mavzusi (Title)ni yozing.", 'warning');
       return;
     }
 
     setIsGenerating(true);
     try {
-      const prompt = `
-          You are a fashion blog writer for a luxury store.
-          Topic: "${formData.title}"
-          
-          Generate a blog post in **Uzbek** language:
-          1. Content: Engaging, sophisticated content (approx 150 words).
-          2. SEO Title: Short catchy title.
-          3. SEO Description: Meta description.
-          4. Keywords: Array of 5 strings.
+      const data = await requestGeminiJson<{
+        titleUz: string;
+        titleRu: string;
+        titleEn: string;
+        slugUz: string;
+        slugRu: string;
+        slugEn: string;
+        contentUz: string;
+        contentRu: string;
+        contentEn: string;
+        seo: {
+          titleUz: string;
+          titleRu: string;
+          titleEn: string;
+          descriptionUz: string;
+          descriptionRu: string;
+          descriptionEn: string;
+          keywordsUz: string[];
+          keywordsRu: string[];
+          keywordsEn: string[];
+        };
+      }>({
+        systemInstruction: 'You are an expert multilingual SEO content writer for a packaging materials and wholesale store in Uzbekistan. Always answer in valid JSON only.',
+        message: `
+          Topic: "${topic}"
+
+          Generate the same blog article in 3 languages:
+          1. Uzbek Latin script
+          2. Russian
+          3. English
+
+          Rules:
+          - Uzbek fields must be Uzbek Latin only.
+          - Russian fields must be Russian only.
+          - English fields must be English only.
+          - Each content field should be around 150 words.
+          - Slugs must be lowercase latin kebab-case.
+          - SEO keywords must be arrays of 5 strings in the same language.
 
           Return JSON:
           {
-              "content": "...",
-              "seo": {
-                  "title": "...",
-                  "description": "...",
-                  "keywords": ["...", "..."]
-              }
+            "titleUz": "...",
+            "titleRu": "...",
+            "titleEn": "...",
+            "slugUz": "...",
+            "slugRu": "...",
+            "slugEn": "...",
+            "contentUz": "...",
+            "contentRu": "...",
+            "contentEn": "...",
+            "seo": {
+              "titleUz": "...",
+              "titleRu": "...",
+              "titleEn": "...",
+              "descriptionUz": "...",
+              "descriptionRu": "...",
+              "descriptionEn": "...",
+              "keywordsUz": ["...", "..."],
+              "keywordsRu": ["...", "..."],
+              "keywordsEn": ["...", "..."]
+            }
           }
-      `;
-
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt,
-          responseMimeType: 'application/json'
-        }),
+        `,
       });
 
-      if (!response.ok) throw new Error('Proxy error');
-      const data = await response.json();
-
-      if (data.text) {
-        const parsedData = JSON.parse(data.text);
-        setFormData(prev => ({
-          ...prev,
-          content: parsedData.content,
-          seo: parsedData.seo
-        }));
-      }
+      setFormData(prev => ({
+        ...prev,
+        title: {
+          uz: data.titleUz || prev.title?.uz || '',
+          ru: data.titleRu || prev.title?.ru || '',
+          en: data.titleEn || prev.title?.en || '',
+        },
+        slug: {
+          uz: data.slugUz || slugify(data.titleUz || prev.title?.uz || ''),
+          ru: data.slugRu || slugify(data.titleRu || prev.title?.ru || ''),
+          en: data.slugEn || slugify(data.titleEn || prev.title?.en || ''),
+        },
+        content: {
+          uz: data.contentUz || prev.content?.uz || '',
+          ru: data.contentRu || prev.content?.ru || '',
+          en: data.contentEn || prev.content?.en || '',
+        },
+        seo: {
+          title: {
+            uz: data.seo.titleUz || prev.seo?.title?.uz || '',
+            ru: data.seo.titleRu || prev.seo?.title?.ru || '',
+            en: data.seo.titleEn || prev.seo?.title?.en || '',
+          },
+          description: {
+            uz: data.seo.descriptionUz || prev.seo?.description?.uz || '',
+            ru: data.seo.descriptionRu || prev.seo?.description?.ru || '',
+            en: data.seo.descriptionEn || prev.seo?.description?.en || '',
+          },
+          keywords: {
+            uz: (data.seo.keywordsUz || []).join(', '),
+            ru: (data.seo.keywordsRu || []).join(', '),
+            en: (data.seo.keywordsEn || []).join(', '),
+          }
+        }
+      }));
     } catch (error) {
       console.error("AI Gen Error", error);
-      alert("AI xatolik yuz berdi. Iltimos, keyinroq urinib ko'ring.");
+      showToast("AI xatolik yuz berdi. API kalitini tekshiring.", 'error');
     } finally {
       setIsGenerating(false);
     }
@@ -108,28 +189,127 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const postData = {
-      ...formData,
-      id: formData.id || `blog_${Date.now()}`
-    } as BlogPost;
+    if (isSaving) return;
+
+    const title = parseLocalizedObject(formData.title);
+    const content = parseLocalizedObject(formData.content);
+    const slug = parseLocalizedObject(formData.slug);
+    const seoTitle = parseLocalizedObject(formData.seo?.title);
+    const seoDescription = parseLocalizedObject(formData.seo?.description);
+    const seoKeywords = parseLocalizedObject(formData.seo?.keywords);
+
+    if (!title.uz.trim() || !content.uz.trim()) {
+      showToast("Maqolaning o'zbekcha sarlavhasi va matni majburiy.", 'warning');
+      return;
+    }
+
+    const localizedSlug = {
+      uz: slug.uz.trim() || slugify(title.uz),
+      ru: slug.ru.trim() || slugify(title.ru || title.uz),
+      en: slug.en.trim() || slugify(title.en || title.uz),
+    };
+
+    const modernPayload: Record<string, any> = {
+      title: JSON.stringify(title),
+      slug: JSON.stringify(localizedSlug),
+      image: formData.image,
+      content: JSON.stringify(content),
+      date: formData.date || new Date().toISOString().split('T')[0],
+      seo: {
+        title: JSON.stringify(seoTitle),
+        description: JSON.stringify(seoDescription),
+        keywords: JSON.stringify(seoKeywords),
+      },
+    };
+
+    const withLegacySeo = (payload: Record<string, any>) => {
+      const next = { ...payload };
+      delete next.seo;
+      next.seo_title = JSON.stringify(seoTitle);
+      next.seo_description = JSON.stringify(seoDescription);
+      next.seo_keywords = Object.values(seoKeywords).filter(Boolean);
+      return next;
+    };
+
+    const getMissingColumn = (error: any) => {
+      const message = [error?.message, error?.details, error?.hint].filter(Boolean).join(' ');
+      return message.match(/Could not find the '([^']+)' column/)?.[1] || '';
+    };
+
+    const normalizeSavedPost = (row: any): BlogPost => ({
+      ...row,
+      seo: row.seo || {
+        title: row.seo_title || modernPayload.seo.title,
+        description: row.seo_description || modernPayload.seo.description,
+        keywords: row.seo_keywords || modernPayload.seo.keywords,
+      },
+    });
 
     try {
-      if (formData.id) {
-        const result = await adminRequest<{ data: BlogPost }>('/api/admin/blog', 'PUT', postData);
-        setPosts(prev => prev.map(p => p.id === formData.id ? result.data : p));
-      } else {
-        const result = await adminRequest<{ data: BlogPost }>('/api/admin/blog', 'POST', postData);
-        setPosts(prev => [result.data, ...prev]);
+      setIsSaving(true);
+
+      let payload = modernPayload;
+      let savedRow: any = null;
+
+      for (let attempt = 0; attempt < 4; attempt += 1) {
+        const query = formData.id
+          ? supabase.from('blog_posts').update(payload).eq('id', formData.id).select().single()
+          : supabase.from('blog_posts').insert([payload]).select().single();
+
+        const { data, error } = await query;
+
+        if (!error) {
+          savedRow = data;
+          break;
+        }
+
+        const missingColumn = getMissingColumn(error);
+        if (missingColumn === 'seo') {
+          payload = withLegacySeo(payload);
+          continue;
+        }
+        if (missingColumn === 'slug') {
+          const next = { ...payload };
+          delete next.slug;
+          payload = next;
+          continue;
+        }
+        if (['seo_title', 'seo_description', 'seo_keywords'].includes(missingColumn)) {
+          const next = { ...payload };
+          delete next.seo_title;
+          delete next.seo_description;
+          delete next.seo_keywords;
+          payload = next;
+          continue;
+        }
+
+        throw error;
       }
+
+      if (!savedRow) {
+        throw new Error('Maqola saqlanmadi. Blog jadvali schema cache yoki ustunlarini tekshiring.');
+      }
+
+      const savedPost = normalizeSavedPost(savedRow);
+
+      if (formData.id) {
+        setPosts(prev => prev.map(p => p.id === savedPost.id ? savedPost : p));
+      } else {
+        setPosts(prev => [savedPost, ...prev]);
+      }
+
       setIsModalOpen(false);
+      showToast('Maqola saqlandi.', 'success');
     } catch (error) {
       console.error('Save error:', error);
-      alert('Saqlashda xatolik: ' + (error as any).message);
+      showToast('Saqlashda xatolik: ' + (error as any).message, 'error');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const filteredPosts = posts.filter(p =>
-    p.title.toLowerCase().includes(searchTerm.toLowerCase())
+    (typeof p.title === 'string' ? p.title : JSON.stringify(p.title)).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -163,15 +343,15 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
         {filteredPosts.map((post) => (
           <div key={post.id} className="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden group hover:border-gold-400/50 transition-all flex flex-col">
             <div className="aspect-video relative overflow-hidden">
-              <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+              <img src={post.image} alt={getLocalizedText(post.title, 'uz')} className="w-full h-full object-cover" />
               <div className="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs text-white flex items-center gap-1">
                 <Calendar size={12} className="text-gold-400" />
                 {post.date}
               </div>
             </div>
             <div className="p-4 flex-1 flex flex-col">
-              <h3 className="text-lg font-bold text-white mb-2 line-clamp-2">{post.title}</h3>
-              <p className="text-gray-400 text-sm line-clamp-3 mb-4 flex-1">{post.content}</p>
+              <h3 className="text-lg font-bold text-white mb-2 line-clamp-2">{getLocalizedText(post.title, 'uz')}</h3>
+              <p className="text-gray-400 text-sm line-clamp-3 mb-4 flex-1">{getLocalizedText(post.content, 'uz')}</p>
 
               <div className="flex justify-between items-center pt-4 border-t border-white/5">
                 <span className="text-xs text-gray-500">ID: {post.id}</span>
@@ -207,15 +387,34 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
               </button>
             </div>
 
+            <div className="flex items-center justify-between gap-3 p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl text-blue-400 text-sm mb-5">
+              <div className="flex items-center gap-2">
+                <Globe size={18} />
+                <span>Hozir <b>{activeLang.toUpperCase()}</b> tili uchun maqola kiritilyapti.</span>
+              </div>
+              <div className="flex bg-black p-1 rounded-xl border border-white/10">
+                {(['uz', 'ru', 'en'] as const).map((lang) => (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() => setActiveLang(lang)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${activeLang === lang ? 'bg-gold-400 text-black' : 'text-gray-400 hover:text-white'}`}
+                  >
+                    {lang}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <form onSubmit={handleSave} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-sm text-gray-400">Sarlavha</label>
+                <label className="text-sm text-gray-400">Sarlavha ({activeLang.toUpperCase()})</label>
                 <div className="flex gap-2">
                   <input
-                    required
+                    required={activeLang === 'uz'}
                     type="text"
-                    value={formData.title}
-                    onChange={e => setFormData({ ...formData, title: e.target.value })}
+                    value={formData.title?.[activeLang] || ''}
+                    onChange={e => setFormData({ ...formData, title: { ...formData.title, [activeLang]: e.target.value } })}
                     className="flex-1 bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none"
                     placeholder="Maqola mavzusi..."
                   />
@@ -233,6 +432,19 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
 
               <div className="space-y-2">
                 <label className="text-sm text-gray-400 flex items-center gap-2">
+                  <Globe size={16} /> Slug ({activeLang.toUpperCase()})
+                </label>
+                <input
+                  type="text"
+                  value={formData.slug?.[activeLang] || ''}
+                  onChange={e => setFormData({ ...formData, slug: { ...formData.slug, [activeLang]: e.target.value } })}
+                  className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none font-mono text-sm"
+                  placeholder={activeLang === 'uz' ? 'premium-soatlar-trendi' : activeLang === 'ru' ? 'trend-premialnyh-chasov' : 'premium-watch-trends'}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm text-gray-400 flex items-center gap-2">
                   <ImageIcon size={16} /> Rasm URL
                 </label>
                 <input
@@ -246,11 +458,11 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm text-gray-400">Matn (Content)</label>
+                <label className="text-sm text-gray-400">Matn (Content) ({activeLang.toUpperCase()})</label>
                 <textarea
-                  required
-                  value={formData.content}
-                  onChange={e => setFormData({ ...formData, content: e.target.value })}
+                  required={activeLang === 'uz'}
+                  value={formData.content?.[activeLang] || ''}
+                  onChange={e => setFormData({ ...formData, content: { ...formData.content, [activeLang]: e.target.value } })}
                   className="w-full h-40 bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none resize-none custom-scrollbar leading-relaxed"
                   placeholder="Maqola matni..."
                 />
@@ -267,11 +479,11 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm text-gray-400">SEO Title</label>
+                  <label className="text-sm text-gray-400">SEO Title ({activeLang.toUpperCase()})</label>
                   <input
                     type="text"
-                    value={formData.seo?.title || ''}
-                    onChange={e => setFormData({ ...formData, seo: { ...formData.seo!, title: e.target.value } })}
+                    value={formData.seo?.title?.[activeLang] || ''}
+                    onChange={e => setFormData({ ...formData, seo: { ...formData.seo!, title: { ...formData.seo?.title, [activeLang]: e.target.value } } })}
                     className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none"
                   />
                 </div>
@@ -281,9 +493,9 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3.5 bg-white/5 hover:bg-white/10 text-white rounded-xl transition-colors">
                   Bekor qilish
                 </button>
-                <button type="submit" className="flex-1 py-3.5 bg-gold-400 hover:bg-gold-500 text-black font-bold rounded-xl transition-colors flex items-center justify-center gap-2">
-                  <Save size={18} />
-                  Saqlash
+                <button type="submit" disabled={isSaving} className="flex-1 py-3.5 bg-gold-400 hover:bg-gold-500 text-black font-bold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                  {isSaving ? <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> : <Save size={18} />}
+                  {isSaving ? 'Saqlanmoqda...' : 'Saqlash'}
                 </button>
               </div>
             </form>

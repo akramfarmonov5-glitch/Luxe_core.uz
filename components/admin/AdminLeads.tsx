@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Phone, Calendar, Search, MessageSquare } from 'lucide-react';
+import { Users, Phone, Calendar, Search, MessageSquare, Trash2 } from 'lucide-react';
 import { ChatLead } from '../../types';
-import { adminRequest } from '../../lib/adminApi';
+import { hasSupabaseCredentials, supabase } from '../../lib/supabaseClient';
+import { useToast } from '../../context/ToastContext';
 
 const AdminLeads: React.FC = () => {
+  const { showToast } = useToast();
   const [leads, setLeads] = useState<ChatLead[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,8 +17,7 @@ const AdminLeads: React.FC = () => {
   const fetchLeads = async () => {
     setLoading(true);
     
-    const env = import.meta.env || {};
-    if (!env.VITE_SUPABASE_URL) {
+    if (!hasSupabaseCredentials) {
         setLeads([
             { id: '1', name: 'Alisher Valiyev', phone: '90 123 45 67', created_at: new Date().toISOString() },
             { id: '2', name: 'Zarina Karimova', phone: '99 876 54 32', created_at: new Date(Date.now() - 86400000).toISOString() },
@@ -26,12 +27,28 @@ const AdminLeads: React.FC = () => {
     }
 
     try {
-        const result = await adminRequest<{ data: ChatLead[] }>('/api/admin/leads', 'GET');
-        setLeads(result.data || []);
+        const { data, error } = await supabase
+            .from('leads')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        setLeads(data || []);
     } catch (error) {
         console.error("Error fetching leads:", error);
     } finally {
         setLoading(false);
+    }
+  };
+
+  const deleteLead = async (id: string) => {
+    try {
+      const { error } = await supabase.from('leads').delete().eq('id', id);
+      if (error) throw error;
+      setLeads(leads.filter(lead => lead.id !== id));
+    } catch (err) {
+      console.error("Error deleting lead:", err);
+      showToast("O'chirishda xatolik yuz berdi", 'error');
     }
   };
 
@@ -75,7 +92,8 @@ const AdminLeads: React.FC = () => {
       </div>
 
       <div className="bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden">
-        <table className="w-full text-left">
+        <div className="overflow-x-auto">
+        <table className="w-full text-left min-w-[600px]">
             <thead className="bg-white/5 border-b border-white/5">
                 <tr>
                     <th className="p-4 text-sm font-medium text-gray-400">Mijoz</th>
@@ -117,15 +135,21 @@ const AdminLeads: React.FC = () => {
                                 </div>
                             </td>
                             <td className="p-4 text-right">
-                                <button className="p-2 text-gold-400 hover:bg-gold-400/10 rounded-lg transition-colors" title="Bog'lanish">
-                                    <MessageSquare size={18} />
-                                </button>
+                                <div className="flex items-center justify-end gap-2">
+                                    <button className="p-2 text-gold-400 hover:bg-gold-400/10 rounded-lg transition-colors" title="Bog'lanish">
+                                        <MessageSquare size={18} />
+                                    </button>
+                                    <button onClick={() => deleteLead(lead.id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors" title="O'chirish">
+                                        <Trash2 size={18} />
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))
                 )}
             </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

@@ -3,47 +3,67 @@ import ProductCard from './ProductCard';
 import { Product, Category } from '../types';
 import { Filter, X, Check, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { ProductSkeleton } from './Skeleton';
+import { getLocalizedText } from '../lib/i18nUtils';
+import { getCategoryDisplayName, getCategorySlug, getProductCategoryKey } from '../lib/categoryUtils';
 
 interface FeaturedProductsProps {
     products: Product[];
     categories: Category[];
     onNavigateToProduct: (id: number) => void;
+    activeCategory?: string;
     isLoading?: boolean;
-    initialCategory?: string;
 }
 
-const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categories, onNavigateToProduct, isLoading, initialCategory }) => {
-    const { t } = useLanguage();
-    const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'All');
+const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categories, onNavigateToProduct, activeCategory, isLoading }) => {
+    const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+    // Sync internal state with prop
+    useEffect(() => {
+        if (activeCategory) {
+            setSelectedCategory(activeCategory);
+        }
+    }, [activeCategory]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [sortOrder, setSortOrder] = useState<string>('newest');
+    const [minPrice, setMinPrice] = useState<string>('');
+    const [maxPrice, setMaxPrice] = useState<string>('');
+    const { isDark } = useTheme();
+    const { lang, t } = useLanguage();
 
-    // Sync with external category selection
-    useEffect(() => {
-        if (initialCategory) setSelectedCategory(initialCategory);
-    }, [initialCategory]);
-
-    // Derive active products based on filter
+    // Derive active products based on filter and sorting
     const filteredProducts = products.filter(p => {
-        const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory;
-        const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.shortDescription.toLowerCase().includes(searchQuery.toLowerCase());
-        return matchesCategory && matchesSearch;
+        const pCat = getProductCategoryKey(p.category, categories);
+        const matchesCategory = selectedCategory === 'All' || pCat === selectedCategory;
+        const pName = getLocalizedText(p.name, lang).toLowerCase();
+        const pDesc = getLocalizedText(p.shortDescription, lang).toLowerCase();
+        const matchesSearch = pName.includes(searchQuery.toLowerCase()) ||
+            pDesc.includes(searchQuery.toLowerCase());
+        const minP = minPrice ? parseInt(minPrice) : 0;
+        const maxP = maxPrice ? parseInt(maxPrice) : Infinity;
+        const matchesPrice = p.price >= minP && p.price <= maxP;
+        return matchesCategory && matchesSearch && matchesPrice;
+    }).sort((a, b) => {
+        if (sortOrder === 'price-asc') return a.price - b.price;
+        if (sortOrder === 'price-desc') return b.price - a.price;
+        return b.id - a.id; // default: newest
     });
 
     return (
-        <section id="featured-products" className="py-12 md:py-24 bg-black scroll-mt-20">
+        <section id="featured-products" className={`py-12 md:py-24 scroll-mt-20 transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-light-bg'}`}>
             <div className="container mx-auto px-4 md:px-6">
 
                 {/* Header with Search and Filter */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-12 gap-4">
                     <div className="space-y-2 w-full md:w-auto">
-                        <h2 className="text-2xl md:text-4xl font-bold">
-                            {t('featured.title').split(' ').slice(0, 1).join(' ')} <span className="text-gold-400">{t('featured.title').split(' ').slice(1).join(' ')}</span>
+                        <h2 className={`text-2xl md:text-4xl font-bold ${isDark ? 'text-white' : 'text-light-text'}`}>
+                            {t('premium_collection').split(' ')[0]} <span className="text-gold-400">{t('premium_collection').split(' ')[1]}</span>
                         </h2>
-                        <p className="text-gray-400 text-sm md:text-base max-w-md">
-                            {t('featured.subtitle')}
+                        <p className={`text-sm md:text-base max-w-md ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
+                            {t('collection_desc')}
                         </p>
                     </div>
 
@@ -53,19 +73,19 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                             <input
                                 type="text"
-                                placeholder={t('common.search')}
+                                placeholder={t('search_placeholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-dark-800 border border-white/10 rounded-full pl-10 pr-4 py-2.5 text-sm text-white focus:border-gold-400 focus:outline-none transition-colors"
+                                className={`w-full border rounded-full pl-10 pr-4 py-2.5 text-sm focus:border-gold-400 focus:outline-none transition-colors ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
                             />
                         </div>
 
                         <button
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
-                            className="md:hidden flex items-center gap-2 px-4 py-2.5 border border-white/20 rounded-full text-white hover:bg-white/10 text-sm shrink-0"
+                            className={`md:hidden flex items-center gap-2 px-4 py-2.5 border rounded-full text-sm shrink-0 ${isDark ? 'border-white/20 text-white hover:bg-white/10' : 'border-light-border text-light-text hover:bg-light-card'}`}
                         >
                             <Filter size={16} />
-                            Filtr
+                            {t('filter')}
                         </button>
                     </div>
                 </div>
@@ -73,30 +93,77 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                 <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
 
                     {/* Sidebar Filter (Desktop) */}
-                    <div className="hidden md:block w-64 shrink-0 space-y-8 sticky top-28 h-fit">
-                        <div>
-                            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                                <Filter size={18} className="text-gold-400" />
-                                {t('categories.title')}
-                            </h3>
-                            <div className="space-y-2">
-                                <button
-                                    onClick={() => setSelectedCategory('All')}
-                                    className={`w-full text-left px-4 py-3 rounded-xl transition-all flex justify-between items-center ${selectedCategory === 'All' ? 'bg-gold-400 text-black font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
-                                >
-                                    <span>Barchasi</span>
-                                    {selectedCategory === 'All' && <Check size={16} />}
-                                </button>
-                                {categories.map(cat => (
+                    <div className="hidden md:block w-64 shrink-0 sticky top-28 h-fit">
+                        <div className="space-y-8">
+                            {/* Categories */}
+                            <div>
+                                <h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${isDark ? 'text-white' : 'text-light-text'}`}>
+                                    <Filter size={18} className="text-gold-400" />
+                                    {t('footer_categories')}
+                                </h3>
+                                <div className="space-y-2">
                                     <button
-                                        key={cat.id}
-                                        onClick={() => setSelectedCategory(cat.name)}
-                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all flex justify-between items-center ${selectedCategory === cat.name ? 'bg-gold-400 text-black font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                                        onClick={() => setSelectedCategory('All')}
+                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all flex justify-between items-center ${selectedCategory === 'All' ? 'bg-gold-400 text-black font-bold' : isDark ? 'text-gray-400 hover:bg-white/5 hover:text-white' : 'text-light-muted hover:bg-light-card hover:text-light-text'}`}
                                     >
-                                        <span>{cat.name}</span>
-                                        {selectedCategory === cat.name && <Check size={16} />}
+                                        <span>{t('all_categories')}</span>
+                                        {selectedCategory === 'All' && <Check size={16} />}
                                     </button>
-                                ))}
+                                    {categories.map(cat => (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => setSelectedCategory(getCategorySlug(cat))}
+                                            className={`w-full text-left px-4 py-3 rounded-xl transition-all font-medium text-sm border ${selectedCategory === getCategorySlug(cat)
+                                                    ? 'border-gold-400 bg-gold-400/10 text-gold-400'
+                                                    : isDark
+                                                        ? 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'
+                                                        : 'border-transparent text-light-muted hover:text-light-text hover:bg-light-card'
+                                                }`}
+                                        >
+                                            {getLocalizedText(cat.name, lang)}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Sort Order */}
+                            <div>
+                                <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-light-text'}`}>
+                                    {t('sort_by')}
+                                </h3>
+                                <select 
+                                    value={sortOrder}
+                                    onChange={(e) => setSortOrder(e.target.value)}
+                                    className={`w-full border rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-gold-400 transition-colors cursor-pointer ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
+                                >
+                                    <option value="newest">{t('sort_newest')}</option>
+                                    <option value="price-asc">{t('sort_price_asc')}</option>
+                                    <option value="price-desc">{t('sort_price_desc')}</option>
+                                </select>
+                            </div>
+
+                            {/* Price Range */}
+                            <div>
+                                <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-light-text'}`}>
+                                    {t('price_range')}
+                                </h3>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="number" 
+                                        placeholder={t('min_price')}
+                                        value={minPrice}
+                                        onChange={(e) => setMinPrice(e.target.value)}
+                                        className={`w-full border rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
+                                    />
+                                    <span className="text-gray-400">-</span>
+                                    <input 
+                                        type="number" 
+                                        placeholder={t('max_price')}
+                                        value={maxPrice}
+                                        onChange={(e) => setMaxPrice(e.target.value)}
+                                        className={`w-full border rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -106,7 +173,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                         {isLoading ? (
                             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
                                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                                    <div key={i} className="bg-dark-800 rounded-xl h-[250px] md:h-[400px] animate-pulse border border-white/5"></div>
+                                    <ProductSkeleton key={i} />
                                 ))}
                             </div>
                         ) : (
@@ -114,10 +181,10 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                 {filteredProducts.length === 0 ? (
                                     <div className="py-20 text-center">
                                         <p className="text-gray-500 text-lg">
-                                            {searchQuery ? t('featured.no_products') : t('featured.no_category_products')}
+                                            {searchQuery ? t('no_products_found') : t('no_products_found')}
                                         </p>
                                         <button onClick={() => { setSelectedCategory('All'); setSearchQuery(''); }} className="mt-4 text-gold-400 underline">
-                                            {t('featured.reset')}
+                                            {t('view_all')}
                                         </button>
                                     </div>
                                 ) : (
@@ -138,6 +205,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                                     <ProductCard
                                                         product={product}
                                                         onNavigate={() => onNavigateToProduct(product.id)}
+                                                        categories={categories}
                                                     />
                                                 </motion.div>
                                             ))}
@@ -165,31 +233,79 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                             animate={{ x: 0 }}
                             exit={{ x: '-100%' }}
                             onClick={(e) => e.stopPropagation()}
-                            className="absolute left-0 top-0 bottom-0 w-[80%] max-w-sm bg-dark-900 border-r border-white/10 p-6"
+                            className={`absolute left-0 top-0 bottom-0 w-[80%] max-w-sm border-r p-6 flex flex-col ${isDark ? 'bg-dark-900 border-white/10' : 'bg-white border-light-border'}`}
                         >
-                            <div className="flex justify-between items-center mb-8">
-                                <h3 className="text-xl font-bold text-white">Filtr</h3>
-                                <button onClick={() => setIsFilterOpen(false)} className="text-gray-400 hover:text-white">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-light-text'}`}>{t('filter')}</h3>
+                                <button onClick={() => setIsFilterOpen(false)} className={isDark ? 'text-gray-400 hover:text-white' : 'text-light-muted hover:text-light-text'}>
                                     <X size={24} />
                                 </button>
                             </div>
 
-                            <div className="space-y-2">
-                                <button
-                                    onClick={() => { setSelectedCategory('All'); setIsFilterOpen(false); }}
-                                    className={`w-full text-left px-4 py-3 rounded-xl transition-all ${selectedCategory === 'All' ? 'bg-gold-400 text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
-                                >
-                                    {t('featured.all')}
-                                </button>
-                                {categories.map(cat => (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => { setSelectedCategory(cat.name); setIsFilterOpen(false); }}
-                                        className={`w-full text-left px-4 py-3 rounded-xl transition-all ${selectedCategory === cat.name ? 'bg-gold-400 text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
+                            <div className="space-y-8 overflow-y-auto max-h-[calc(100vh-140px)] pr-2 custom-scrollbar">
+                                {/* Categories */}
+                                <div>
+                                    <h4 className={`text-sm font-bold mb-3 uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('footer_categories')}</h4>
+                                    <div className="space-y-1">
+                                        <button
+                                            onClick={() => { setSelectedCategory('All'); setIsFilterOpen(false); }}
+                                            className={`w-full text-left px-4 py-3 rounded-xl transition-all ${selectedCategory === 'All' ? 'bg-gold-400 text-black font-bold' : isDark ? 'text-gray-400 hover:bg-white/5' : 'text-light-muted hover:bg-light-card'}`}
+                                        >
+                                            {t('all_categories')}
+                                        </button>
+                                        {categories.map(cat => (
+                                            <button
+                                                key={cat.id}
+                                                onClick={() => { setSelectedCategory(getCategorySlug(cat)); setIsFilterOpen(false); }}
+                                                className={`w-full text-left px-4 py-3 rounded-xl transition-all ${selectedCategory === getCategorySlug(cat) ? 'bg-gold-400 text-black font-bold' : isDark ? 'text-gray-400 hover:bg-white/5' : 'text-light-muted hover:bg-light-card'}`}
+                                            >
+                                                {getCategoryDisplayName(cat.name, categories, lang)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Sort Order */}
+                                <div>
+                                    <h4 className={`text-sm font-bold mb-3 uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('sort_by')}</h4>
+                                    <select 
+                                        value={sortOrder}
+                                        onChange={(e) => setSortOrder(e.target.value)}
+                                        className={`w-full border rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-gold-400 transition-colors ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
                                     >
-                                        {cat.name}
+                                        <option value="newest">{t('sort_newest')}</option>
+                                        <option value="price-asc">{t('sort_price_asc')}</option>
+                                        <option value="price-desc">{t('sort_price_desc')}</option>
+                                    </select>
+                                </div>
+
+                                {/* Price Range */}
+                                <div>
+                                    <h4 className={`text-sm font-bold mb-3 uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('price_range')}</h4>
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="number" 
+                                            placeholder={t('min_price')}
+                                            value={minPrice}
+                                            onChange={(e) => setMinPrice(e.target.value)}
+                                            className={`w-full border rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
+                                        />
+                                        <span className="text-gray-400">-</span>
+                                        <input 
+                                            type="number" 
+                                            placeholder={t('max_price')}
+                                            value={maxPrice}
+                                            onChange={(e) => setMaxPrice(e.target.value)}
+                                            className={`w-full border rounded-xl px-3 py-3 text-sm focus:outline-none focus:border-gold-400 transition-colors ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
+                                        />
+                                    </div>
+                                    <button 
+                                        onClick={() => setIsFilterOpen(false)}
+                                        className="w-full mt-4 bg-gold-400 text-black font-bold py-3 rounded-xl hover:bg-gold-500"
+                                    >
+                                        {t('apply')}
                                     </button>
-                                ))}
+                                </div>
                             </div>
                         </motion.div>
                     </motion.div>

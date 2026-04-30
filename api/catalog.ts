@@ -1,37 +1,35 @@
 import { createClient } from '@supabase/supabase-js';
 
-const getEnv = (key: string): string => {
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
-    return process.env[key] as string;
-  }
-  return '';
-};
+export default async function handler(req, res) {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_KEY;
+  const BASE_URL = 'https://luxe-core-uz-three.vercel.app';
 
-export default async function handler(req: any, res: any) {
   try {
-    const url = getEnv('SUPABASE_URL') || getEnv('VITE_SUPABASE_URL');
-    const key = getEnv('SUPABASE_SERVICE_ROLE_KEY') || getEnv('SUPABASE_ANON_KEY') || getEnv('VITE_SUPABASE_KEY');
-
-    if (!url || !key) {
-      return res.status(500).json({ error: 'Server config missing' });
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase environment variables are missing');
     }
 
-    const supabase = createClient(url, key, { auth: { persistSession: false } });
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // 1. Fetch products from Supabase
     const { data: products, error } = await supabase
       .from('products')
       .select('*');
 
     if (error) throw error;
 
-    const BASE_URL = process.env.SITE_URL || 'https://luxecoreuz.vercel.app';
+    if (!products || products.length === 0) {
+      console.warn('No products found in database');
+    }
 
-    const xmlItems = (products || []).map((product: any) => `
+    // 2. Generate XML
+    const xmlItems = (products || []).map((product) => `
     <item>
       <g:id>${product.id}</g:id>
       <g:title><![CDATA[${product.name}]]></g:title>
       <g:description><![CDATA[${product.shortDescription || product.name}]]></g:description>
-      <g:link>${BASE_URL}?product_id=${product.id}</g:link>
+      <g:link>${BASE_URL}/product/${product.id}</g:link>
       <g:image_link>${product.image}</g:image_link>
       <g:brand>LUXECORE</g:brand>
       <g:condition>new</g:condition>
@@ -46,15 +44,24 @@ export default async function handler(req: any, res: any) {
   <channel>
     <title>LUXECORE Product Feed</title>
     <link>${BASE_URL}</link>
-    <description>Premium luxury products from LUXECORE</description>
+    <description>Premium mahsulotlar LUXECORE dan</description>
     ${xmlItems}
   </channel>
 </rss>`;
 
+    // 3. Send Response
     res.setHeader('Content-Type', 'text/xml');
     res.status(200).send(xmlFeed);
-  } catch (err: any) {
-    console.error('Feed generation error:', err);
-    res.status(500).json({ error: 'Failed to generate feed' });
+
+  } catch (err) {
+    console.error('Catalog Feed Error:', err);
+    res.status(500).json({
+      error: 'Failed to generate feed',
+      details: err instanceof Error ? err.message : 'Unknown error',
+      env: {
+        url: !!supabaseUrl,
+        key: !!supabaseKey
+      }
+    });
   }
 }

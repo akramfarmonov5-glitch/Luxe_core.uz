@@ -1,42 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# LUXECORE
 
-# Run and deploy your AI Studio app
+Next.js + React + Supabase asosidagi e-commerce loyiha.
 
-This contains everything you need to run your app locally.
+## Run locally
 
-View your app in AI Studio: https://ai.studio/apps/drive/17_gOT7TjykOgLd5zG0BV24FdRoERr0ML
+1. `npm install`
+2. `.env.local` faylida frontend uchun envlarni sozlang:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_KEY`
+3. Server-side envlarni Vercel yoki lokal server muhitingizga qo'shing:
+   - `GEMINI_API_KEY`
+   - `TELEGRAM_BOT_TOKEN`
+   - `TELEGRAM_CHAT_ID`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - ixtiyoriy: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
+4. `npm run dev`
 
-## Run Locally
+## Supabase
 
-**Prerequisites:**  Node.js
+- Yangi baza uchun: `supabase_schema.sql`
+- Mavjud bazani yangilash uchun: `supabase_fix_tables.sql`
+- Review jadvali kerak bo'lsa: `supabase_reviews.sql`
 
+## Admin access
 
-1. Install dependencies:
-   `npm install`
-2. Set env values in `.env.local`:
-   - `GEMINI_API_KEY=...` (required for `/api/chat`)
-   - `VITE_GEMINI_API_KEY=...` (optional fallback for browser-only/dev mode)
-   - `VITE_SUPABASE_URL=...`
-   - `VITE_SUPABASE_KEY=...`
-   - `VITE_ADMIN_EMAILS=admin@example.com` (comma-separated if multiple)
-3. Run with API routes (recommended):
-   `npx vercel dev`
-4. Frontend-only dev (no `/api/*` routes):
-   `npm run dev`
+1. Supabase Auth orqali admin user yarating.
+2. SQL Editor ichida shu user ID sini `public.admin_users` ga qo'shing:
 
-## Security Setup (Supabase)
+```sql
+insert into public.admin_users (user_id)
+values ('YOUR_AUTH_USER_UUID');
+```
 
-1. Run `supabase_schema.sql` (base tables).
-2. Run `supabase_fix_tables.sql` (hero/navigation fixes).
-3. Run `supabase_security_patch.sql` (hardened RLS policies).
-4. Ensure admin users have `app_metadata.role = "admin"` or email is in `VITE_ADMIN_EMAILS` / `ADMIN_EMAILS`.
-
-## Server API Env (Vercel / Backend)
-
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_ANON_KEY` (optional fallback)
-- `ADMIN_EMAILS` (recommended)
-- `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` (optional order notifications)
+Shundan keyin admin foydalanuvchi `/admin` orqali email/parol bilan kirishi mumkin bo'ladi.

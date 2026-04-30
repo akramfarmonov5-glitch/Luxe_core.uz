@@ -2,6 +2,8 @@
 const env = import.meta.env || {};
 export const FB_PIXEL_ID = env.VITE_FACEBOOK_PIXEL_ID;
 
+
+
 declare global {
   interface Window {
     fbq: any;
@@ -42,38 +44,34 @@ export const trackAddToCart = (product: { id: number; name: string; price: numbe
   });
 };
 
-export const trackInitiateCheckout = (items: { id: number; name: string; price: number; quantity: number }[], total: number) => {
-  event('InitiateCheckout', {
-    content_ids: items.map(i => i.id.toString()),
-    contents: items.map(i => ({ id: i.id.toString(), quantity: i.quantity })),
-    content_type: 'product',
-    num_items: items.reduce((sum, i) => sum + i.quantity, 0),
-    value: total,
-    currency: 'UZS',
-  });
-};
-
-export const trackSearch = (searchQuery: string, resultsCount: number) => {
-  event('Search', {
-    search_string: searchQuery,
-    content_type: 'product',
-    contents: [],
-    value: 0,
-    currency: 'UZS',
-  });
-};
-
-export const trackPurchase = (orderId: string, value: number, currency: string = 'UZS', items?: { id: number; quantity: number }[]) => {
-  const params: any = {
+export const trackPurchase = (orderId: string, value: number, productIds: string[] = [], currency: string = 'UZS') => {
+  event('Purchase', {
     order_id: orderId,
+    content_ids: productIds,
+    content_type: 'product',
     value: value,
     currency: currency,
-  };
-  if (items && items.length > 0) {
-    params.content_ids = items.map(i => i.id.toString());
-    params.contents = items.map(i => ({ id: i.id.toString(), quantity: i.quantity }));
-    params.content_type = 'product';
-    params.num_items = items.reduce((sum, i) => sum + i.quantity, 0);
-  }
-  event('Purchase', params);
+  });
+};
+
+export const trackInitiateCheckout = (value: number, productIds: string[] = [], currency: string = 'UZS') => {
+  event('InitiateCheckout', {
+    content_ids: productIds,
+    content_type: 'product',
+    value: value,
+    currency: currency,
+  });
+};
+
+export const trackSearch = (searchString: string) => {
+  event('Search', {
+    search_string: searchString,
+  });
+};
+
+export const trackViewCategory = (categoryName: string) => {
+  event('ViewCategory', {
+    content_name: categoryName,
+    content_category: categoryName,
+  });
 };

@@ -1,22 +1,27 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Heart } from 'lucide-react';
-import { Product } from '../types';
+import { Category, Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
+import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getLocalizedText } from '../lib/i18nUtils';
+import { getCategoryDisplayName } from '../lib/categoryUtils';
 
 interface ProductCardProps {
   product: Product;
   onNavigate: () => void;
+  categories?: Category[];
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, categories = [] }) => {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { showToast } = useToast();
-  const { t } = useLanguage();
+  const { isDark } = useTheme();
+  const { lang, t } = useLanguage();
 
   const isLiked = isInWishlist(product.id);
 
@@ -24,57 +29,49 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
     e.stopPropagation();
     toggleWishlist(product);
     if (!isLiked) {
-      showToast(`${product.name} ${t('product.wishlist_added')}`, 'success');
-    } else {
-      showToast(`${product.name} ${t('product.wishlist_removed')}`, 'info');
-    }
-  };
+    showToast(`${getLocalizedText(product.name, lang)} ${t('added_to_wishlist_desc')}`, 'success');
+  } else {
+    showToast(`${getLocalizedText(product.name, lang)} ${t('removed_from_wishlist_desc')}`, 'info');
+  }
+};
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    addToCart(product);
-    showToast(`${product.name} ${t('product.cart_added')}`, 'success');
-  };
+const handleAddToCart = (e: React.MouseEvent) => {
+  e.preventDefault();
+  addToCart(product);
+  showToast(`${getLocalizedText(product.name, lang)} ${t('added_to_cart_desc')}`, 'success');
+};
 
   return (
     <motion.div
       whileHover={{ y: -8 }}
-      className="group relative bg-dark-800 rounded-xl md:rounded-2xl overflow-hidden border border-white/5 shadow-lg flex flex-col"
+      className={`group relative rounded-xl md:rounded-2xl overflow-hidden shadow-lg flex flex-col transition-colors duration-300 ${isDark ? 'bg-dark-800 border border-white/5' : 'bg-white border border-light-border'}`}
     >
       {/* Image Container */}
       <div
-        className="relative aspect-[3/4] w-full overflow-hidden bg-gray-900 cursor-pointer"
+        onClick={onNavigate}
+        className="relative aspect-[4/5] w-full overflow-hidden bg-gray-900 cursor-pointer"
       >
-        <a
-          href={`/product/${product.id}`}
-          onClick={(e) => {
-            e.preventDefault();
-            onNavigate();
-          }}
-          className="block w-full h-full"
-        >
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-        </a>
+        <img
+          src={product.image}
+          alt={getLocalizedText(product.name, lang)}
+          loading="lazy"
+          decoding="async"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
 
-        {/* Product Badges */}
+        {/* Badges */}
         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1.5 z-10">
-          {product.stock !== undefined && product.stock > 15 && (
-            <span className="bg-emerald-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shadow-lg">
-              🆕 {t('product.new')}
-            </span>
-          )}
           {product.stock !== undefined && product.stock > 0 && product.stock <= 5 && (
-            <span className="bg-orange-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider shadow-lg animate-pulse">
-              🔥 {t('product.bestseller')}
+            <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] md:text-[11px] font-bold rounded-md uppercase tracking-wider shadow-lg">
+              🔥 Bestseller
             </span>
           )}
-        </div>
-
-        {/* Overlay Buttons - Mobile: Always visible (translate-x-0), Desktop: Visible on hover */}
+          {product.price >= 100000 && product.price <= 300000 && (
+            <span className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] md:text-[11px] font-bold rounded-md uppercase tracking-wider shadow-lg">
+              ✨ Yangi
+            </span>
+          )}
+        </div>        {/* Overlay Buttons - Mobile: Always visible (translate-x-0), Desktop: Visible on hover */}
         <div className="absolute top-2 right-2 md:top-3 md:right-3 flex flex-col gap-2 translate-x-0 md:translate-x-12 md:group-hover:translate-x-0 transition-transform duration-300 z-10">
           <button
             onClick={handleWishlistClick}
@@ -90,32 +87,32 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate }) => {
 
       {/* Content */}
       <div className="p-3 md:p-6 flex flex-col flex-grow">
-        <div className="flex-grow">
-          <span className="text-[9px] md:text-xs text-gray-500 uppercase tracking-wider">{product.category}</span>
-          <a
-            href={`/product/${product.id}`}
-            onClick={(e) => {
-              e.preventDefault();
-              onNavigate();
-            }}
-            className="text-sm md:text-lg font-medium text-white mt-0.5 md:mt-1 group-hover:text-gold-400 transition-colors line-clamp-1 block"
-          >
-            {product.name}
-          </a>
+        <div className="flex-grow cursor-pointer" onClick={onNavigate}>
+          <span className={`text-[11px] md:text-xs uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-light-muted'}`}>
+            {getCategoryDisplayName(product.category, categories, lang)}
+          </span>
+          <h3 className={`text-base md:text-lg font-medium mt-0.5 md:mt-1 group-hover:text-gold-400 transition-colors line-clamp-1 ${isDark ? 'text-white' : 'text-light-text'}`}>
+            {getLocalizedText(product.name, lang)}
+          </h3>
+          {product.itemsPerPackage && product.itemsPerPackage > 1 && (
+            <span className="text-xs text-gold-400/80 font-medium">
+              ({product.itemsPerPackage} {t('items_per_package_desc')})
+            </span>
+          )}
         </div>
 
         <div className="flex items-center justify-between mt-2 md:mt-4">
-          <span className="text-gold-400 font-semibold text-xs md:text-lg">
+          <span className="text-gold-400 font-semibold text-sm md:text-lg">
             {product.formattedPrice}
           </span>
 
           <button
             onClick={handleAddToCart}
-            className="flex items-center justify-center gap-2 w-7 h-7 md:w-auto md:h-auto md:px-4 md:py-2 bg-white/5 hover:bg-white text-white hover:text-black border border-white/10 rounded-full text-sm font-medium transition-all duration-300"
-            aria-label="Add to cart"
+            className={`flex items-center justify-center gap-2 w-7 h-7 md:w-auto md:h-auto md:px-4 md:py-2 border rounded-full text-sm font-medium transition-all duration-300 ${isDark ? 'bg-white/5 hover:bg-white text-white hover:text-black border-white/10' : 'bg-light-card hover:bg-gold-400 text-light-text hover:text-black border-light-border'}`}
+            aria-label={t('add_to_cart')}
           >
             <Plus size={14} className="md:w-[16px] md:h-[16px]" />
-            <span className="hidden md:inline">{t('product.add_to_cart')}</span>
+            <span className="hidden md:inline">{t('add_to_cart')}</span>
           </button>
         </div>
       </div>

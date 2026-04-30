@@ -1,5 +1,8 @@
+'use client';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Product, CartItem } from '../types';
+import { trackAddToCart } from '../lib/fpixel';
+import { getLocalizedText } from '../lib/i18nUtils';
 
 interface CartContextType {
   cart: CartItem[];
@@ -8,6 +11,7 @@ interface CartContextType {
   removeFromCart: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   toggleCart: () => void;
+  closeCart: () => void;
   clearCart: () => void;
   cartTotal: number;
   cartCount: number;
@@ -21,7 +25,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Load cart from local storage on mount (optional persistence)
   useEffect(() => {
-    const savedCart = localStorage.getItem('luxecore_cart');
+    const savedCart = (typeof window !== 'undefined' ? localStorage.getItem('luxecore_cart') : null);
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
@@ -37,20 +41,36 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [cart]);
 
   const addToCart = (product: Product) => {
+    const qtyToAdd = product.itemsPerPackage || 1;
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
       if (existingItem) {
         return prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id ? { ...item, quantity: item.quantity + qtyToAdd } : item
         );
       }
-      return [...prevCart, { ...product, quantity: 1 }];
+      return [...prevCart, { ...product, quantity: qtyToAdd }];
     });
+    
+    // Pixel Tracking
+    trackAddToCart({
+      id: product.id,
+      name: getLocalizedText(product.name, 'uz'),
+      price: product.price,
+      category: getLocalizedText(product.category, 'uz'),
+    });
+    
     setIsCartOpen(true); // Open cart when adding item
   };
 
   const removeFromCart = (productId: number) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+    setCart((prevCart) => {
+      const newCart = prevCart.filter((item) => item.id !== productId);
+      if (newCart.length === 0) {
+        setIsCartOpen(false);
+      }
+      return newCart;
+    });
   };
 
   const updateQuantity = (productId: number, quantity: number) => {
@@ -66,6 +86,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const toggleCart = () => setIsCartOpen((prev) => !prev);
+  const closeCart = () => setIsCartOpen(false);
   const clearCart = () => setCart([]);
 
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -80,6 +101,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         removeFromCart,
         updateQuantity,
         toggleCart,
+        closeCart,
         clearCart,
         cartTotal,
         cartCount,
