@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
 const TTS_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-2.5-flash-preview-tts';
@@ -24,10 +25,27 @@ function createWavHeader(dataLength: number, sampleRate = 24000) {
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimit = checkRateLimit(`gemini:${getClientIp(req)}`, 30, 5 * 60 * 1000);
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: 'Juda ko‘p so‘rov yuborildi. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
+    }
+
     const { message, history, systemInstruction, jsonMode, enableTts } = await req.json();
     
     if (!message) {
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
+    }
+
+    if (typeof message !== 'string' || message.length > 2_000) {
+      return NextResponse.json({ error: 'Message is too long' }, { status: 400 });
+    }
+
+    if (Array.isArray(history) && history.length > 20) {
+      return NextResponse.json({ error: 'History is too long' }, { status: 400 });
+    }
+
+    if (typeof systemInstruction === 'string' && systemInstruction.length > 8_000) {
+      return NextResponse.json({ error: 'System instruction is too long' }, { status: 400 });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;

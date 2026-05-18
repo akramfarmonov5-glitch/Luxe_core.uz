@@ -8,6 +8,8 @@ services:
     envVars:
       - key: BOT_TOKEN
         sync: false
+      - key: BOT_INTERNAL_SECRET
+        sync: false
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_KEY

@@ -5,6 +5,8 @@ export async function isAdminUser(userId?: string | null): Promise<boolean> {
     return false;
   }
 
+
+
   const { data, error } = await supabase
     .from('admin_users')
     .select('user_id')

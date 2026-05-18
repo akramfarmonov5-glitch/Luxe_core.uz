@@ -4,9 +4,9 @@ import { supabase } from '../supabase';
 import { CartItem } from '../types';
 import { config } from '../config';
 import { t } from '../i18n';
-import { handlePromoCheck } from './promo';
 import { notifyAdmin } from './admin';
 import { getUserProfile, ensureUser } from './profile';
+import { createTelegramOrder, quoteTelegramCart, type CheckoutQuote } from '../orderApi';
 
 // In-memory storage
 const carts = new Map<number, CartItem[]>();
@@ -16,7 +16,7 @@ const checkoutState = new Map<number, {
     name?: string;
     address?: string;
     promo?: string;
-    discount?: number;
+    quote?: CheckoutQuote;
     paymentMethod?: string;
 }>();
 
@@ -113,11 +113,10 @@ export async function handleShowCart(ctx: Context) {
         text += `${i + 1}. *${item.name}*\n`;
         text += `   ${item.quantity} x ${Number(item.price).toLocaleString('uz-UZ')} = *${Number(sum).toLocaleString('uz-UZ')} UZS*\n\n`;
 
-        // +/- buttons for each item
-        kb.text(`➖`, `cart_minus:${item.productId}`)
+        kb.text('➖', `cart_minus:${item.productId}`)
             .text(`${item.quantity}`, 'noop')
-            .text(`➕`, `cart_plus:${item.productId}`)
-            .text(`🗑`, `cart_del:${item.productId}`)
+            .text('➕', `cart_plus:${item.productId}`)
+            .text('🗑', `cart_del:${item.productId}`)
             .row();
     });
 
@@ -134,7 +133,6 @@ export async function handleShowCart(ctx: Context) {
     });
 }
 
-// Cart quantity handlers
 export async function handleCartPlus(ctx: Context) {
     const userId = ctx.from?.id || 0;
     const data = ctx.callbackQuery?.data || '';
@@ -196,10 +194,8 @@ export async function handleCheckout(ctx: Context) {
         return;
     }
 
-    // Try to use saved profile data
     const profile = await getUserProfile(userId);
     if (profile?.phone && profile?.name) {
-        // Skip phone/name steps if already saved
         checkoutState.set(userId, {
             step: 'address',
             phone: profile.phone,
@@ -207,7 +203,6 @@ export async function handleCheckout(ctx: Context) {
             address: profile.address || undefined,
         });
         if (profile.address) {
-            // Ask for promo directly
             checkoutState.get(userId)!.step = 'promo';
             await ctx.reply(t(userId, 'checkout_promo'), { parse_mode: 'Markdown' });
         } else {
@@ -228,12 +223,10 @@ export async function handleCheckoutInput(ctx: Context) {
 
     const text = ctx.message?.text?.trim() || '';
 
-    // STEP 1: Phone
     if (state.step === 'phone') {
         let phone = text.replace(/[\s\-\(\)]/g, '');
         if (!phone.startsWith('+')) phone = '+' + phone;
 
-        // Validate +998XXXXXXXXX format
         if (!/^\+998\d{9}$/.test(phone)) {
             await ctx.reply(
                 t(userId, 'phone_invalid') + '\n' + t(userId, 'checkout_phone'),
@@ -249,7 +242,6 @@ export async function handleCheckoutInput(ctx: Context) {
         return;
     }
 
-    // STEP 2: Name
     if (state.step === 'name') {
         state.name = text;
         state.step = 'address';
@@ -258,13 +250,11 @@ export async function handleCheckoutInput(ctx: Context) {
         return;
     }
 
-    // STEP 3: Address
     if (state.step === 'address') {
         state.address = text;
         state.step = 'promo';
         checkoutState.set(userId, state);
 
-        // Save profile data
         await supabase.from('bot_users').upsert({
             telegram_id: userId,
             name: state.name,
@@ -276,53 +266,58 @@ export async function handleCheckoutInput(ctx: Context) {
         return;
     }
 
-    // STEP 4: Promo code
     if (state.step === 'promo') {
         const cart = getUserCart(userId);
-        let total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-        let discount = 0;
-        let promoText = '';
+        const promoCode = isPromoSkipped(text) ? undefined : text;
 
-        if (text.toLowerCase() !== 'yo\'q' && text.toLowerCase() !== 'нет' && text.toLowerCase() !== 'yoq' && text.length > 0) {
-            const promo = await handlePromoCheck(text);
-            if (promo.valid) {
-                discount = promo.discount;
-                const discountAmount = Math.round(total * discount / 100);
-                total -= discountAmount;
-                promoText = `\n🎟 Promo: *${text.toUpperCase()}* (-${discount}%, -${discountAmount.toLocaleString('uz-UZ')} UZS)`;
-            } else {
-                if (promo.message === 'expired') {
-                    await ctx.reply(t(userId, 'promo_expired'));
-                } else {
-                    await ctx.reply(t(userId, 'promo_invalid'));
-                }
+        try {
+            const quote = await quoteTelegramCart(cart, promoCode, userId);
+
+            if (promoCode && quote.promoStatus !== 'valid') {
+                await ctx.reply(quote.promoStatus === 'expired' ? t(userId, 'promo_expired') : t(userId, 'promo_invalid'));
                 await ctx.reply(t(userId, 'checkout_promo'), { parse_mode: 'Markdown' });
                 return;
             }
+
+            if (!quote.meetsMinimumOrderAmount) {
+                await ctx.reply(
+                    t(userId, 'checkout_minimum').replace('{amount}', formatPrice(quote.minimumOrderAmount)),
+                    { parse_mode: 'Markdown' },
+                );
+                return;
+            }
+
+            state.promo = quote.appliedPromo || undefined;
+            state.quote = quote;
+            state.step = 'payment';
+            checkoutState.set(userId, state);
+
+            const { paymentKeyboard } = require('../keyboards');
+            await ctx.reply(
+                `${t(userId, 'checkout_payment')}\n\n${formatQuoteSummary(userId, quote)}`,
+                {
+                    parse_mode: 'Markdown',
+                    reply_markup: paymentKeyboard(userId),
+                },
+            );
+        } catch (err) {
+            console.error('Quote error:', err);
+            await ctx.reply(t(userId, 'checkout_error'));
         }
-
-        state.promo = promoText ? text : undefined;
-        state.discount = discount;
-        state.step = 'payment';
-        checkoutState.set(userId, state);
-
-        // Show payment options
-        const { paymentKeyboard } = require('../keyboards');
-        await ctx.reply(t(userId, 'checkout_payment'), {
-            parse_mode: 'Markdown',
-            reply_markup: paymentKeyboard(userId),
-        });
         return;
     }
 
-    // STEP 5: Card payment confirmation
     if (state.step === 'card_confirm') {
-        await finalizeOrder(ctx, userId, state, 'Kartadan kartaga');
+        if (!isCardConfirmation(text)) {
+            await ctx.reply(t(userId, 'checkout_card_confirm_again'), { parse_mode: 'Markdown' });
+            return;
+        }
+
+        await finalizeOrder(ctx, userId, state, 'card');
         return;
     }
 }
 
-// Payment callbacks
 export async function handlePayCard(ctx: Context) {
     if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     const userId = ctx.from?.id || 0;
@@ -346,54 +341,46 @@ export async function handlePayCash(ctx: Context) {
     const state = checkoutState.get(userId);
     if (!state) return;
 
-    await finalizeOrder(ctx, userId, state, 'Naqd to\'lov');
+    await finalizeOrder(ctx, userId, state, 'cash');
 }
 
-async function finalizeOrder(ctx: Context, userId: number, state: any, paymentMethod: string) {
+async function finalizeOrder(ctx: Context, userId: number, state: any, paymentMethod: 'cash' | 'card') {
     const cart = getUserCart(userId);
-    let total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-    let promoText = '';
-
-    if (state.discount && state.discount > 0) {
-        const discountAmount = Math.round(total * state.discount / 100);
-        total -= discountAmount;
-        promoText = `\n🎟 Promo: *${state.promo?.toUpperCase()}* (-${state.discount}%, -${discountAmount.toLocaleString('uz-UZ')} UZS)`;
-    }
 
     try {
-        const orderId = `LC${Date.now().toString(36).toUpperCase()}`;
-        const { error } = await supabase
-            .from('orders')
-            .insert({
-                id: orderId,
-                customerName: state.name || '',
-                phone: state.phone || '',
-                total: total,
-                status: 'Kutilmoqda',
-                date: new Date().toISOString().split('T')[0],
-                paymentMethod: paymentMethod,
-                items: cart,
-                telegram_user_id: userId,
-            });
-
-        if (error) throw error;
+        const order = await createTelegramOrder({
+            cart,
+            telegramUserId: userId,
+            firstName: state.name || '',
+            phone: state.phone || '',
+            address: state.address || '',
+            promoCode: state.promo,
+            paymentMethod,
+        });
 
         carts.delete(userId);
         clearCheckoutMode(userId);
 
         let itemsText = '';
-        cart.forEach(i => {
+        order.items.forEach(i => {
             itemsText += `  • ${i.name} x${i.quantity}\n`;
         });
 
+        const promoText = order.appliedPromo
+            ? `\n🎟 Promo: *${order.appliedPromo}* (-${formatPrice(order.discountAmount)})`
+            : '';
+        const deliveryText = order.deliveryFee > 0
+            ? `\n🚚 Yetkazib berish: *${formatPrice(order.deliveryFee)}*`
+            : `\n🚚 Yetkazib berish: *${t(userId, 'checkout_delivery_free')}*`;
+
         await ctx.reply(
             `${t(userId, 'checkout_success')}\n\n` +
-            `📋 Buyurtma: *#${orderId}*\n` +
+            `📋 Buyurtma: *#${order.orderId}*\n` +
             `👤 Ism: ${state.name}\n` +
             `📱 Tel: ${state.phone}\n` +
             `📍 Manzil: ${state.address || '-'}\n` +
-            `💳 To'lov: ${paymentMethod}\n` +
-            `💰 Jami: *${Number(total).toLocaleString('uz-UZ')} UZS*${promoText}\n\n` +
+            `💳 To'lov: ${order.paymentMethod}\n` +
+            `💰 Jami: *${formatPrice(order.total)}*${promoText}${deliveryText}\n\n` +
             `📦 Mahsulotlar:\n${itemsText}\n` +
             t(userId, 'continue_msg'),
             {
@@ -404,11 +391,54 @@ async function finalizeOrder(ctx: Context, userId: number, state: any, paymentMe
         );
 
         if (botInstance) {
-            await notifyAdmin(botInstance, orderId, state.name || '', state.phone || '', total, cart, userId, paymentMethod, state.address);
+            await notifyAdmin(
+                botInstance,
+                order.orderId,
+                state.name || '',
+                state.phone || '',
+                order.total,
+                order.items,
+                userId,
+                order.paymentMethod,
+                state.address,
+            );
         }
     } catch (err) {
         console.error('Checkout error:', err);
         clearCheckoutMode(userId);
         await ctx.reply(t(userId, 'checkout_error'));
     }
+}
+
+function isPromoSkipped(value: string) {
+    const normalized = value.trim().toLowerCase();
+    return normalized === '' || normalized === 'yo\'q' || normalized === 'yoq' || normalized === 'нет';
+}
+
+function isCardConfirmation(value: string) {
+    const normalized = value.trim().toLowerCase();
+    return normalized === 'tayyor' || normalized === 'готово';
+}
+
+function formatQuoteSummary(userId: number, quote: CheckoutQuote) {
+    const lines = [
+        `${t(userId, 'checkout_subtotal')} *${formatPrice(quote.subtotal)}*`,
+    ];
+
+    if (quote.appliedPromo) {
+        lines.push(`${t(userId, 'checkout_discount')} *-${formatPrice(quote.discountAmount)}*`);
+    }
+
+    lines.push(
+        quote.deliveryFee > 0
+            ? `${t(userId, 'checkout_delivery_fee')} *${formatPrice(quote.deliveryFee)}*`
+            : `${t(userId, 'checkout_delivery_fee')} *${t(userId, 'checkout_delivery_free')}*`,
+    );
+    lines.push(`${t(userId, 'checkout_confirmed_total')} *${formatPrice(quote.total)}*`);
+
+    return lines.join('\n');
+}
+
+function formatPrice(value: number) {
+    return `${Number(value).toLocaleString('uz-UZ')} UZS`;
 }

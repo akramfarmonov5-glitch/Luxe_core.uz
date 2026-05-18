@@ -1,30 +1,5 @@
 import { Context } from 'grammy';
 import { supabase } from '../supabase';
-import { t } from '../i18n';
-
-export async function handlePromoCheck(code: string): Promise<{ valid: boolean; discount: number; message: string }> {
-    try {
-        const { data, error } = await supabase
-            .from('promo_codes')
-            .select('*')
-            .eq('code', code.toUpperCase())
-            .eq('active', true)
-            .single();
-
-        if (error || !data) {
-            return { valid: false, discount: 0, message: 'invalid' };
-        }
-
-        // Check expiration
-        if (data.expires_at && new Date(data.expires_at) < new Date()) {
-            return { valid: false, discount: 0, message: 'expired' };
-        }
-
-        return { valid: true, discount: data.discount_percent, message: 'applied' };
-    } catch {
-        return { valid: false, discount: 0, message: 'invalid' };
-    }
-}
 
 // Admin command: /addpromo CODE PERCENT
 export async function handleAddPromo(ctx: Context) {

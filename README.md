@@ -27,9 +27,11 @@ Next.js 16 (App Router) + React 18 + Supabase asosidagi premium e-commerce loyih
 - `NEXT_PUBLIC_SITE_URL` — sayt URL (default: production Vercel domeni)
 
 ### Server-only
-- `SUPABASE_SERVICE_ROLE_KEY` — order tracking uchun
+- `SUPABASE_SERVICE_ROLE_KEY` — server-side order creation + order tracking uchun
 - `GEMINI_API_KEY` — AI chat uchun
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` — buyurtma bildirishnoma uchun
+- `TELEGRAM_INTERNAL_SECRET` — `/api/telegram` relay endpointidan ichki foydalanish kerak bo‘lsa
+- `BOT_INTERNAL_SECRET` — Telegram botdan server-side checkout API’ga ishonchli ichki so‘rovlar uchun
 
 ### Optional (server alternatives)
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY` — `NEXT_PUBLIC_*` o'rniga server-side uchun

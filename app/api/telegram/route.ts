@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 
 export async function POST(req: NextRequest) {
+  const rateLimit = checkRateLimit(`telegram:${getClientIp(req)}`, 5, 60 * 1000);
+  if (!rateLimit.allowed) {
+    return NextResponse.json({ error: 'Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
+  }
+
+  const internalSecret = process.env.TELEGRAM_INTERNAL_SECRET;
+  if (!internalSecret || req.headers.get('x-telegram-secret') !== internalSecret) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -13,6 +24,10 @@ export async function POST(req: NextRequest) {
 
     if (!message) {
       return NextResponse.json({ error: 'Message content is required' }, { status: 400 });
+    }
+
+    if (typeof message !== 'string' || message.length > 4_000) {
+      return NextResponse.json({ error: 'Message is too long' }, { status: 400 });
     }
 
     const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
