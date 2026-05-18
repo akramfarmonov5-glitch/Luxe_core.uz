@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, ShieldCheck, CreditCard, Truck, Send, Wallet, Banknote, X, Smartphone, ExternalLink, Ticket, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { hasSupabaseCredentials, supabase } from '../lib/supabaseClient';
 import * as fpixel from '../lib/fpixel';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
@@ -20,7 +19,7 @@ const DELIVERY_FEE = 40_000;
 
 const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const { cart, cartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { session } = useAuth();
   const { showToast } = useToast();
   const { isDark } = useTheme();
   const { lang, t } = useLanguage();
@@ -34,6 +33,8 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [appliedPromo, setAppliedPromo] = useState('');
   const [isCheckingPromo, setIsCheckingPromo] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
+  const [confirmedTotal, setConfirmedTotal] = useState<number | null>(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -88,25 +89,37 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
     if (!promoCode.trim()) return;
     setIsCheckingPromo(true);
 
-    await new Promise(resolve => setTimeout(resolve, 800));
+    try {
+      const response = await fetch('/api/checkout/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cart.map((item) => ({ id: item.id, quantity: item.quantity })),
+          promoCode,
+        }),
+      });
 
-    const code = promoCode.trim().toUpperCase();
-    if (code === 'PAKET2026') {
-      const discount = cartTotal * 0.1;
-      setDiscountAmount(discount);
-      setAppliedPromo(code);
-      showToast(t('checkout_promo_success'), "success");
-    } else if (code === 'ADMIN') {
-      const discount = cartTotal * 0.5;
-      setDiscountAmount(discount);
-      setAppliedPromo(code);
-      showToast(t('checkout_promo_special'), "success");
-    } else {
-      showToast(t('checkout_promo_error'), "error");
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || t('checkout_promo_error'));
+      }
+
+      if (data.appliedPromo) {
+        setDiscountAmount(Number(data.discountAmount || 0));
+        setAppliedPromo(data.appliedPromo);
+        showToast(t('checkout_promo_success'), 'success');
+      } else {
+        setDiscountAmount(0);
+        setAppliedPromo('');
+        showToast(t('checkout_promo_error'), 'error');
+      }
+    } catch (error: any) {
+      showToast(error?.message || t('checkout_promo_error'), 'error');
       setDiscountAmount(0);
       setAppliedPromo('');
+    } finally {
+      setIsCheckingPromo(false);
     }
-    setIsCheckingPromo(false);
   };
 
   const handleRemovePromo = () => {
@@ -115,93 +128,41 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
     setPromoCode('');
   };
 
-  const saveOrderToDatabase = async () => {
-    if (!hasSupabaseCredentials) return;
-
-    const orderId = `ORD-${Date.now()}`;
-    const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-
-    try {
-      const orderData: any = {
-        id: orderId,
-        "customerName": `${formData.firstName} ${formData.lastName}`,
+  const createOrder = async () => {
+    const response = await fetch('/api/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+      },
+      body: JSON.stringify({
+        source: 'checkout',
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         phone: formData.phone,
-        total: finalTotal,
-        status: 'Kutilmoqda',
-        date: dateStr,
-        "paymentMethod": paymentMethod === 'paynet' ? 'Paynet' : 'Naqd',
-        items: cart.map((item) => ({
-          id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        shipping_address: formData.address,
+        address: formData.address,
         city: formData.city,
-      };
+        paymentMethod,
+        promoCode: appliedPromo || promoCode,
+        items: cart.map((item) => ({ id: item.id, quantity: item.quantity })),
+      }),
+    });
 
-      if (user) {
-        orderData.user_id = user.id;
-      }
-
-      const { error } = await supabase.from('orders').insert(orderData);
-
-      if (error) {
-        console.error("Error saving order to Supabase:", error);
-        showToast("Buyurtmani saqlashda xatolik: " + error.message, "error");
-      }
-    } catch (e) {
-      console.error("Supabase error:", e);
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || 'Buyurtma yaratishda xatolik yuz berdi');
     }
+
+    setDiscountAmount(Number(data.discountAmount || 0));
+    setAppliedPromo(data.appliedPromo || '');
+    setCreatedOrderId(data.orderId);
+    setConfirmedTotal(Number(data.total || 0));
+    return data.orderId as string;
   };
 
-  const sendTelegramNotification = async () => {
-    const itemsList = cart.map((item, index) =>
-      `${index + 1}. ${item.name} (x${item.quantity}) - ${new Intl.NumberFormat('uz-UZ').format(item.price * item.quantity)} UZS`
-    ).join('\n');
-
-    const totalFormatted = new Intl.NumberFormat('uz-UZ').format(finalTotal) + ' UZS';
-    const deliveryInfo = deliveryFee > 0
-      ? `\n${t('checkout_delivery')}: ${new Intl.NumberFormat('uz-UZ').format(deliveryFee)} UZS`
-      : `\n${t('checkout_delivery')}: ${t('checkout_delivery_free')}`;
-    const discountInfo = appliedPromo ? `\n🏷 <b>Promo:</b> ${appliedPromo} (-${new Intl.NumberFormat('uz-UZ').format(discountAmount)} UZS)` : '';
-    const paymentLabel = paymentMethod === 'paynet' ? '📲 Paynet (Onlayn)' : '💵 Naqd (Yetkazilganda)';
-
-    const message = `
-📦 <b>YANGI BUYURTMA! (LUXECORE)</b>
-
-👤 <b>Mijoz:</b> ${formData.firstName} ${formData.lastName}
-📞 <b>Tel:</b> ${formData.phone}
-📍 <b>Manzil:</b> ${formData.city}, ${formData.address}
-
-💳 <b>To'lov turi:</b> ${paymentLabel}
-
-🛒 <b>Mahsulotlar:</b>
-${itemsList}
-
-------------------
-${discountInfo}
-${deliveryInfo}
-💰 <b>JAMI TO'LOV:</b> ${totalFormatted}
-    `;
-
-    try {
-      await fetch('/api/telegram', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-    } catch (error) {
-      console.error("Failed to send Telegram message via API", error);
-    }
-  };
-
-  const completeOrder = async () => {
-    await saveOrderToDatabase();
-
-    const orderId = `ORD-${Date.now()}`;
+  const completeOrder = (orderId: string) => {
     const productIds = cart.map(item => item.id.toString());
-    fpixel.trackPurchase(orderId, finalTotal, productIds, 'UZS');
+    fpixel.trackPurchase(orderId, confirmedTotal ?? finalTotal, productIds, 'UZS');
 
     setShowPaynetModal(false);
     setIsLoading(false);
@@ -236,20 +197,25 @@ ${deliveryInfo}
     setErrors({});
     setIsLoading(true);
 
-    await sendTelegramNotification();
+    try {
+      const orderId = await createOrder();
 
-    if (paymentMethod === 'paynet') {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-      if (isMobile) {
-        window.open(PAYNET_URL, '_blank');
-        setTimeout(completeOrder, 2000);
+      if (paymentMethod === 'paynet') {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+        if (isMobile) {
+          window.open(PAYNET_URL, '_blank');
+          setTimeout(() => completeOrder(orderId), 2000);
+        } else {
+          setShowPaynetModal(true);
+          setIsLoading(false);
+          return;
+        }
       } else {
-        setShowPaynetModal(true);
-        setIsLoading(false);
-        return;
+        setTimeout(() => completeOrder(orderId), 1500);
       }
-    } else {
-      setTimeout(completeOrder, 1500);
+    } catch (error: any) {
+      showToast(error?.message || 'Buyurtma yaratishda xatolik yuz berdi', 'error');
+      setIsLoading(false);
     }
   };
 
@@ -499,7 +465,7 @@ ${deliveryInfo}
                 <img src={PAYNET_QR_IMAGE} alt="Paynet QR Code" className="w-48 h-48 object-contain" onError={(e) => { e.currentTarget.src = QR_FALLBACK; }} />
               </div>
               <div className="flex flex-col gap-3 w-full">
-                <button onClick={completeOrder} className="w-full bg-gold-400 text-black font-bold py-3.5 rounded-xl hover:bg-gold-500 transition-colors">{t('checkout_paynet_btn')}</button>
+                <button onClick={() => createdOrderId && completeOrder(createdOrderId)} className="w-full bg-gold-400 text-black font-bold py-3.5 rounded-xl hover:bg-gold-500 transition-colors">{t('checkout_paynet_btn')}</button>
                 <a href={PAYNET_URL} target="_blank" rel="noopener noreferrer" className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-colors text-sm"><ExternalLink size={16} /> {t('checkout_paynet_link')}</a>
               </div>
             </motion.div>

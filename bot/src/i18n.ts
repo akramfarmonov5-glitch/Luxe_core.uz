@@ -72,9 +72,22 @@ const translations: Record<string, Record<Lang, string>> = {
         uz: '💳 *Kartadan kartaga to\'lov*\n\nKarta raqam: `{card}`\nEgasi: *{holder}*\n\n✅ To\'lov qilgandan keyin "tayyor" deb yozing.',
         ru: '💳 *Оплата картой*\n\nНомер карты: `{card}`\nВладелец: *{holder}*\n\n✅ После оплаты напишите "готово".',
     },
+    checkout_card_confirm_again: {
+        uz: 'To‘lov qilgan bo‘lsangiz, tasdiqlash uchun *tayyor* deb yozing.',
+        ru: 'Если оплата выполнена, напишите *готово* для подтверждения.',
+    },
     checkout_success: { uz: '✅ *Buyurtma qabul qilindi!*', ru: '✅ *Заказ принят!*' },
     checkout_error: { uz: '❌ Buyurtma berishda xatolik.', ru: '❌ Ошибка при оформлении заказа.' },
     checkout_address: { uz: '📍 Yetkazib berish manzilini kiriting:', ru: '📍 Введите адрес доставки:' },
+    checkout_minimum: {
+        uz: 'Minimal buyurtma summasi *{amount}* bo‘lishi kerak.',
+        ru: 'Минимальная сумма заказа — *{amount}*.',
+    },
+    checkout_subtotal: { uz: 'Oraliq summa:', ru: 'Промежуточная сумма:' },
+    checkout_discount: { uz: 'Chegirma:', ru: 'Скидка:' },
+    checkout_delivery_fee: { uz: 'Yetkazib berish:', ru: 'Доставка:' },
+    checkout_delivery_free: { uz: 'Bepul', ru: 'Бесплатно' },
+    checkout_confirmed_total: { uz: 'Tasdiqlangan jami:', ru: 'Подтвержденный итог:' },
 
     orders_prompt: { uz: '📦 Buyurtmalaringizni ko\'rsataman...', ru: '📦 Показываю ваши заказы...' },
     orders_empty: { uz: '📦 Buyurtmalar topilmadi.', ru: '📦 Заказы не найдены.' },

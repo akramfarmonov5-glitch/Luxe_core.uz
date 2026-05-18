@@ -26,3 +26,4 @@ tsconfig.tsbuildinfo
 
 .vercel
 .claude/
+.env*.local

@@ -16,7 +16,7 @@ export async function notifyAdmin(
     customerName: string,
     phone: string,
     total: number,
-    items: CartItem[],
+    items: Array<Pick<CartItem, 'name' | 'price' | 'quantity'>>,
     userId: number,
     paymentMethod?: string,
     address?: string

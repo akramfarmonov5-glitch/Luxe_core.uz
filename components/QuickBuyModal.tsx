@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Product } from '../types';
-import { hasSupabaseCredentials, supabase } from '../lib/supabaseClient';
 import { useTheme } from '../context/ThemeContext';
 import * as fpixel from '../lib/fpixel';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedText } from '../lib/i18nUtils';
+import { useAuth } from '../context/AuthContext';
 
 interface QuickBuyModalProps {
   isOpen: boolean;
@@ -18,6 +18,7 @@ interface QuickBuyModalProps {
 const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product, quantity }) => {
   const { isDark } = useTheme();
   const { lang } = useLanguage();
+  const { session } = useAuth();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -26,6 +27,7 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const total = product.price * quantity;
 
@@ -37,79 +39,44 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const saveOrderToDatabase = async (orderId: string, dateStr: string) => {
-    if (!hasSupabaseCredentials) return;
-
-    try {
-      const { error } = await supabase.from('orders').insert({
-        id: orderId,
-        customerName: formData.firstName,
-        phone: formData.phone,
-        total,
-        status: 'Kutilmoqda',
-        date: dateStr,
-        paymentMethod: 'Naqd',
-        items: [
-          {
-            id: product.id,
-            name: getLocalizedText(product.name, lang),
-            quantity,
-            price: product.price,
-          },
-        ],
-      });
-
-      if (error) {
-        console.error('Error saving quick order to Supabase:', error);
-      }
-    } catch (e) {
-      console.error('Supabase quick order error:', e);
-    }
-  };
-
-  const sendTelegramNotification = async () => {
-    const message = `
-<b>TEZKOR BUYURTMA</b>
-
-<b>Ism:</b> ${formData.firstName}
-<b>Telefon:</b> ${formData.phone}
-<b>Tolov:</b> Operator aniqlaydi
-
-<b>Mahsulot:</b>
-1. ${getLocalizedText(product.name, lang)} (x${quantity}) - ${formatPrice(total)}
-
-<b>Jami:</b> ${formatPrice(total)}
-    `.trim();
-
-    try {
-      await fetch('/api/telegram', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message }),
-      });
-    } catch (error) {
-      console.error('Failed to send Telegram message', error);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
-    const orderId = `QORD-${Date.now()}`;
-    const dateStr = new Date().toISOString().split('T')[0];
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          source: 'quick-buy',
+          firstName: formData.firstName,
+          phone: formData.phone,
+          paymentMethod: 'cash',
+          items: [{ id: product.id, quantity }],
+        }),
+      });
 
-    await saveOrderToDatabase(orderId, dateStr);
-    await sendTelegramNotification();
-    fpixel.trackPurchase(orderId, total, [product.id.toString()], 'UZS');
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Buyurtma yuborilmadi');
+      }
 
-    setIsLoading(false);
-    setIsSuccess(true);
+      fpixel.trackPurchase(data.orderId, Number(data.total || total), [product.id.toString()], 'UZS');
+      setIsSuccess(true);
 
-    setTimeout(() => {
-      onClose();
-      setTimeout(() => setIsSuccess(false), 500);
-    }, 3000);
+      setTimeout(() => {
+        onClose();
+        setTimeout(() => setIsSuccess(false), 500);
+      }, 3000);
+    } catch (err: any) {
+      setError(err?.message || 'Buyurtma yuborilmadi');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -161,6 +128,11 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {error && (
+                    <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-400">
+                      {error}
+                    </div>
+                  )}
                   <div className="space-y-1.5">
                     <label className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Ismingiz</label>
                     <input
