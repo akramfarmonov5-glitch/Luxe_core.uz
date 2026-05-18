@@ -7,7 +7,7 @@ import { getLocalizedText } from '../lib/i18nUtils';
 interface CartContextType {
   cart: CartItem[];
   isCartOpen: boolean;
-  addToCart: (product: Product) => void;
+  addToCart: (product: Product, options?: { openSidebar?: boolean }) => void;
   removeFromCart: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   toggleCart: () => void;
@@ -40,7 +40,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem('luxecore_cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product: Product) => {
+  const addToCart = (product: Product, options?: { openSidebar?: boolean }) => {
     const qtyToAdd = product.itemsPerPackage || 1;
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
@@ -51,16 +51,17 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
       return [...prevCart, { ...product, quantity: qtyToAdd }];
     });
-    
-    // Pixel Tracking
+
     trackAddToCart({
       id: product.id,
       name: getLocalizedText(product.name, 'uz'),
       price: product.price,
       category: getLocalizedText(product.category, 'uz'),
     });
-    
-    setIsCartOpen(true); // Open cart when adding item
+
+    if (options?.openSidebar !== false) {
+      setIsCartOpen(true);
+    }
   };
 
   const removeFromCart = (productId: number) => {

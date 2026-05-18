@@ -23,11 +23,10 @@ export function checkRateLimit(key: string, limit: number, windowMs: number) {
   return { allowed: true, remaining: limit - existing.count, resetAt: existing.resetAt };
 }
 
-export function getClientIp(req: any): string {
-  const forwardedFor = req.headers?.['x-forwarded-for'];
-  if (typeof forwardedFor === 'string' && forwardedFor.length > 0) {
+export function getClientIp(req: Request): string {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor && forwardedFor.length > 0) {
     return forwardedFor.split(',')[0].trim();
   }
-
-  return req.socket?.remoteAddress || 'unknown';
+  return 'unknown';
 }

@@ -207,6 +207,7 @@ const translations: Translations = {
 
     // Breadcrumbs
     breadcrumb_home: { uz: 'Bosh sahifa', ru: 'Главная', en: 'Home' },
+    back_button: { uz: 'Orqaga', ru: 'Назад', en: 'Back' },
 
     // Quick Buy
     quick_buy: { uz: 'Bitta bosishda xarid qilish', ru: 'Купить в один клик', en: 'Quick Buy' },

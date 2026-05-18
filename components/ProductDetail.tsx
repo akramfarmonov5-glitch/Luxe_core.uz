@@ -60,17 +60,25 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
       category: getCategoryDisplayName(product.category, categories, lang)
     });
 
+    const fallbackDesc = getLocalizedText(product.shortDescription, lang) || "Eksklyuziv dizayn va yuqori sifat uyg'unligi. Ushbu mahsulot sizning stilingizni yangi darajaga olib chiqadi.";
+
     const generateAIDescription = async () => {
+      // Create an AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
       try {
         const languageName = lang === 'uz' ? 'Uzbek (Cyrillic or Latin as common)' : lang === 'ru' ? 'Russian' : 'English';
         const text = await requestGeminiText({
           systemInstruction: 'You write elegant but concise product copy for e-commerce product pages.',
           message: `Write a short, sophisticated, and persuasive product description for a luxury e-commerce item named "${getLocalizedText(product.name, 'uz')}" in the "${getCategoryDisplayName(product.category, categories, 'uz')}" category. The description must be in ${languageName}. Keep it premium, minimal, and limited to 3 sentences.`,
         });
+        clearTimeout(timeoutId);
 
-        setAiDescription(text || "Eksklyuziv dizayn va yuqori sifat uyg'unligi. Ushbu mahsulot sizning stilingizni yangi darajaga olib chiqadi.");
+        setAiDescription(text || fallbackDesc);
       } catch (error) {
-        setAiDescription("Eksklyuziv dizayn va yuqori sifat uyg'unligi. Ushbu mahsulot sizning stilingizni yangi darajaga olib chiqadi.");
+        clearTimeout(timeoutId);
+        setAiDescription(fallbackDesc);
       } finally {
         setLoading(false);
       }
@@ -81,29 +89,25 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
 
   const handleAddToCart = () => {
     addToCart(product);
-    showToast(t('toast_added_to_cart'), 'success');
-    fpixel.trackAddToCart({
-      ...product,
-      name: getLocalizedText(product.name, lang),
-      category: getCategoryDisplayName(product.category, categories, lang)
-    });
+    showToast(`${getLocalizedText(product.name, lang)} ${t('product.cart_added')}`, 'success');
   };
 
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     if (!isLiked) {
-      showToast(t('toast_added_to_wishlist'), 'success');
+      showToast(`${getLocalizedText(product.name, lang)} ${t('product.wishlist_added')}`, 'success');
     } else {
-      showToast(t('toast_removed_from_wishlist'), 'info');
+      showToast(`${getLocalizedText(product.name, lang)} ${t('product.wishlist_removed')}`, 'info');
     }
   };
 
   const handleBuyNow = () => {
     addToCart(product);
     fpixel.trackAddToCart({
-      ...product,
+      id: product.id,
       name: getLocalizedText(product.name, lang),
-      category: getCategoryDisplayName(product.category, categories, lang)
+      price: product.price,
+      category: getLocalizedText(product.category, lang),
     });
     onCheckout();
   };

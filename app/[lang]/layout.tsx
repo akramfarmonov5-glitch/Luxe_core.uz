@@ -1,8 +1,9 @@
 import '../globals.css';
 import { Providers } from './Providers';
 import ClientLayout from './ClientLayout';
+import { SITE_URL } from '../../lib/siteUrl';
 
-const siteUrl = 'https://luxe-core-uz-three.vercel.app';
+const siteUrl = SITE_URL;
 const logoUrl = `${siteUrl}/logo.jpg`;
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {

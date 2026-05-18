@@ -7,6 +7,7 @@ const defaultLocale = 'uz';
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Skip static files, API routes, and Next.js internals
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||
@@ -16,16 +17,18 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Check if the URL already has a locale prefix
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`,
   );
 
   if (pathnameHasLocale) return NextResponse.next();
 
+  // Redirect to the default locale
   request.nextUrl.pathname = `/${defaultLocale}${pathname}`;
   return NextResponse.redirect(request.nextUrl);
 }
 
 export const config = {
-  matcher: ['/((?!_next).*)'],
+  matcher: ['/((?!_next|api|favicon|.*\\.).*)'],
 };

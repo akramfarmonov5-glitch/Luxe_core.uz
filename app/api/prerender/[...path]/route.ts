@@ -1,22 +1,25 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { SITE_URL } from '../../../../lib/siteUrl';
 
-const BASE_URL = 'https://luxe-core-uz-three.vercel.app';
+const BASE_URL = SITE_URL;
 const LANGUAGES = ['uz', 'ru', 'en'] as const;
-const LOCALES = { uz: 'uz_UZ', ru: 'ru_RU', en: 'en_US' };
+type Lang = typeof LANGUAGES[number];
+const LOCALES: Record<Lang, string> = { uz: 'uz_UZ', ru: 'ru_RU', en: 'en_US' };
 
-export default async function handler(req, res) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_KEY;
-  const { path } = req.query;
-  const rawSegments = Array.isArray(path) ? path : (path ? path.split('/') : []);
-  const lang = LANGUAGES.includes(rawSegments[0]) ? rawSegments[0] : 'uz';
-  const segments = LANGUAGES.includes(rawSegments[0]) ? rawSegments.slice(1) : rawSegments;
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const { path } = await params;
+  const rawSegments = path || [];
+  const lang: Lang = (LANGUAGES as readonly string[]).includes(rawSegments[0]) ? (rawSegments[0] as Lang) : 'uz';
+  const segments = (LANGUAGES as readonly string[]).includes(rawSegments[0]) ? rawSegments.slice(1) : rawSegments;
   const pageType = segments[0] || 'home';
 
   try {
-    let products = [];
-    let categories = [];
-    let blogPosts = [];
+    let products: any[] = [];
+    let categories: any[] = [];
+    let blogPosts: any[] = [];
 
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
@@ -45,17 +48,21 @@ export default async function handler(req, res) {
       html = renderHomePage(products, categories, blogPosts, lang);
     }
 
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
-    res.status(200).send(html);
+    return new NextResponse(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
   } catch (err) {
     console.error('Pre-render Error:', err);
-    res.redirect(302, localizedPath('/', 'uz'));
+    return NextResponse.redirect(`${BASE_URL}${localizedPath('/', 'uz')}`, 302);
   }
 }
 
-function renderProductPage(slug, products, categories, lang) {
-  const id = parseInt(slug.split('-').pop(), 10);
+function renderProductPage(slug: string, products: any[], categories: any[], lang: Lang) {
+  const id = parseInt(slug.split('-').pop() || '', 10);
   const product = products.find(p => Number(p.id) === id);
   if (!product) return renderNotFound(lang);
 
@@ -126,7 +133,7 @@ function renderProductPage(slug, products, categories, lang) {
   });
 }
 
-function renderBlogPage(slug, blogPosts, lang) {
+function renderBlogPage(slug: string, blogPosts: any[], lang: Lang) {
   const id = slug.split('-').pop();
   const post = blogPosts.find(p => String(p.id) === String(id));
   if (!post) return renderNotFound(lang);
@@ -183,7 +190,7 @@ function renderBlogPage(slug, blogPosts, lang) {
   });
 }
 
-function renderCategoryPage(catSlug, products, categories, lang) {
+function renderCategoryPage(catSlug: string, products: any[], categories: any[], lang: Lang) {
   const category = categories.find(c => getCategorySlugs(c).includes(catSlug) || slugify(getLocalizedText(c.name, 'uz')) === catSlug);
   const categoryName = category ? getLocalizedText(category.name, lang) : catSlug;
   const description = category ? getLocalizedText(category.description, lang) : `${categoryName} - LUXECORE`;
@@ -234,7 +241,7 @@ function renderCategoryPage(catSlug, products, categories, lang) {
   });
 }
 
-function renderHomePage(products, categories, blogPosts, lang) {
+function renderHomePage(products: any[], categories: any[], blogPosts: any[], lang: Lang) {
   const title = homeTitle(lang);
   const description = homeDescription(lang);
   const canonicalUrl = localizedUrl('/', lang);
@@ -266,7 +273,7 @@ function renderHomePage(products, categories, blogPosts, lang) {
     title,
     description,
     canonicalUrl,
-    keywords: ['LUXECORE', 'online shop', 'Uzbekistan'],
+    keywords: ['LUXECORE', 'premium store', 'luxury', 'Uzbekistan'],
     ogType: 'website',
     ogImage: `${BASE_URL}/logo.jpg`,
     schemas,
@@ -286,7 +293,20 @@ function renderHomePage(products, categories, blogPosts, lang) {
   });
 }
 
-function renderDocument({ lang, title, description, canonicalUrl, keywords, ogType, ogImage, schemas, body, alternatePaths = null }) {
+interface RenderDocumentParams {
+  lang: Lang;
+  title: string;
+  description: string;
+  canonicalUrl: string;
+  keywords: string[] | string;
+  ogType: string;
+  ogImage: string;
+  schemas: any[];
+  body: string;
+  alternatePaths?: Record<string, string> | null;
+}
+
+function renderDocument({ lang, title, description, canonicalUrl, keywords, ogType, ogImage, schemas, body, alternatePaths = null }: RenderDocumentParams) {
   const basePath = stripLanguagePrefix(new URL(canonicalUrl).pathname);
   const alternates = LANGUAGES.map(altLang =>
     `<link rel="alternate" hreflang="${altLang}" href="${localizedUrl(alternatePaths?.[altLang] || basePath, altLang)}">`
@@ -332,7 +352,7 @@ function renderDocument({ lang, title, description, canonicalUrl, keywords, ogTy
 </html>`;
 }
 
-function breadcrumbSchema(items) {
+function breadcrumbSchema(items: { name: string; url: string }[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -345,7 +365,7 @@ function breadcrumbSchema(items) {
   };
 }
 
-function breadcrumbHtml(items) {
+function breadcrumbHtml(items: { name: string; url: string }[]) {
   return `<nav aria-label="breadcrumb"><ol>${items.map((item, index) =>
     index === items.length - 1
       ? `<li>${esc(item.name)}</li>`
@@ -353,12 +373,12 @@ function breadcrumbHtml(items) {
   ).join('')}</ol></nav>`;
 }
 
-function specTable(specs, lang) {
+function specTable(specs: any[], lang: Lang) {
   if (!specs.length) return '';
   return `<table>${specs.map(spec => `<tr><th>${esc(getLocalizedText(spec.label, lang))}</th><td>${esc(getLocalizedText(spec.value, lang))}</td></tr>`).join('')}</table>`;
 }
 
-function productListItem(product, lang) {
+function productListItem(product: any, lang: Lang) {
   const name = getLocalizedText(product.name, lang);
   const description = getLocalizedText(product.shortDescription || product.description || '', lang);
   return `<li>
@@ -371,7 +391,7 @@ function productListItem(product, lang) {
   </li>`;
 }
 
-function findCategoryByValue(value, categories) {
+function findCategoryByValue(value: any, categories: any[]) {
   const rawValue = getLocalizedText(value, 'uz');
   return categories.find(category => {
     const names = LANGUAGES.map(lang => getLocalizedText(category.name, lang));
@@ -379,45 +399,45 @@ function findCategoryByValue(value, categories) {
   });
 }
 
-function getProductCategoryKey(value, categories, lang = 'uz') {
+function getProductCategoryKey(value: any, categories: any[], lang: Lang = 'uz') {
   const category = findCategoryByValue(value, categories);
   return category ? getCategorySlug(category, lang) : getLocalizedText(value, lang);
 }
 
-function getCategorySlug(category, lang = 'uz') {
+function getCategorySlug(category: any, lang: Lang = 'uz') {
   return getLocalizedText(category.slug, lang) || slugify(getLocalizedText(category.name, lang));
 }
 
-function getCategorySlugs(category) {
+function getCategorySlugs(category: any) {
   return LANGUAGES
     .map(lang => getCategorySlug(category, lang))
     .filter((slug, index, slugs) => slug && slugs.indexOf(slug) === index);
 }
 
-function getEntitySlug(entity, entityType, lang) {
+function getEntitySlug(entity: any, entityType: string, lang: Lang) {
   const source = entityType === 'blog' ? entity.title : entity.name;
   return `${getLocalizedText(entity.slug, lang) || slugify(getLocalizedText(source, lang))}-${entity.id}`;
 }
 
-function localizedUrl(path, lang) {
+function localizedUrl(path: string, lang: Lang) {
   return `${BASE_URL}${localizedPath(path, lang)}`;
 }
 
-function localizedPath(path, lang) {
+function localizedPath(path: string, lang: Lang) {
   const cleanPath = stripLanguagePrefix(path);
   return cleanPath === '/' ? `/${lang}` : `/${lang}${cleanPath}`;
 }
 
-function stripLanguagePrefix(path) {
+function stripLanguagePrefix(path: string) {
   const segments = path.split('/').filter(Boolean);
-  if (LANGUAGES.includes(segments[0])) {
+  if ((LANGUAGES as readonly string[]).includes(segments[0])) {
     const rest = segments.slice(1).join('/');
     return rest ? `/${rest}` : '/';
   }
   return path.startsWith('/') ? path : `/${path}`;
 }
 
-function getLocalizedText(text, lang) {
+function getLocalizedText(text: any, lang: Lang): string {
   if (!text) return '';
   if (typeof text === 'string') {
     try {
@@ -433,7 +453,7 @@ function getLocalizedText(text, lang) {
   return String(text);
 }
 
-function slugify(text) {
+function slugify(text: string) {
   if (!text) return '';
   return text.toString().toLowerCase().trim()
     .replace(/['`']/g, '')
@@ -443,57 +463,57 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-function esc(str) {
+function esc(str: string) {
   if (!str) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function formatPrice(price) {
+function formatPrice(price: number) {
   if (!price) return '0 UZS';
   return new Intl.NumberFormat('uz-UZ').format(price) + ' UZS';
 }
 
-function homeLabel(lang) {
+function homeLabel(lang: Lang) {
   return ({ uz: 'Bosh sahifa', ru: 'Главная', en: 'Home' })[lang];
 }
 
-function homeTitle(lang) {
+function homeTitle(lang: Lang) {
   return ({
-    uz: "LUXECORE | O'zbekistondagi sifatli mahsulotlar",
-    ru: 'LUXECORE | Качественные товары в Узбекистане',
-    en: 'LUXECORE | Quality products in Uzbekistan',
+    uz: "LUXECORE | O'zbekistondagi premium onlayn do'kon",
+    ru: 'LUXECORE | Премиум онлайн-магазин в Узбекистане',
+    en: 'LUXECORE | Premium online store in Uzbekistan',
   })[lang];
 }
 
-function homeDescription(lang) {
+function homeDescription(lang: Lang) {
   return ({
-    uz: "LUXECORE - O'zbekistondagi ishonchli onlayn do'kon. Qadoqlash, oshxona va xo'jalik mahsulotlarini qulay narxlarda buyurtma qiling.",
-    ru: 'LUXECORE - надежный интернет-магазин в Узбекистане. Заказывайте упаковку, кухонные и хозяйственные товары по удобным ценам.',
-    en: 'LUXECORE is a reliable online store in Uzbekistan. Order packaging, kitchen and household products at convenient prices.',
+    uz: "LUXECORE - O'zbekistondagi premium onlayn do'kon. Eksklyuziv soatlar, sumkalar, parfyumeriya va aksessuarlarni buyurtma qiling.",
+    ru: 'LUXECORE - премиум онлайн-магазин в Узбекистане. Эксклюзивные часы, сумки, парфюмерия и аксессуары.',
+    en: 'LUXECORE is a premium online store in Uzbekistan. Exclusive watches, bags, perfume and accessories.',
   })[lang];
 }
 
-function categoriesLabel(lang) {
+function categoriesLabel(lang: Lang) {
   return ({ uz: 'Kategoriyalar', ru: 'Категории', en: 'Categories' })[lang];
 }
 
-function productsLabel(lang) {
+function productsLabel(lang: Lang) {
   return ({ uz: 'Mahsulotlar', ru: 'Товары', en: 'Products' })[lang];
 }
 
-function priceLabel(lang) {
+function priceLabel(lang: Lang) {
   return ({ uz: 'Narxi', ru: 'Цена', en: 'Price' })[lang];
 }
 
-function relatedLabel(lang) {
+function relatedLabel(lang: Lang) {
   return ({ uz: "O'xshash mahsulotlar", ru: 'Похожие товары', en: 'Related products' })[lang];
 }
 
-function productsCountLabel(lang, count) {
+function productsCountLabel(lang: Lang, count: number) {
   return ({ uz: `${count} ta mahsulot`, ru: `${count} товаров`, en: `${count} products` })[lang];
 }
 
-function renderNotFound(lang) {
+function renderNotFound(lang: Lang) {
   return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"><title>404 | LUXECORE</title><meta name="robots" content="noindex"></head><body><h1>404</h1><p><a href="${localizedUrl('/', lang)}">LUXECORE</a></p></body></html>`;
 }
 
@@ -501,11 +521,15 @@ function getMockProducts() {
   return [
     {
       id: 1,
-      name: { uz: 'Chiqindi uchun qoplar 70x90 sm 20 dona', ru: 'Мешки для мусора 70x90 см 20 шт', en: 'Trash bags 70x90 cm 20 pcs' },
-      price: 45000,
-      category: 'paketlar',
-      image: 'https://res.cloudinary.com/dkc6rlyeo/image/upload/v1776180967/xmpekaing8zqafdzu42k.webp',
-      shortDescription: { uz: 'Ulgurji narxlarda sifatli chiqindi qoplari.', ru: 'Качественные мешки для мусора по оптовым ценам.', en: 'Quality trash bags at wholesale prices.' },
+      name: { uz: 'Midnight Chronograph', ru: 'Midnight Chronograph', en: 'Midnight Chronograph' },
+      price: 12500000,
+      category: 'soatlar',
+      image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=1000&auto=format&fit=crop',
+      shortDescription: {
+        uz: 'Tungi osmon ilhomi bilan yaratilgan, olmos qoplamali eksklyuziv soat.',
+        ru: 'Эксклюзивные часы с алмазным покрытием.',
+        en: 'Exclusive diamond-coated chronograph watch.',
+      },
       specs: [],
     },
   ];
@@ -513,8 +537,9 @@ function getMockProducts() {
 
 function getMockCategories() {
   return [
-    { slug: 'paketlar', name: { uz: 'Paketlar', ru: 'Пакеты', en: 'Bags' }, description: { uz: 'Polietilen va qogoz paketlar', ru: 'Полиэтиленовые и бумажные пакеты', en: 'Polyethylene and paper bags' } },
-    { slug: 'idishlar', name: { uz: 'Idishlar va konteynerlar', ru: 'Посуда и контейнеры', en: 'Tableware and containers' } },
-    { slug: 'xojalik-mollari', name: { uz: "Xo'jalik mollari", ru: 'Хозяйственные товары', en: 'Household goods' } },
+    { slug: 'soatlar', name: { uz: 'Soatlar', ru: 'Часы', en: 'Watches' }, description: { uz: 'Premium soatlar', ru: 'Премиум часы', en: 'Premium watches' } },
+    { slug: 'sumkalar', name: { uz: 'Sumkalar', ru: 'Сумки', en: 'Bags' }, description: { uz: 'Italiya charmidan sumkalar', ru: 'Сумки из итальянской кожи', en: 'Italian leather bags' } },
+    { slug: 'parfyumeriya', name: { uz: 'Parfyumeriya', ru: 'Парфюмерия', en: 'Perfume' }, description: { uz: 'Premium parfyumeriya', ru: 'Премиум парфюмерия', en: 'Premium perfume' } },
+    { slug: 'aksessuarlar', name: { uz: 'Aksessuarlar', ru: 'Аксессуары', en: 'Accessories' }, description: { uz: 'Premium aksessuarlar', ru: 'Премиум аксессуары', en: 'Premium accessories' } },
   ];
 }

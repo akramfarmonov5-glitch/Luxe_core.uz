@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, Send, MessageCircle, User, Phone, ChevronRight } from 'lucide-react';
+import { Sparkles, X, Send, MessageCircle, User, Phone, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import { Product } from '../types';
 import { hasSupabaseCredentials, supabase } from '../lib/supabaseClient';
 import { getLocalizedText } from '../lib/i18nUtils';
@@ -27,6 +27,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -114,7 +115,8 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
         body: JSON.stringify({
           message: userMessage,
           history: history,
-          systemInstruction: getSystemInstruction()
+          systemInstruction: getSystemInstruction(),
+          enableTts: audioEnabled,
         })
       });
 
@@ -176,6 +178,13 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                 </div>
               </div>
               <div className="flex gap-2">
+                <button
+                  onClick={() => setAudioEnabled(v => !v)}
+                  title={audioEnabled ? 'Audio javobni o\'chirish' : 'Audio javobni yoqish'}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
+                >
+                  {audioEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                </button>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"

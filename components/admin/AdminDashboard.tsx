@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { TrendingUp, Users, DollarSign, Package } from 'lucide-react';
-import { Product, Order } from '../../types';
+import { Product, Category, Order } from '../../types';
 import { supabase } from '../../lib/supabaseClient';
+import { getProductCategoryKey, getCategorySlug } from '../../lib/categoryUtils';
+import { getLocalizedText } from '../../lib/i18nUtils';
 
 interface AdminDashboardProps {
   products: Product[];
+  categories?: Category[];
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ products }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ products, categories = [] }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [totalSales, setTotalSales] = useState(0);
 
@@ -42,12 +45,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ products }) => {
 
   const salesData = processSalesData();
 
-  const categoryData = [
-    { name: 'Soatlar', count: products.filter(p => p.category === 'Soatlar').length },
-    { name: 'Sumkalar', count: products.filter(p => p.category === 'Sumkalar').length },
-    { name: 'Texno', count: products.filter(p => p.category === 'Texnologiya').length },
-    { name: 'Aksessuar', count: products.filter(p => p.category === 'Aksessuarlar').length },
-  ];
+  const categoryData = categories.length > 0
+    ? categories.map(cat => {
+        const slug = getCategorySlug(cat, 'uz');
+        const count = products.filter(p => getProductCategoryKey(p.category, categories, 'uz') === slug).length;
+        return { name: getLocalizedText(cat.name, 'uz'), count };
+      })
+    : Array.from(new Set(products.map(p => getLocalizedText(p.category, 'uz')))).map(name => ({
+        name,
+        count: products.filter(p => getLocalizedText(p.category, 'uz') === name).length,
+      }));
 
   const formatPrice = (price: number) => {
       if (price >= 1000000) return (price / 1000000).toFixed(1) + 'M UZS';

@@ -1,7 +1,10 @@
+import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { SITE_URL } from '../../lib/siteUrl';
 
-const BASE_URL = 'https://luxe-core-uz-three.vercel.app';
+const BASE_URL = SITE_URL;
 const LANGUAGES = ['uz', 'ru', 'en'] as const;
+type Lang = typeof LANGUAGES[number];
 
 interface SitemapImageData {
   image?: string;
@@ -9,15 +12,15 @@ interface SitemapImageData {
   imageCaption?: string;
 }
 
-export default async function handler(req, res) {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_KEY;
+export async function GET() {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const today = new Date().toISOString().split('T')[0];
 
   try {
-    let products = [];
-    let categories = [];
-    let blogPosts = [];
+    let products: any[] = [];
+    let categories: any[] = [];
+    let blogPosts: any[] = [];
 
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
@@ -68,9 +71,13 @@ export default async function handler(req, res) {
         xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls}
 </urlset>`;
 
-    res.setHeader('Content-Type', 'application/xml');
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
-    res.status(200).send(sitemap);
+    return new NextResponse(sitemap, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/xml',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
   } catch (err) {
     console.error('Sitemap Generation Error:', err);
     const fallback = `<?xml version="1.0" encoding="UTF-8"?>
@@ -81,12 +88,14 @@ export default async function handler(req, res) {
     <priority>1.0</priority>
   </url>
 </urlset>`;
-    res.setHeader('Content-Type', 'application/xml');
-    res.status(200).send(fallback);
+    return new NextResponse(fallback, {
+      status: 200,
+      headers: { 'Content-Type': 'application/xml' },
+    });
   }
 }
 
-function renderLocalizedUrl(path, lastmod, changefreq, priority, imageData: SitemapImageData = {}) {
+function renderLocalizedUrl(path: string, lastmod: string, changefreq: string, priority: string, imageData: SitemapImageData = {}) {
   return LANGUAGES.map((lang) => {
     const loc = localizedUrl(path, lang);
     const alternates = LANGUAGES.map((altLang) =>
@@ -112,7 +121,7 @@ ${xDefault}
   }).join('');
 }
 
-function renderLocalizedCategoryUrl(category, lastmod, changefreq, priority, imageData: SitemapImageData = {}) {
+function renderLocalizedCategoryUrl(category: any, lastmod: string, changefreq: string, priority: string, imageData: SitemapImageData = {}) {
   return LANGUAGES.map((lang) => {
     const loc = localizedUrl(`/category/${getCategorySlug(category, lang)}`, lang);
     const alternates = LANGUAGES.map((altLang) =>
@@ -138,7 +147,7 @@ ${xDefault}
   }).join('');
 }
 
-function renderLocalizedEntityUrl(entityType, entity, lastmod, changefreq, priority, imageData: SitemapImageData = {}) {
+function renderLocalizedEntityUrl(entityType: string, entity: any, lastmod: string, changefreq: string, priority: string, imageData: SitemapImageData = {}) {
   return LANGUAGES.map((lang) => {
     const path = `/${entityType}/${getEntitySlug(entityType, entity, lang)}`;
     const loc = localizedUrl(path, lang);
@@ -165,20 +174,20 @@ ${xDefault}
   }).join('');
 }
 
-function localizedUrl(path, lang) {
+function localizedUrl(path: string, lang: Lang) {
   return `${BASE_URL}${path === '/' ? `/${lang}` : `/${lang}${path}`}`;
 }
 
-function getCategorySlug(category, lang) {
+function getCategorySlug(category: any, lang: Lang) {
   return getLocalizedText(category.slug, lang) || slugify(getLocalizedText(category.name, lang));
 }
 
-function getEntitySlug(entityType, entity, lang) {
+function getEntitySlug(entityType: string, entity: any, lang: Lang) {
   const source = entityType === 'blog' ? entity.title : entity.name;
   return `${getLocalizedText(entity.slug, lang) || slugify(getLocalizedText(source, lang))}-${entity.id}`;
 }
 
-function getLocalizedText(text, lang) {
+function getLocalizedText(text: any, lang: Lang): string {
   if (!text) return '';
   if (typeof text === 'string') {
     try {
@@ -196,7 +205,7 @@ function getLocalizedText(text, lang) {
   return String(text);
 }
 
-function slugify(text) {
+function slugify(text: string) {
   if (!text) return '';
   return text.toString().toLowerCase().trim()
     .replace(/['`']/g, '')
@@ -206,7 +215,7 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-function escapeXml(str) {
+function escapeXml(str: string) {
   if (!str) return '';
   return String(str)
     .replace(/&/g, '&amp;')
