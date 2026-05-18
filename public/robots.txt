@@ -1,13 +1,24 @@
 # LUXECORE - Premium Store
-# https://luxe-core-uz-three.vercel.app
 
 User-agent: *
 Allow: /
+Disallow: /uz/admin
+Disallow: /ru/admin
+Disallow: /en/admin
+Disallow: /uz/checkout
+Disallow: /ru/checkout
+Disallow: /en/checkout
+Disallow: /uz/profile
+Disallow: /ru/profile
+Disallow: /en/profile
 Disallow: /api/
-Disallow: /admin
 
-# Crawl delay
-Crawl-delay: 1
+# Allow Googlebot full access for Image / Mobile / etc.
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
 
 # Sitemap
 Sitemap: https://luxe-core-uz-three.vercel.app/sitemap.xml
