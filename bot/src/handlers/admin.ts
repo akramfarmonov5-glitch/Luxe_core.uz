@@ -252,7 +252,7 @@ export async function handleUsers(ctx: Context) {
         }
 
         const total = count || users.length;
-        const header = `👥 *Foydalanuvchilar (${total}):*\n\n`;
+        const header = `👥 Foydalanuvchilar (${total}):\n\n`;
         const MAX_LEN = 3800; // Telegram limit 4096, margin qoldiramiz
 
         let messages: string[] = [];
@@ -260,13 +260,13 @@ export async function handleUsers(ctx: Context) {
 
         users.forEach((u: any, i: number) => {
             const line =
-                `${i + 1}. *${u.name || 'Nomsiz'}* ${u.username ? `(@${u.username})` : ''}\n` +
+                `${i + 1}. ${u.name || 'Nomsiz'}${u.username ? ` (@${u.username})` : ''}\n` +
                 `   📱 ${u.phone || '-'} | 🌐 ${u.lang}\n` +
-                `   🆔 \`${u.telegram_id}\`\n\n`;
+                `   🆔 ${u.telegram_id}\n\n`;
 
             if (current.length + line.length > MAX_LEN) {
                 messages.push(current);
-                current = `👥 *davomi (${total}):*\n\n` + line;
+                current = `👥 davomi (${total}):\n\n` + line;
             } else {
                 current += line;
             }
@@ -274,7 +274,7 @@ export async function handleUsers(ctx: Context) {
         if (current.length > 0) messages.push(current);
 
         for (const msg of messages) {
-            await ctx.reply(msg, { parse_mode: 'Markdown' });
+            await ctx.reply(msg);
         }
     } catch (err) {
         console.error('Users error:', err);
