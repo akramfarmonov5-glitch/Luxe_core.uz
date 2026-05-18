@@ -244,22 +244,38 @@ export async function handleUsers(ctx: Context) {
         const { data: users, count } = await supabase
             .from('bot_users')
             .select('*', { count: 'exact' })
-            .order('created_at', { ascending: false })
-            .limit(20);
+            .order('created_at', { ascending: false });
 
         if (!users || users.length === 0) {
             await ctx.reply('👥 Foydalanuvchilar topilmadi.');
             return;
         }
 
-        let text = `👥 *Foydalanuvchilar (${count || users.length}):*\n\n`;
-        users.forEach((u: any, i: number) => {
-            text += `${i + 1}. *${u.name || 'Nomsiz'}* ${u.username ? `(@${u.username})` : ''}\n`;
-            text += `   📱 ${u.phone || '-'} | 🌐 ${u.lang}\n`;
-            text += `   🆔 \`${u.telegram_id}\`\n\n`;
-        });
+        const total = count || users.length;
+        const header = `👥 Foydalanuvchilar (${total}):\n\n`;
+        const MAX_LEN = 3800; // Telegram limit 4096, margin qoldiramiz
 
-        await ctx.reply(text, { parse_mode: 'Markdown' });
+        let messages: string[] = [];
+        let current = header;
+
+        users.forEach((u: any, i: number) => {
+            const line =
+                `${i + 1}. ${u.name || 'Nomsiz'}${u.username ? ` (@${u.username})` : ''}\n` +
+                `   📱 ${u.phone || '-'} | 🌐 ${u.lang}\n` +
+                `   🆔 ${u.telegram_id}\n\n`;
+
+            if (current.length + line.length > MAX_LEN) {
+                messages.push(current);
+                current = `👥 davomi (${total}):\n\n` + line;
+            } else {
+                current += line;
+            }
+        });
+        if (current.length > 0) messages.push(current);
+
+        for (const msg of messages) {
+            await ctx.reply(msg);
+        }
     } catch (err) {
         console.error('Users error:', err);
         await ctx.reply('❌ Xatolik.');
