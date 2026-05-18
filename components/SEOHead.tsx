@@ -3,6 +3,7 @@ import { Product, BlogPost, Category } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedText } from '../lib/i18nUtils';
 import { LOCALE_BY_LANG, SEO_LANGUAGES, stripLanguagePrefix, withLanguagePrefix } from '../lib/seoLanguage';
+import { SITE_URL } from '../lib/siteUrl';
 
 interface SEOProps {
   title?: string;
@@ -20,7 +21,7 @@ interface SEOProps {
   noindex?: boolean;
 }
 
-const BASE_URL = 'https://luxe-core-uz-three.vercel.app';
+const BASE_URL = SITE_URL;
 
 /**
  * SEOHead — Dinamik meta taglar va structured data boshqarish

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { SITE_URL } from '../../../../lib/siteUrl';
 
-const BASE_URL = 'https://luxe-core-uz-three.vercel.app';
+const BASE_URL = SITE_URL;
 const LANGUAGES = ['uz', 'ru', 'en'] as const;
 type Lang = typeof LANGUAGES[number];
 const LOCALES: Record<Lang, string> = { uz: 'uz_UZ', ru: 'ru_RU', en: 'en_US' };

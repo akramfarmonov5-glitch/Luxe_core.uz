@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { SITE_URL } from '../../lib/siteUrl';
 
-const BASE_URL = 'https://luxe-core-uz-three.vercel.app';
+const BASE_URL = SITE_URL;
 
 export async function GET() {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;

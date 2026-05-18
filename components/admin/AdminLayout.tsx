@@ -54,7 +54,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <AdminDashboard products={products} />;
+        return <AdminDashboard products={products} categories={categories} />;
       case 'hero':
         return <AdminHero heroContent={heroContent} setHeroContent={setHeroContent} />;
       case 'navigation':
@@ -82,7 +82,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         }
         return <div>Blog posts loading...</div>;
       default:
-        return <AdminDashboard products={products} />;
+        return <AdminDashboard products={products} categories={categories} />;
     }
   };
 
