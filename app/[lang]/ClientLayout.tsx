@@ -23,6 +23,7 @@ export default function ClientLayout({ children, lang }: { children: React.React
   const { products, categories, navigationSettings } = useGlobalData();
   const pathname = usePathname() || '/';
   const router = useRouter();
+  const langPrefix = `/${lang || 'uz'}`;
 
   const isCheckout = pathname.includes('/checkout');
   const isAdmin = pathname.includes('/admin');
@@ -34,19 +35,18 @@ export default function ClientLayout({ children, lang }: { children: React.React
   const hideNavAndFooter = isCheckout || isAdmin || isTracking;
   const hideFooter = hideNavAndFooter || isBlogPost || isWishlist;
 
-  const navigateToHome = () => router.push('/');
+  const navigateToHome = () => router.push(langPrefix);
   const navigateToProduct = (id: number) => {
-    // Topamiz va slug orqali otamiz
     const product = products.find(p => p.id === id);
-    if (product) router.push(`/product/${id}`); // Actually should use slug, but using id for simplicity first
+    if (product) router.push(`${langPrefix}/product/${id}`);
   };
-  const navigateToWishlist = () => router.push('/wishlist');
-  const navigateToTracking = () => router.push('/tracking');
-  const navigateToAdmin = () => router.push('/admin');
+  const navigateToWishlist = () => router.push(`${langPrefix}/wishlist`);
+  const navigateToTracking = () => router.push(`${langPrefix}/tracking`);
+  const navigateToAdmin = () => router.push(`${langPrefix}/admin`);
 
   const handleProfileClick = () => {
     if (user) {
-      router.push('/profile');
+      router.push(`${langPrefix}/profile`);
     } else {
       setIsAuthModalOpen(true);
     }
@@ -69,7 +69,7 @@ export default function ClientLayout({ children, lang }: { children: React.React
 
       {children}
 
-      {!isAdmin && <CartSidebar onCheckout={() => router.push('/checkout')} />}
+      {!isAdmin && <CartSidebar onCheckout={() => router.push(`${langPrefix}/checkout`)} />}
 
       {!hideNavAndFooter && (
         <MobileNav
