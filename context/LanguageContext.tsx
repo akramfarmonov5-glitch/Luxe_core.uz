@@ -19,12 +19,14 @@ const translations: Translations = {
     nav_contact: { uz: 'Bog\'lanish', ru: 'Kontakt', en: 'Contact' },
 
     // Hero & General UI
-    hero_title_suffix: { uz: 'Olamiga Xush Kelibsiz', ru: 'Добро Пожаловать', en: 'Welcome' },
     shop_now: { uz: 'Hozir Xarid Qilish', ru: 'Купить Сейчас', en: 'Shop Now' },
     add_to_cart: { uz: 'Savatga', ru: 'В Корзину', en: 'Add to Cart' },
+    hero_chip_delivery: { uz: "2 mln so'mdan bepul yetkazish", ru: 'Бесплатная доставка от 2 млн сум', en: 'Free delivery from 2M UZS' },
+    hero_chip_returns: { uz: '14 kun ichida qaytarish', ru: 'Возврат в течение 14 дней', en: '14-day returns' },
+    hero_chip_tracking: { uz: 'Buyurtmani kuzatish', ru: 'Отслеживание заказа', en: 'Order tracking' },
 
     // Footer
-    footer_desc: { uz: 'Premium mahsulotlar, soatlar, sumkalar va aksessuarlarni ishonchli yetkazib beramiz.', ru: 'Premium aksessuarlar, soatlar va sumkalarni ishonchli yetkazib beramiz.', en: 'Reliable delivery of premium watches, bags, perfume, and accessories.' },
+    footer_desc: { uz: 'Premium mahsulotlar, soatlar, sumkalar va aksessuarlarni ishonchli yetkazib beramiz.', ru: 'Надёжно доставляем премиальные часы, сумки, парфюмерию и аксессуары.', en: 'Reliable delivery of premium watches, bags, perfume, and accessories.' },
     footer_categories: { uz: 'Kategoriyalar', ru: 'Категории', en: 'Categories' },
     footer_help: { uz: 'Yordam', ru: 'Помощь', en: 'Help' },
     footer_contact: { uz: 'Bog\'lanish', ru: 'Контакты', en: 'Contact Us' },
@@ -88,6 +90,12 @@ const translations: Translations = {
     checkout_success_desc_1: { uz: 'Rahmat,', ru: 'Спасибо,', en: 'Thank you,' },
     checkout_success_desc_2: { uz: 'Menejerlarimiz tez orada', ru: 'Наши менеджеры скоро свяжутся с вами по номеру', en: 'Our managers will contact you soon at' },
     checkout_success_desc_3: { uz: 'raqami orqali siz bilan bog\'lanishadi.', ru: '', en: '' },
+    checkout_order_id_label: { uz: 'Buyurtma ID', ru: 'ID заказа', en: 'Order ID' },
+    checkout_tracking_hint: {
+      uz: 'Kuzatish sahifasida telefon raqamingiz bilan birga shu ID orqali buyurtmani tezroq topishingiz mumkin.',
+      ru: 'На странице отслеживания вы сможете быстрее найти заказ по этому ID и номеру телефона.',
+      en: 'On the tracking page, use this ID together with your phone number to find the order faster.',
+    },
     checkout_back_home: { uz: 'Bosh sahifaga qaytish', ru: 'Вернуться на главную', en: 'Back to home' },
     checkout_placeholder_firstname: { uz: 'Aziz', ru: 'Азиз', en: 'Aziz' },
     checkout_placeholder_lastname: { uz: 'Rahimov', ru: 'Рахимов', en: 'Rahimov' },
@@ -118,13 +126,15 @@ const translations: Translations = {
     buy_now: { uz: 'Hozir olish', ru: 'Купить сейчас', en: 'Buy Now' },
     premium_warranty: { uz: 'Premium Kafolat', ru: 'Премиум Гарантия', en: 'Premium Warranty' },
     free_delivery: { uz: 'Bepul Yetkazish', ru: 'Бесплатная Доставка', en: 'Free Delivery' },
-    eco_package: { uz: 'Premium qadoq', ru: 'Premium qadoq', en: 'Premium packaging' },
+    eco_package: { uz: 'Premium qadoq', ru: 'Премиальная упаковка', en: 'Premium packaging' },
     recommendations: { uz: 'Tavsiyalar', ru: 'Рекомендации', en: 'Recommendations' },
     video_error: { uz: 'Agar video ishlamasa, YouTube orqali ko\'ring', ru: 'Если видео не работает, посмотрите на YouTube', en: 'If the video doesn\'t work, watch on YouTube' },
     category_collection: { uz: 'Kolleksiya', ru: 'Коллекция', en: 'Collection' },
+    category_section_title: { uz: 'Kategoriyalar', ru: 'Категории', en: 'Categories' },
+    category_section_desc: { uz: 'Mos bo‘limdan boshlang va kerakli mahsulotni tezroq toping.', ru: 'Начните с нужной категории и быстрее найдите подходящий товар.', en: 'Start with the right category and find the product you need faster.' },
     view: { uz: 'Ko\'rish', ru: 'Посмотреть', en: 'View' },
-    items_per_package: { uz: 'To\'plamdagi soni', ru: 'To\'plamdagi soni', en: 'Items per set' },
-    items_per_package_desc: { uz: 'Har bir to\'plamda', ru: 'Har bir to\'plamda', en: 'In each set' },
+    items_per_package: { uz: 'To\'plamdagi soni', ru: 'Количество в наборе', en: 'Items per set' },
+    items_per_package_desc: { uz: 'Har bir to\'plamda', ru: 'в наборе', en: 'In each set' },
 
     // Toast Messages
     toast_added_to_cart: { uz: 'Mahsulot savatchaga qo\'shildi', ru: 'Товар добавлен в корзину', en: 'Product added to cart' },
@@ -144,7 +154,7 @@ const translations: Translations = {
     follow_us: { uz: 'Bizni kuzating', ru: 'Подписывайтесь на нас', en: 'Follow Us' },
     all_rights_reserved: { uz: 'Barcha huquqlar himoyalangan', ru: 'Все права защищены', en: 'All rights reserved' },
     meta_title: { uz: 'LUXECORE | Premium Store', ru: 'LUXECORE | Premium Store', en: 'LUXECORE | Premium Store' },
-    meta_description: { uz: 'LUXECORE - O\'zbekistondagi premium onlayn do\'kon.', ru: 'LUXECORE - premium onlayn do\'kon.', en: 'LUXECORE - premium online store in Uzbekistan.' },
+    meta_description: { uz: 'LUXECORE - O\'zbekistondagi premium onlayn do\'kon.', ru: 'LUXECORE — премиальный онлайн-магазин в Узбекистане.', en: 'LUXECORE - premium online store in Uzbekistan.' },
     premium_series: { uz: 'Premium Seriya', ru: 'Премиум Серия', en: 'Premium Series' },
     limited_edition: { uz: 'Maxsus Nashr', ru: 'Лимитированная Серия', en: 'Limited Edition' },
     collection_2026: { uz: '2026 To\'plami', ru: 'Коллекция 2026', en: '2026 Collection' },
@@ -162,7 +172,7 @@ const translations: Translations = {
     trust_title: { uz: 'Nima uchun bizni', ru: 'Почему выбирают', en: 'Why choose' },
     trust_title_highlight: { uz: 'tanlashadi?', ru: 'нас?', en: 'us?' },
     trust_delivery_title: { uz: 'Bepul yetkazish', ru: 'Бесплатная доставка', en: 'Free Delivery' },
-    trust_delivery_desc: { uz: '1 mln so\'mdan yuqori buyurtmalar uchun butun O\'zbekiston bo\'ylab', ru: 'Для заказов свыше 1 млн сум по всему Узбекистану', en: 'For orders over 1M UZS across Uzbekistan' },
+    trust_delivery_desc: { uz: '2 mln so\'mdan yuqori buyurtmalar uchun butun O\'zbekiston bo\'ylab', ru: 'Для заказов свыше 2 млн сум по всему Узбекистану', en: 'For orders over 2M UZS across Uzbekistan' },
     trust_quality_title: { uz: 'Sifat kafolati', ru: 'Гарантия качества', en: 'Quality Guarantee' },
     trust_quality_desc: { uz: 'Barcha mahsulotlar sertifikatlangan va sifat nazoratidan o\'tgan', ru: 'Вся продукция сертифицирована и прошла контроль качества', en: 'All products are certified and quality controlled' },
     trust_payment_title: { uz: 'Xavfsiz to\'lov', ru: 'Безопасная оплата', en: 'Secure Payment' },
@@ -184,6 +194,27 @@ const translations: Translations = {
     promo_minutes: { uz: 'Daqiqa', ru: 'Минут', en: 'Minutes' },
     promo_seconds: { uz: 'Soniya', ru: 'Секунд', en: 'Seconds' },
     promo_shop: { uz: 'Xarid qilish', ru: 'Купить', en: 'Shop Now' },
+
+    // Shopping Guide
+    shopping_guide_label: { uz: 'Qanday ishlaydi', ru: 'Как это работает', en: 'How it works' },
+    shopping_guide_title: { uz: 'Xarid jarayoni sodda va tushunarli', ru: 'Покупка проходит просто и понятно', en: 'A simple, clear shopping flow' },
+    shopping_guide_desc: { uz: 'Mahsulotni topishdan boshlab buyurtmani kuzatishgacha asosiy qadamlar bir joyda ko‘rinadi.', ru: 'От выбора товара до отслеживания заказа — все основные шаги видны сразу.', en: 'From choosing a product to tracking the order, the key steps are visible upfront.' },
+    shopping_step_choose_title: { uz: 'Kategoriyani tanlang', ru: 'Выберите категорию', en: 'Choose a category' },
+    shopping_step_choose_desc: { uz: 'Mos bo‘limga kiring va mahsulotlarni qidiring yoki filtrlang.', ru: 'Откройте нужный раздел и ищите товары через поиск или фильтры.', en: 'Open the right section and browse with search or filters.' },
+    shopping_step_order_title: { uz: 'Buyurtma bering', ru: 'Оформите заказ', en: 'Place the order' },
+    shopping_step_order_desc: { uz: 'Mahsulotni tanlang, savatga qo‘shing va qulay usulda rasmiylashtiring.', ru: 'Выберите товар, добавьте в корзину и оформите удобным способом.', en: 'Pick a product, add it to cart, and complete checkout comfortably.' },
+    shopping_step_track_title: { uz: 'Holatini kuzating', ru: 'Отслеживайте статус', en: 'Track the status' },
+    shopping_step_track_desc: { uz: 'Telefon raqami va buyurtma ID orqali holatini tez tekshiring.', ru: 'Быстро проверяйте статус по номеру телефона и ID заказа.', en: 'Check progress quickly using your phone number and order ID.' },
+    shopping_support_label: { uz: 'Boshlash uchun', ru: 'Для начала', en: 'Get started' },
+    shopping_support_title: { uz: 'Avval tanlang, keyin xotirjam kuzating', ru: 'Сначала выберите, потом спокойно отслеживайте', en: 'Choose first, then track with confidence' },
+    shopping_support_desc: { uz: 'Katalogdan mos mahsulotni toping yoki allaqachon berilgan buyurtma holatini tekshiring.', ru: 'Найдите подходящий товар в каталоге или проверьте статус уже оформленного заказа.', en: 'Find the right product in the catalog or check an order you have already placed.' },
+    shopping_support_catalog: { uz: 'Katalogni ko‘rish', ru: 'Смотреть каталог', en: 'Browse catalog' },
+    shopping_support_tracking: { uz: 'Buyurtmani kuzatish', ru: 'Отследить заказ', en: 'Track order' },
+
+    // Home Reviews
+    home_reviews_label: { uz: 'Haqiqiy sharhlar', ru: 'Реальные отзывы', en: 'Real reviews' },
+    home_reviews_title: { uz: 'Mijozlar mahsulotlar haqida nima yozdi', ru: 'Что клиенты пишут о товарах', en: 'What customers say about the products' },
+    home_reviews_desc: { uz: 'Bu bo‘lim faqat bazada mavjud haqiqiy izohlar bo‘lsa chiqadi — uydirma sharhlar yo‘q.', ru: 'Этот блок появляется только при наличии реальных отзывов в базе — без вымышленных комментариев.', en: 'This section appears only when real stored reviews exist — no invented testimonials.' },
 
     'Soatlar': { uz: 'Soatlar', ru: 'Часы', en: 'Watches' },
     'Ko\'zoynaklar': { uz: 'Ko\'zoynaklar', ru: 'Очки', en: 'Glasses' },
@@ -231,6 +262,8 @@ const translations: Translations = {
     submit: { uz: 'Yuborish', ru: 'Отправить', en: 'Submit' },
     no_reviews: { uz: "Hali izohlar qoldirilmagan. Birinchi bo'lib fikr bildiring!", ru: 'Отзывов пока нет. Будьте первым!', en: 'No reviews yet. Be the first to leave one!' },
     review_thanks: { uz: 'Fikringiz uchun rahmat!', ru: 'Спасибо за ваш отзыв!', en: 'Thank you for your review!' },
+    review_pending: { uz: 'Sharhingiz yuborildi. Admin tasdiqlagach saytda ko‘rinadi.', ru: 'Отзыв отправлен. Он появится на сайте после одобрения администратором.', en: 'Your review was sent and will appear after admin approval.' },
+    review_customer: { uz: 'Mijoz', ru: 'Клиент', en: 'Customer' },
     error_occurred: { uz: 'Xatolik yuz berdi.', ru: 'Произошла ошибка.', en: 'An error occurred.' },
 };
 

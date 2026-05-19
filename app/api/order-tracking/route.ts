@@ -17,21 +17,27 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { phone } = await req.json();
+    const { phone, orderId } = await req.json();
     const rawPhone = String(phone || '').trim();
     const normalizedPhone = normalizePhone(phone);
+    const normalizedOrderId = String(orderId || '').trim();
 
     if (normalizedPhone.length < 9) {
       return NextResponse.json({ error: 'Valid phone is required' }, { status: 400 });
     }
 
     const supabase = createClient(supabaseUrl, serviceRoleKey);
-    const { data, error } = await supabase
+    let query = supabase
       .from('orders')
       .select('id, customerName, phone, total, status, date, paymentMethod, items, created_at')
       .in('phone', [...new Set([rawPhone, normalizedPhone].filter(Boolean))])
-      .order('created_at', { ascending: false })
-      .limit(20);
+      .order('created_at', { ascending: false });
+
+    if (normalizedOrderId) {
+      query = query.eq('id', normalizedOrderId);
+    }
+
+    const { data, error } = await query.limit(normalizedOrderId ? 1 : 20);
 
     if (error) {
       throw error;

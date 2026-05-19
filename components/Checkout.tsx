@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, ShieldCheck, CreditCard, Truck, Send, Wallet, Banknote, X, Smartphone, ExternalLink, Ticket, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import * as fpixel from '../lib/fpixel';
+import { trackBeginCheckout, trackPurchase as trackGaPurchase } from '../lib/analytics';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -35,6 +36,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const [isCheckingPromo, setIsCheckingPromo] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [confirmedTotal, setConfirmedTotal] = useState<number | null>(null);
+  const hasTrackedCheckoutRef = useRef(false);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -55,11 +57,13 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const QR_FALLBACK = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(PAYNET_URL)}&color=000000&bgcolor=ffffff`;
 
   useEffect(() => {
-    if (cart.length > 0) {
+    if (!hasTrackedCheckoutRef.current && cart.length > 0) {
       const productIds = cart.map(item => item.id.toString());
       fpixel.trackInitiateCheckout(cartTotal, productIds);
+      trackBeginCheckout(cart, cartTotal, lang);
+      hasTrackedCheckoutRef.current = true;
     }
-  }, []);
+  }, [cart, cartTotal, lang]);
 
   const cities = [
     'city_toshkent',
@@ -163,6 +167,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const completeOrder = (orderId: string) => {
     const productIds = cart.map(item => item.id.toString());
     fpixel.trackPurchase(orderId, confirmedTotal ?? finalTotal, productIds, 'UZS');
+    trackGaPurchase(orderId, cart, confirmedTotal ?? finalTotal, lang);
 
     setShowPaynetModal(false);
     setIsLoading(false);
@@ -481,6 +486,15 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
               <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle2 size={40} className="text-green-500" /></div>
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">{t('checkout_success_title')}</h2>
               <p className="text-gray-400 mb-8 leading-relaxed">{t('checkout_success_desc_1')} {formData.firstName}! {t('checkout_success_desc_2')} <b>{formData.phone}</b> {t('checkout_success_desc_3')}</p>
+              {createdOrderId && (
+                <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-left">
+                  <p className="text-xs uppercase tracking-wider text-gray-500">{t('checkout_order_id_label')}</p>
+                  <p className="mt-1 break-all font-mono text-sm text-gold-400">{createdOrderId}</p>
+                  <p className="mt-2 text-xs text-gray-500">
+                    {t('checkout_tracking_hint')}
+                  </p>
+                </div>
+              )}
               <button onClick={onBack} className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">{t('checkout_back_home')}</button>
             </motion.div>
           </div>

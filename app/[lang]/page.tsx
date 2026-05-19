@@ -4,12 +4,14 @@ import { supabase } from '../../lib/supabaseClient';
 import { MOCK_CATEGORIES, MOCK_PRODUCTS } from '../../constants';
 import { getLocalizedText } from '../../lib/i18nUtils';
 import { slugify, productSlug } from '../../lib/slugify';
-import type { Category, Product } from '../../types';
+import { loadApprovedReviews } from '../../lib/reviews';
+import type { Category, Product, Review } from '../../types';
 
 async function loadHomeData() {
-  const [{ data: categoriesData }, { data: productsData }] = await Promise.all([
+  const [{ data: categoriesData }, { data: productsData }, reviewsData] = await Promise.all([
     supabase.from('categories').select('*'),
     supabase.from('products').select('*'),
+    loadApprovedReviews(6),
   ]);
   const categories: Category[] = (categoriesData && categoriesData.length > 0)
     ? (categoriesData as unknown as Category[])
@@ -17,7 +19,11 @@ async function loadHomeData() {
   const products: Product[] = (productsData && productsData.length > 0)
     ? (productsData as unknown as Product[])
     : MOCK_PRODUCTS;
-  return { categories, products };
+  const reviews: Review[] = reviewsData
+    .filter((review) => typeof review.comment === 'string' && review.comment.trim().length > 0)
+    .slice(0, 3) as Review[];
+
+  return { categories, products, reviews };
 }
 
 function homeCopy(lang: string) {
@@ -51,7 +57,7 @@ function homeCopy(lang: string) {
 export default async function HomePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const activeLang = lang || 'uz';
-  const { categories, products } = await loadHomeData();
+  const { categories, products, reviews } = await loadHomeData();
   const copy = homeCopy(activeLang);
 
   const websiteSchema = {
@@ -108,7 +114,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </ul>
       </div>
 
-      <HomeClient />
+      <HomeClient featuredReviews={reviews} />
     </>
   );
 }

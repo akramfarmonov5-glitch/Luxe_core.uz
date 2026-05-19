@@ -5,6 +5,7 @@ import { Product, Category } from '../types';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import * as fpixel from '../lib/fpixel';
+import { trackSearch as trackGaSearch } from '../lib/analytics';
 import { getLocalizedText } from '../lib/i18nUtils';
 import { getCategoryDisplayName } from '../lib/categoryUtils';
 
@@ -47,6 +48,7 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
     if (query.trim().length > 2) {
       const timer = setTimeout(() => {
         fpixel.trackSearch(query.trim());
+        trackGaSearch(query.trim());
       }, 1000);
       return () => clearTimeout(timer);
     }
@@ -60,13 +62,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
     ? categories.filter(c => getLocalizedText(c.name, lang).toLowerCase().includes(query.toLowerCase()))
     : [];
 
-  // Popular searches suggestions based on actual categories
-  const suggestions = [
-    t('Paketlar (Polietilen va qog\'oz mahsulotlari)')?.split(' ')[0] || 'Paketlar', 
-    t('Stakanlar (Keng assortiment)')?.split(' ')[0] || 'Stakanlar', 
-    t('Oshxona sarflov materiallari')?.split(' ')[0] || 'Oshxona', 
-    t('Tozalash inventarlari (Cleaning)')?.split(' ')[0] || 'Tozalash'
-  ];
+  const suggestions = categories
+    .slice(0, 4)
+    .map((category) => getLocalizedText(category.name, lang))
+    .filter(Boolean);
 
   const handleProductClick = (id: number) => {
     onNavigateToProduct(id);

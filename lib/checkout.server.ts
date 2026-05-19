@@ -9,6 +9,7 @@ export const FREE_DELIVERY_THRESHOLD = 2_000_000;
 export const DELIVERY_FEE = 40_000;
 
 const FALLBACK_PROMO_RULES: Record<string, number> = {
+  LUXE2026: 0.1,
   PAKET2026: 0.1,
   ADMIN: 0.5,
 };

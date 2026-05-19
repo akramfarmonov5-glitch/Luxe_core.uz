@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, FileText, LogOut, Layers, Image as ImageIcon, Menu, Users, X } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, FileText, LogOut, Layers, Image as ImageIcon, Menu, MessageCircle, Users, X } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCategories from './AdminCategories';
@@ -8,6 +8,7 @@ import AdminBlog from './AdminBlog';
 import AdminHero from './AdminHero';
 import AdminNavigation from './AdminNavigation';
 import AdminLeads from './AdminLeads';
+import AdminReviews from './AdminReviews';
 import { Product, Category, HeroContent, NavigationSettings, BlogPost } from '../../types';
 
 interface AdminLayoutProps {
@@ -37,13 +38,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     blogPosts,
     setBlogPosts
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'orders' | 'leads' | 'blog' | 'hero' | 'navigation'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'orders' | 'leads' | 'reviews' | 'blog' | 'hero' | 'navigation'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
     { id: 'dashboard', label: 'Statistika', icon: LayoutDashboard },
     { id: 'orders', label: 'Buyurtmalar (CRM)', icon: ShoppingCart },
     { id: 'leads', label: 'Mijozlar (Chat)', icon: Users },
+    { id: 'reviews', label: 'Sharhlar', icon: MessageCircle },
     { id: 'products', label: 'Mahsulotlar', icon: Package },
     { id: 'categories', label: 'Kategoriyalar', icon: Layers },
     { id: 'blog', label: 'SEO Blog & AI', icon: FileText },
@@ -76,6 +78,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         return <AdminOrders />;
       case 'leads':
         return <AdminLeads />;
+      case 'reviews':
+        return <AdminReviews products={products} />;
       case 'blog':
         if (blogPosts && setBlogPosts) {
             return <AdminBlog posts={blogPosts} setPosts={setBlogPosts} />;
@@ -96,7 +100,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-zinc-900 border-b border-white/10 flex items-center justify-between px-4 py-3">
         <h1 className="text-lg font-bold tracking-wider text-white">
-          Paket<span className="text-gold-400">ADMIN</span>
+          LUXECORE<span className="text-gold-400"> ADMIN</span>
         </h1>
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -123,7 +127,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       `}>
         <div className="p-6 border-b border-white/10">
           <h1 className="text-2xl font-bold tracking-wider text-white">
-            Paket<span className="text-gold-400">ADMIN</span>
+            LUXECORE<span className="text-gold-400"> ADMIN</span>
           </h1>
           <p className="text-xs text-gray-500 mt-1">Management Console</p>
         </div>

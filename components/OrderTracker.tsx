@@ -10,6 +10,7 @@ interface OrderTrackerProps {
 
 const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [orderId, setOrderId] = useState('');
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [searched, setSearched] = useState(false);
@@ -49,7 +50,7 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
       const response = await fetch('/api/order-tracking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber }),
+        body: JSON.stringify({ phone: phoneNumber, orderId }),
       });
 
       const data = await response.json();
@@ -104,27 +105,36 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">Buyurtmani Kuzatish</h1>
           <p className="text-gray-400">
-            Buyurtma holatini tekshirish uchun xarid vaqtida kiritgan telefon raqamingizni yozing.
+            Telefon raqamingizni yozing. Agar buyurtma ID ham bo'lsa, natijani aniqroq topamiz.
           </p>
         </div>
 
         <div className="bg-zinc-900 border border-white/10 p-6 md:p-8 rounded-3xl shadow-2xl mb-10">
-          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-lg">+998</span>
+          <form onSubmit={handleSearch} className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium text-lg">+998</span>
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="90 123 45 67"
+                  className="w-full bg-black border border-white/20 rounded-xl pl-16 pr-4 py-4 text-lg text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all"
+                  required
+                />
+              </div>
               <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="90 123 45 67"
-                className="w-full bg-black border border-white/20 rounded-xl pl-16 pr-4 py-4 text-lg text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all"
-                required
+                type="text"
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                placeholder="Buyurtma ID (ixtiyoriy)"
+                className="w-full bg-black border border-white/20 rounded-xl px-4 py-4 text-lg text-white focus:border-gold-400 focus:outline-none focus:ring-1 focus:ring-gold-400 transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="bg-gold-400 text-black font-bold py-4 px-8 rounded-xl hover:bg-gold-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-gold-400 text-black font-bold py-4 px-8 rounded-xl hover:bg-gold-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <span className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>

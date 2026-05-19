@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Product, CartItem } from '../types';
 import { trackAddToCart } from '../lib/fpixel';
+import { trackAddToCart as trackGaAddToCart } from '../lib/analytics';
 import { getLocalizedText } from '../lib/i18nUtils';
 
 interface CartContextType {
@@ -58,6 +59,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       price: product.price,
       category: getLocalizedText(product.category, 'uz'),
     });
+    trackGaAddToCart(product, 'uz', qtyToAdd);
 
     if (options?.openSidebar !== false) {
       setIsCartOpen(true);
