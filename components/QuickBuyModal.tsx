@@ -4,6 +4,7 @@ import { X, Send, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Product } from '../types';
 import { useTheme } from '../context/ThemeContext';
 import * as fpixel from '../lib/fpixel';
+import { trackQuickPurchase } from '../lib/analytics';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedText } from '../lib/i18nUtils';
 import { useAuth } from '../context/AuthContext';
@@ -66,6 +67,7 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
       }
 
       fpixel.trackPurchase(data.orderId, Number(data.total || total), [product.id.toString()], 'UZS');
+      trackQuickPurchase(data.orderId, product, quantity, Number(data.total || total), lang);
       setIsSuccess(true);
 
       setTimeout(() => {

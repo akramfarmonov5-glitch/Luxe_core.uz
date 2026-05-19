@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ShoppingBag, ChevronRight } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { HeroContent } from '../types';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -31,6 +31,11 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
   const images = displayContent.images && displayContent.images.length > 0
     ? displayContent.images
     : ["https://picsum.photos/800/1000"];
+  const proofChips = [
+    { id: 'delivery', label: t('hero_chip_delivery') },
+    { id: 'returns', label: t('hero_chip_returns') },
+    { id: 'tracking', label: t('hero_chip_tracking') },
+  ];
 
   useEffect(() => {
     if (images.length <= 1) return;
@@ -49,13 +54,29 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
     }
   };
 
+  const scrollToCategories = () => {
+    const categoriesSection = document.getElementById('shop-categories');
+    if (categoriesSection) {
+      categoriesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const getLocalizedTitle = () => {
     const titleStr = getLocalizedText(displayContent.title, lang);
+    const titleWords = titleStr.trim().split(/\s+/);
+    const splitIndex = titleWords.length > 2 ? Math.ceil(titleWords.length / 2) : 1;
+    const firstLine = titleWords.slice(0, splitIndex).join(' ');
+    const accentLine = titleWords.slice(splitIndex).join(' ');
+
+    if (!accentLine) {
+      return titleStr;
+    }
+
     return (
       <>
-        {titleStr.split(' ').slice(0, 1).join(' ')} <br />
+        {firstLine} <br />
         <span className={`text-transparent bg-clip-text bg-gradient-to-r ${isDark ? 'from-white to-gray-400' : 'from-amber-600 to-gold-500'}`}>
-          {titleStr.split(' ').slice(1).join(' ')} {t('hero_title_suffix')}
+          {accentLine}
         </span>
       </>
     );
@@ -87,7 +108,7 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
             {getLocalizedText(displayContent.description, lang)}
           </p>
 
-          <div className="flex gap-4 pt-2 md:pt-4">
+          <div className="flex flex-wrap gap-3 md:gap-4 pt-2 md:pt-4">
             <button
               onClick={scrollToProducts}
               className={`flex items-center gap-2 px-6 py-3 md:px-8 md:py-4 font-semibold rounded-full transition-all duration-300 transform hover:scale-105 text-sm md:text-base ${isDark ? 'bg-white text-black hover:bg-gold-400' : 'bg-gold-500 text-white hover:bg-gold-600'}`}
@@ -95,9 +116,27 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
               {getLocalizedText(displayContent.buttonText, lang)}
               <ShoppingBag size={18} />
             </button>
-            <button className={`px-6 py-3 md:px-8 md:py-4 border font-medium rounded-full backdrop-blur-sm transition-all duration-300 text-sm md:text-base ${isDark ? 'border-white/20 text-white hover:bg-white/10' : 'border-light-border text-light-text hover:bg-light-card'}`}>
+            <button
+              onClick={scrollToCategories}
+              className={`px-6 py-3 md:px-8 md:py-4 border font-medium rounded-full backdrop-blur-sm transition-all duration-300 text-sm md:text-base ${isDark ? 'border-white/20 text-white hover:bg-white/10' : 'border-light-border text-light-text hover:bg-light-card'}`}
+            >
               {t('nav_catalog')}
             </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            {proofChips.map((chip) => (
+              <span
+                key={chip.id}
+                className={`rounded-full border px-3 py-1.5 text-[11px] md:text-xs ${
+                  isDark
+                    ? 'border-white/10 bg-white/5 text-gray-300'
+                    : 'border-light-border bg-white text-light-muted'
+                }`}
+              >
+                {chip.label}
+              </span>
+            ))}
           </div>
         </motion.div>
 

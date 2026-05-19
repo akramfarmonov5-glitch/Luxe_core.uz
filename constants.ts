@@ -2,9 +2,9 @@ import { Product, Category, HeroContent, NavigationSettings, BlogPost } from './
 
 export const DEFAULT_HERO_CONTENT: HeroContent = {
   badge: "Yangi Mavsum",
-  title: "Premium Collection 2026",
-  description: "Elegentlik va zamonaviy dizayn uyg'unligi. O'z uslubingizni LUXECORE bilan yangi bosqichga olib chiqing.",
-  buttonText: "Sotib olish",
+  title: "Premium tanlovlar",
+  description: "Soatlar, sumkalar, parfyumeriya va aksessuarlarni bir joyda toping. Qulay tanlang, buyurtma bering va holatini kuzating.",
+  buttonText: "Mahsulotlarni ko'rish",
   images: [
     "https://images.unsplash.com/photo-1547996160-71df45082e0e?q=80&w=1000&auto=format&fit=crop", // Nature/Landscape for vibe
     "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000&auto=format&fit=crop", // Fashion Model

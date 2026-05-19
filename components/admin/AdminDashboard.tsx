@@ -65,10 +65,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ products, categories = 
   const uniqueCustomers = new Set(orders.map(o => o.phone)).size;
 
   const stats = [
-    { label: 'Jami Savdo', value: formatPrice(totalSales), icon: DollarSign, change: '100%' },
-    { label: 'Yangi Mijozlar', value: uniqueCustomers, icon: Users, change: '100%' },
-    { label: 'Buyurtmalar', value: orders.length, icon: TrendingUp, change: '100%' },
-    { label: 'Mahsulotlar', value: products.length, icon: Package, change: '100%' },
+    { label: 'Jami Savdo', value: formatPrice(totalSales), icon: DollarSign, note: 'Umumiy' },
+    { label: 'Mijozlar', value: uniqueCustomers, icon: Users, note: 'Unikal' },
+    { label: 'Buyurtmalar', value: orders.length, icon: TrendingUp, note: 'Jami' },
+    { label: 'Mahsulotlar', value: products.length, icon: Package, note: `${categories.length} kategoriya` },
   ];
 
   return (
@@ -86,8 +86,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ products, categories = 
               <div className="p-3 bg-gold-400/10 rounded-xl">
                 <stat.icon className="text-gold-400" size={24} />
               </div>
-              <span className="text-xs font-medium text-green-400 bg-green-400/10 px-2 py-1 rounded-full">
-                {stat.change}
+              <span className="text-xs font-medium text-gray-300 bg-white/5 px-2 py-1 rounded-full">
+                {stat.note}
               </span>
             </div>
             <h3 className="text-gray-400 text-sm font-medium">{stat.label}</h3>

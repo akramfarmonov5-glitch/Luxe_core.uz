@@ -5,6 +5,8 @@ import { MOCK_PRODUCTS } from '../../../../constants';
 import { SITE_URL } from '../../../../lib/siteUrl';
 import { productSlug } from '../../../../lib/slugify';
 import { SEO_LANGUAGES } from '../../../../lib/seoLanguage';
+import { loadApprovedProductReviews } from '../../../../lib/reviews';
+import type { Review } from '../../../../types';
 
 function resolveProductId(raw: string): string {
   if (!isNaN(Number(raw))) return raw;
@@ -82,6 +84,10 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const { id, lang } = await params;
   const activeLang = lang || 'uz';
   const product = await loadProduct(id);
+  const reviews = product ? await loadApprovedProductReviews(Number(product.id)) : [];
+  const averageRating = reviews.length > 0
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+    : 0;
 
   const jsonLd = product ? {
     '@context': 'https://schema.org/',
@@ -102,6 +108,23 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         : 'https://schema.org/OutOfStock',
       seller: { '@type': 'Organization', name: 'LUXECORE' },
     },
+    ...(reviews.length > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: Number(averageRating.toFixed(1)),
+        reviewCount: reviews.length,
+      },
+      review: reviews.slice(0, 5).map((review) => ({
+        '@type': 'Review',
+        author: { '@type': 'Person', name: review.user_name || 'Customer' },
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: review.rating,
+          bestRating: 5,
+        },
+        reviewBody: review.comment || undefined,
+      })),
+    } : {}),
   } : null;
 
   return (

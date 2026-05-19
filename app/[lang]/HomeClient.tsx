@@ -4,17 +4,22 @@ import React, { useState } from 'react';
 import Hero from '../../components/Hero';
 import TrustBadges from '../../components/TrustBadges';
 import CategoryGrid from '../../components/CategoryGrid';
-import PromoBanner from '../../components/PromoBanner';
 import FeaturedProducts from '../../components/FeaturedProducts';
-import Testimonials from '../../components/Testimonials';
+import ShoppingGuide from '../../components/ShoppingGuide';
+import CustomerReviews from '../../components/CustomerReviews';
 import BlogGrid from '../../components/BlogGrid';
 import { useGlobalData } from '../../context/GlobalContext';
 import { useRouter, useParams } from 'next/navigation';
 import { getCategorySlug } from '../../lib/categoryUtils';
 import * as fpixel from '../../lib/fpixel';
 import { getLocalizedText } from '../../lib/i18nUtils';
+import type { Review } from '../../types';
 
-export default function HomePage() {
+interface HomePageProps {
+  featuredReviews?: Review[];
+}
+
+export default function HomePage({ featuredReviews = [] }: HomePageProps) {
   const { products, categories, heroContent, blogPosts, isLoading } = useGlobalData();
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const router = useRouter();
@@ -46,13 +51,11 @@ export default function HomePage() {
   return (
     <main className="pb-20">
       <Hero content={heroContent} />
-      <TrustBadges />
       <CategoryGrid
         categories={categories}
         onSelectCategory={handleCategorySelect}
         isLoading={isLoading}
       />
-      <PromoBanner />
       <FeaturedProducts
         products={products}
         categories={categories}
@@ -60,7 +63,9 @@ export default function HomePage() {
         onNavigateToProduct={navigateToProduct}
         isLoading={isLoading}
       />
-      <Testimonials />
+      <ShoppingGuide />
+      <TrustBadges />
+      <CustomerReviews reviews={featuredReviews} products={products} />
       <BlogGrid posts={blogPosts} onPostClick={navigateToBlogPost} isLoading={isLoading} />
     </main>
   );

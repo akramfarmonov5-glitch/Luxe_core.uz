@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Star, ShoppingBag, ShieldCheck, Truck, Box, Activity, Zap, PlayCircle, X, Youtube, ExternalLink, ArrowRight, Heart, Play } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, Box, Activity, Zap, PlayCircle, X, Youtube, ExternalLink, ArrowRight, Heart, Play } from 'lucide-react';
 import { Category, Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -13,6 +13,7 @@ import ProductCard from './ProductCard';
 import QuickBuyModal from './QuickBuyModal';
 import ProductReviews from './ProductReviews';
 import * as fpixel from '../lib/fpixel';
+import { trackViewItem } from '../lib/analytics';
 import { requestGeminiText } from '../lib/geminiApi';
 import { getLocalizedText } from '../lib/i18nUtils';
 import { getCategoryDisplayName, getProductCategoryKey } from '../lib/categoryUtils';
@@ -59,6 +60,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
       name: getLocalizedText(product.name, lang),
       category: getCategoryDisplayName(product.category, categories, lang)
     });
+    trackViewItem(product, lang);
 
     const fallbackDesc = getLocalizedText(product.shortDescription, lang) || "Eksklyuziv dizayn va yuqori sifat uyg'unligi. Ushbu mahsulot sizning stilingizni yangi darajaga olib chiqadi.";
 
@@ -85,11 +87,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
     };
 
     generateAIDescription();
-  }, [product, lang]);
+  }, [product, lang, categories]);
 
   const handleAddToCart = () => {
     addToCart(product);
-    showToast(`${getLocalizedText(product.name, lang)} ${t('product.cart_added')}`, 'success');
+    showToast(`${getLocalizedText(product.name, lang)} ${t('added_to_cart_desc')}`, 'success');
   };
 
   const handleToggleWishlist = () => {
@@ -103,12 +105,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
 
   const handleBuyNow = () => {
     addToCart(product);
-    fpixel.trackAddToCart({
-      id: product.id,
-      name: getLocalizedText(product.name, lang),
-      price: product.price,
-      category: getLocalizedText(product.category, lang),
-    });
     onCheckout();
   };
 
@@ -134,7 +130,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
   };
 
   return (
-    <div className={`pt-24 pb-20 min-h-screen transition-colors duration-300 ${isDark ? "bg-black text-white" : "bg-light-bg text-light-text"}`}>
+    <div className={`pt-24 pb-32 md:pb-20 min-h-screen transition-colors duration-300 ${isDark ? "bg-black text-white" : "bg-light-bg text-light-text"}`}>
       <div className="container mx-auto px-4 md:px-6 max-w-6xl">
         <div className="mb-6 md:mb-8">
           <Breadcrumbs
@@ -215,10 +211,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                 <span className={`px-2 py-1 md:px-3 rounded text-xs md:text-sm font-medium text-white ${product.stock === 0 ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
                   {product.stock === 0 ? t('out_of_stock') : (product.stock ? `${product.stock} ${t('stock_in')}` : t('in_stock'))}
                 </span>
-                <div className="flex text-gold-500">
-                  {[...Array(5)].map((_, i) => <Star key={i} size={12} className="md:w-[14px] md:h-[14px]" fill="currentColor" />)}
-                </div>
-
                 {hasVideo && (
                   <button
                     onClick={handleOpenVideo}
@@ -435,6 +427,36 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
         product={product}
         quantity={1}
       />
+      {product.stock !== 0 && (
+        <div className={`fixed inset-x-0 bottom-0 z-40 border-t px-4 py-3 md:hidden ${
+          isDark ? 'bg-black/95 border-white/10' : 'bg-white/95 border-light-border'
+        } backdrop-blur-xl`}>
+          <div className="mx-auto flex max-w-md items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className={`truncate text-xs ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
+                {getLocalizedText(product.name, lang)}
+              </p>
+              <p className="text-base font-bold text-gold-400">{product.formattedPrice}</p>
+            </div>
+            <button
+              onClick={handleAddToCart}
+              className={`rounded-xl border px-4 py-3 text-sm font-bold ${
+                isDark
+                  ? 'border-white/10 bg-white/5 text-white'
+                  : 'border-light-border bg-light-card text-light-text'
+              }`}
+            >
+              {t('add_to_cart')}
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="rounded-xl bg-gold-400 px-4 py-3 text-sm font-bold text-black"
+            >
+              {t('buy_now')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

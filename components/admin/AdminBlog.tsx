@@ -100,7 +100,7 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
           keywordsEn: string[];
         };
       }>({
-        systemInstruction: 'You are an expert multilingual SEO content writer for a packaging materials and wholesale store in Uzbekistan. Always answer in valid JSON only.',
+        systemInstruction: 'You are an expert multilingual SEO content writer for a premium fashion and accessories store in Uzbekistan. Always answer in valid JSON only.',
         message: `
           Topic: "${topic}"
 

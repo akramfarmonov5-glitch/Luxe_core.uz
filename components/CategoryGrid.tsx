@@ -19,14 +19,14 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategor
   const { lang, t } = useLanguage();
 
   return (
-    <section className={`py-12 md:py-20 transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-light-bg'}`}>
+    <section id="shop-categories" className={`py-12 md:py-20 scroll-mt-20 transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-light-bg'}`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex justify-between items-end mb-8 md:mb-12">
           <h2 className={`text-2xl md:text-4xl font-bold ${isDark ? 'text-white' : 'text-light-text'}`}>
-            Kategoriyalar
+            {t('category_section_title')}
           </h2>
           <p className={`hidden md:block text-sm max-w-xs text-right ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
-            Bizning keng turdagi premium kolleksiyalarimiz bilan tanishing
+            {t('category_section_desc')}
           </p>
         </div>
 
@@ -45,14 +45,15 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategor
           ) : (
             <>
               {categories.map((category, index) => (
-            <motion.div
+            <motion.button
               key={category.id}
+              type="button"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
               onClick={() => onSelectCategory(getCategorySlug(category))}
-              className={`group relative rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer border border-white/5 ${
+              className={`group relative rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer border border-white/5 text-left ${
                 // 1-element (index 0) 2x2 joy egallaydi. 3 ustunli gridda bu 2/3 qismni oladi.
                 index === 0 ? 'col-span-2 row-span-2' : 'col-span-1'
                 }`}
@@ -92,7 +93,7 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategor
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </motion.button>
           ))}
             </>
           )}

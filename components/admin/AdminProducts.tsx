@@ -24,32 +24,36 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeLang, setActiveLang] = useState<'uz' | 'ru' | 'en'>('uz');
   const [formData, setFormData] = useState<any>({
-    name: '',
-    slug: '',
+    name: { uz: '', ru: '', en: '' },
+    slug: { uz: '', ru: '', en: '' },
     category: '',
     price: 0,
     image: '',
     images: [],
     videoUrl: '',
-    shortDescription: '',
+    shortDescription: { uz: '', ru: '', en: '' },
     stock: 0,
     itemsPerPackage: 1,
+    is_premium: false,
+    is_bestseller: false,
     specs: []
   });
 
   const handleOpenAdd = () => {
     setFormData({
-      name: '',
+      name: { uz: '', ru: '', en: '' },
       slug: { uz: '', ru: '', en: '' },
       category: categories.length > 0 ? getCategorySlug(categories[0]) : '',
       price: 0,
       image: '',
       images: [''],
       videoUrl: '',
-      shortDescription: '',
+      shortDescription: { uz: '', ru: '', en: '' },
       stock: 0,
       itemsPerPackage: 1,
-      specs: [{ label: '', value: '' }]
+      is_premium: false,
+      is_bestseller: false,
+      specs: [{ label: { uz: '', ru: '', en: '' }, value: { uz: '', ru: '', en: '' } }]
     });
     setIsModalOpen(true);
   };
@@ -69,7 +73,9 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
         value: parseLocalizedObject(spec.value),
       })),
       category: getProductCategoryKey(product.category, categories),
-      images: images
+      images,
+      is_premium: Boolean(product.is_premium),
+      is_bestseller: Boolean(product.is_bestseller),
     });
     setIsModalOpen(true);
   };
@@ -122,7 +128,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
           valueEn: string;
         }[];
       }>({
-        systemInstruction: 'You are a multilingual ecommerce product content expert for a packaging materials and wholesale store in Uzbekistan. Always answer in valid JSON only.',
+        systemInstruction: 'You are a multilingual ecommerce product content expert for a premium fashion and accessories store in Uzbekistan. Always answer in valid JSON only.',
         message: `
           Product name: "${productName}"
           Category: "${categoryName}"
@@ -134,7 +140,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
           3. English
 
           Rules:
-          - Keep descriptions concise, sales-friendly, and relevant to packaging/disposable tableware/wholesale.
+          - Keep descriptions concise, elegant, sales-friendly, and relevant to premium fashion, accessories, fragrance, or luxury gifting.
           - Each shortDescription must be max 2 sentences.
           - Generate 4 key specifications.
           - Slugs must be lowercase latin kebab-case.
@@ -226,6 +232,8 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
       description: JSON.stringify(formData.shortDescription),
       stock: Number(formData.stock),
       "itemsPerPackage": Number(formData.itemsPerPackage || 1),
+      is_premium: Boolean(formData.is_premium),
+      is_bestseller: Boolean(formData.is_bestseller),
       specifications: formData.specs
     };
 
@@ -285,7 +293,13 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
   };
 
   const addSpec = () => {
-    setFormData({ ...formData, specs: [...(formData.specs || []), { label: '', value: '' }] });
+    setFormData({
+      ...formData,
+      specs: [
+        ...(formData.specs || []),
+        { label: { uz: '', ru: '', en: '' }, value: { uz: '', ru: '', en: '' } },
+      ],
+    });
   };
   const removeSpec = (index: number) => {
     const newSpecs = [...(formData.specs || [])];
@@ -462,7 +476,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                     value={formData.slug?.[activeLang] || ''}
                     onChange={e => setFormData({ ...formData, slug: { ...formData.slug, [activeLang]: e.target.value } })}
                     className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none font-mono text-sm"
-                    placeholder={activeLang === 'uz' ? 'polietilen-paket' : activeLang === 'ru' ? 'polietilenovyy-paket' : 'polyethylene-bag'}
+                    placeholder={activeLang === 'uz' ? 'rolex-submariner' : activeLang === 'ru' ? 'rolex-submariner' : 'rolex-submariner'}
                   />
                 </div>
               </div>
@@ -510,7 +524,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm text-gray-400 flex items-center gap-2">
-                    <Box size={14} className="text-gold-400" /> Qadoqdagi soni
+                    <Box size={14} className="text-gold-400" /> To'plamdagi soni
                   </label>
                   <input
                     required
@@ -522,6 +536,33 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                     placeholder="Masalan: 100"
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-white">Premium badge</p>
+                    <p className="text-xs text-gray-500">Kartochkada faqat tanlangan mahsulotlarda ko'rinadi.</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(formData.is_premium)}
+                    onChange={e => setFormData({ ...formData, is_premium: e.target.checked })}
+                    className="h-5 w-5 accent-amber-400"
+                  />
+                </label>
+                <label className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-white">Bestseller badge</p>
+                    <p className="text-xs text-gray-500">Yolg'on avtomatik belgi o'rniga qo'lda boshqariladi.</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(formData.is_bestseller)}
+                    onChange={e => setFormData({ ...formData, is_bestseller: e.target.checked })}
+                    className="h-5 w-5 accent-red-400"
+                  />
+                </label>
               </div>
 
               <div className="space-y-3 bg-black/40 p-4 rounded-xl border border-white/5">

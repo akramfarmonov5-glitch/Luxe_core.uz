@@ -365,7 +365,7 @@ const AdminCategories: React.FC<AdminCategoriesProps> = ({ categories, setCatego
                     value={formData.name[activeLang]}
                     onChange={e => updateLocalizedField('name', activeLang, e.target.value)}
                     className="flex-1 bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
-                    placeholder={activeLang === 'uz' ? 'Masalan: Paketlar' : activeLang === 'ru' ? 'Например: Пакеты' : 'For example: Bags'}
+                    placeholder={activeLang === 'uz' ? 'Masalan: Soatlar' : activeLang === 'ru' ? 'Primer: Chasy' : 'For example: Watches'}
                   />
                   <button
                     type="button"
@@ -388,7 +388,7 @@ const AdminCategories: React.FC<AdminCategoriesProps> = ({ categories, setCatego
                   value={formData.slug[activeLang]}
                   onChange={e => updateSlug(activeLang, e.target.value)}
                   className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors font-mono text-sm"
-                  placeholder={activeLang === 'uz' ? "polietilen-paketlar" : activeLang === 'ru' ? 'polietilenovye-pakety' : 'polyethylene-bags'}
+                  placeholder={activeLang === 'uz' ? 'soatlar' : activeLang === 'ru' ? 'chasy' : 'watches'}
                 />
                 <p className="text-[10px] text-gray-500 ml-1">Har bir til uchun alohida SEO-friendly URL yoziladi. Bo'sh qolsa nomdan avtomatik yaratiladi.</p>
               </div>

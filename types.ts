@@ -18,6 +18,9 @@ export interface Product {
   specs: { label: string | LocalizedString; value: string | LocalizedString }[];
   stock?: number;
   itemsPerPackage?: number;
+  is_premium?: boolean;
+  is_bestseller?: boolean;
+  created_at?: string;
 }
 
 export interface Category {
@@ -107,11 +110,13 @@ export interface ChatLead {
 }
 
 export interface Review {
-  id: string;
+  id: string | number;
   product_id: number;
-  user_name: string;
+  user_id?: string | null;
+  user_name?: string | null;
   rating: number; // 1 to 5
-  comment: string;
+  comment?: string | null;
+  is_approved?: boolean;
   created_at: string;
 }
 

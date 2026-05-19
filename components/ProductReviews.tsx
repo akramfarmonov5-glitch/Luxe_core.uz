@@ -6,6 +6,8 @@ import { Review } from '../types';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
+import { loadApprovedProductReviews } from '../lib/reviews';
 
 interface ProductReviewsProps {
   productId: number;
@@ -15,6 +17,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   const { isDark } = useTheme();
   const { showToast } = useToast();
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -26,26 +29,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // MOCK fallback for when DB isn't configured yet
-  const FAKE_REVIEWS: Review[] = [
-    {
-      id: 'fake-1',
-      product_id: productId,
-      user_name: 'Jasur Bek',
-      rating: 5,
-      comment: 'Kutganimdan ham a\'lo sifat! Rahmat sizlarga, tavsiya qilaman.',
-      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-    },
-    {
-      id: 'fake-2',
-      product_id: productId,
-      user_name: 'Dildora',
-      rating: 4,
-      comment: 'Juda chiroyli dizayn, lekin yetkazib berish bir oz kechikdi.',
-      created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
-    }
-  ];
-
   useEffect(() => {
     fetchReviews();
   }, [productId]);
@@ -54,30 +37,15 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
     setLoading(true);
     try {
       if (!hasSupabaseCredentials) {
-        setReviews(FAKE_REVIEWS);
+        setReviews([]);
         setLoading(false);
         return;
       }
 
-      const { data, error } = await supabase
-        .from('product_reviews')
-        .select('*')
-        .eq('product_id', productId)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        // Table might not exist yet
-        console.warn("Could not fetch reviews:", error);
-        setReviews(FAKE_REVIEWS);
-      } else if (data && data.length > 0) {
-        setReviews(data as Review[]);
-      } else {
-        // If empty, show some fake ones to keep the design alive initially (optional)
-        setReviews([]);
-      }
+      setReviews(await loadApprovedProductReviews(productId));
     } catch (e) {
       console.error(e);
-      setReviews(FAKE_REVIEWS);
+      setReviews([]);
     } finally {
       setLoading(false);
     }
@@ -90,35 +58,36 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
     setIsSubmitting(true);
 
     const newReview = {
+      user_id: user?.id || null,
       product_id: productId,
-      user_name: name,
       rating,
       comment,
     };
 
     try {
-      if (hasSupabaseCredentials) {
-        const { error } = await supabase.from('product_reviews').insert(newReview);
-        if (error) {
-          console.error("Error saving review:", error);
-        }
+      if (!hasSupabaseCredentials) {
+        throw new Error('Review storage is not configured');
       }
 
-      // Optimistically add to UI
-      const mockInsertedReview: Review = {
+      let { error } = await supabase.from('product_reviews').insert({
         ...newReview,
-        id: `local-${Date.now()}`,
-        created_at: new Date().toISOString()
-      };
+        user_name: name.trim(),
+      });
 
-      setReviews([mockInsertedReview, ...reviews]);
-      showToast(t('review_thanks'), "success");
+      if (error?.message.includes('user_name')) {
+        ({ error } = await supabase.from('product_reviews').insert(newReview));
+      }
+
+      if (error) throw error;
+
+      showToast(t('review_pending'), "success");
       
       setName('');
       setComment('');
       setRating(5);
       setShowForm(false);
     } catch (error) {
+      console.error("Error saving review:", error);
       showToast(t('error_occurred'), "error");
     } finally {
       setIsSubmitting(false);
@@ -197,7 +166,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className={`w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-1 focus:ring-gold-400 transition-colors ${isDark ? 'bg-dark-900 border-white/10 text-white placeholder-gray-600' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'}`}
-                    placeholder="{t('enter_name_placeholder')}"
+                    placeholder={t('enter_name_placeholder')}
                   />
                 </div>
                 
@@ -232,7 +201,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   className={`w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-1 focus:ring-gold-400 transition-colors resize-none ${isDark ? 'bg-dark-900 border-white/10 text-white placeholder-gray-600' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-400'}`}
-                  placeholder="{t('comment_placeholder')}"
+                  placeholder={t('comment_placeholder')}
                 />
               </div>
 
@@ -269,7 +238,9 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
                     <User size={18} />
                   </div>
                   <div>
-                    <h4 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{review.user_name}</h4>
+                    <h4 className={`text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                      {review.user_name || t('review_customer')}
+                    </h4>
                     <span className={`text-[10px] md:text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                       {formatDate(review.created_at)}
                     </span>
@@ -280,7 +251,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
                 </div>
               </div>
               <p className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                {review.comment}
+                {review.comment || ''}
               </p>
             </motion.div>
           ))

@@ -61,17 +61,19 @@ const handleAddToCart = (e: React.MouseEvent) => {
 
         {/* Badges */}
         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1.5 z-10">
-          {product.stock !== undefined && product.stock > 0 && product.stock <= 5 && (
+          {product.is_bestseller && (
             <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] md:text-[11px] font-bold rounded-md uppercase tracking-wider shadow-lg">
-              🔥 Bestseller
+              Bestseller
             </span>
           )}
-          {product.price >= 100000 && product.price <= 300000 && (
-            <span className="px-2 py-0.5 bg-emerald-500 text-white text-[10px] md:text-[11px] font-bold rounded-md uppercase tracking-wider shadow-lg">
-              ✨ Yangi
+          {product.is_premium && (
+            <span className="px-2 py-0.5 bg-amber-500 text-black text-[10px] md:text-[11px] font-bold rounded-md uppercase tracking-wider shadow-lg">
+              Premium
             </span>
           )}
-        </div>        {/* Overlay Buttons - Mobile: Always visible (translate-x-0), Desktop: Visible on hover */}
+        </div>
+
+        {/* Overlay Buttons - Mobile: Always visible (translate-x-0), Desktop: Visible on hover */}
         <div className="absolute top-2 right-2 md:top-3 md:right-3 flex flex-col gap-2 translate-x-0 md:translate-x-12 md:group-hover:translate-x-0 transition-transform duration-300 z-10">
           <button
             onClick={handleWishlistClick}
