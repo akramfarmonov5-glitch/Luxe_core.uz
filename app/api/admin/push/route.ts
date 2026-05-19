@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUserId } from '../../../lib/checkout.server';
-import { isAdminUser } from '../../../lib/admin';
-import { getServiceSupabaseClient } from '../../../lib/checkout.server';
+import { getAuthenticatedUserId } from '@/lib/checkout.server';
+import { isAdminUser } from '@/lib/admin';
+import { getServiceSupabaseClient } from '@/lib/checkout.server';
 
 export async function POST(req: NextRequest) {
   try {
