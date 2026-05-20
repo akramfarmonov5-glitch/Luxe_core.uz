@@ -36,23 +36,23 @@ const InstallPWA: React.FC = () => {
       e.preventDefault();
       setDeferredPrompt(e);
       
-      // Delay showing the prompt slightly so it's not too intrusive on first load
+      // Delay showing the prompt slightly so it's not too intrusive on first load (1 minute)
       setTimeout(() => {
         if (!isDismissedRecently()) {
           setShowPrompt(true);
         }
-      }, 2000);
+      }, 60000);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
-    // For iOS we just show it if not dismissed
+    // For iOS we just show it if not dismissed (1 minute)
     if (isIOSDevice && !isAppStandalone) {
       setTimeout(() => {
         if (!isDismissedRecently()) {
           setShowPrompt(true);
         }
-      }, 2000);
+      }, 60000);
     }
 
     return () => {
