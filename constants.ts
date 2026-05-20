@@ -6,7 +6,7 @@ export const DEFAULT_HERO_CONTENT: HeroContent = {
   description: "Soatlar, sumkalar, parfyumeriya va aksessuarlarni bir joyda toping. Qulay tanlang, buyurtma bering va holatini kuzating.",
   buttonText: "Mahsulotlarni ko'rish",
   images: [
-    "https://images.unsplash.com/photo-1547996160-71df45082e0e?q=80&w=1000&auto=format&fit=crop", // Nature/Landscape for vibe
+    "https://images.unsplash.com/photo-1547996160-81df4508200e?q=80&w=1000&auto=format&fit=crop", // Luxury Watch
     "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=1000&auto=format&fit=crop", // Fashion Model
     "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1000&auto=format&fit=crop"  // Shopping/Luxury
   ]

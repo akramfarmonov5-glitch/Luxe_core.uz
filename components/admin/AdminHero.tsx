@@ -34,7 +34,7 @@ const AdminHero: React.FC<AdminHeroProps> = ({ heroContent, setHeroContent }) =>
         try {
             // Prepare data for save (stringify objects)
             const savePayload = {
-                id: 2, // Explicitly use integer ID for hero_content
+                id: 'main', // Use 'main' primary key for hero_content single-row config
                 badge: JSON.stringify(formData.badge),
                 title: JSON.stringify(formData.title),
                 description: JSON.stringify(formData.description),
@@ -45,8 +45,7 @@ const AdminHero: React.FC<AdminHeroProps> = ({ heroContent, setHeroContent }) =>
             // Upsert to Supabase
             const { error } = await supabase
                 .from('hero_content')
-                .update(savePayload)
-                .eq('id', 2);
+                .upsert(savePayload, { onConflict: 'id' });
 
             if (error) throw error;
 
