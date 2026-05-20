@@ -11,6 +11,16 @@ interface Translations {
 }
 
 const translations: Translations = {
+    // Push Notification Banner
+    push_title: { uz: 'Chegirmalar va Aksiyalar', ru: 'Скидки и Акции', en: 'Discounts & Promotions' },
+    push_subtitle: { uz: "LuxeCore eksklyuziv takliflari va premium to'plamlari haqida birinchilardan bo'lib bilib oling.", ru: 'Узнавайте первыми об эксклюзивных предложениях LuxeCore и новых премиум коллекциях.', en: 'Be the first to know about exclusive LuxeCore offers and new premium collections.' },
+    push_allow: { uz: 'Ruxsat berish', ru: 'Разрешить', en: 'Allow' },
+    push_later: { uz: 'Keyinroq', ru: 'Позже', en: 'Later' },
+    push_error: { uz: 'Ruxsat berilmadi yoki xatolik yuz berdi. Iltimos brauzer sozlamalarini tekshiring.', ru: 'Разрешение не предоставлено или произошла ошибка. Пожалуйста, проверьте настройки браузера.', en: 'Permission was not granted or an error occurred. Please check your browser settings.' },
+    push_success_title: { uz: 'Bildirishnomalar Yoqildi!', ru: 'Уведомления включены!', en: 'Notifications Enabled!' },
+    push_success_subtitle: { uz: "Aksiya va maxsus chegirmalar haqidagi bildirishnomalar endi to'g'ridan-to'g'ri ekraningizda ko'rsatiladi.", ru: 'Уведомления об акциях и специальных скидках теперь будут отображаться прямо на вашем экране.', en: 'Notifications about promotions and special discounts will now be displayed directly on your screen.' },
+    push_enabling: { uz: 'Yoqilmoqda...', ru: 'Включение...', en: 'Enabling...' },
+
     // Navigation
     nav_home: { uz: 'Bosh sahifa', ru: 'Главная', en: 'Home' },
     nav_catalog: { uz: 'Katalog', ru: 'Каталог', en: 'Catalog' },
