@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import CartSidebar from '../../components/CartSidebar';
@@ -25,6 +25,28 @@ export default function ClientLayout({ children, lang }: { children: React.React
   const pathname = usePathname() || '/';
   const router = useRouter();
   const langPrefix = `/${lang || 'uz'}`;
+
+  // Universal Service Worker Registration for PWA Offline Cache and Installability
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      const registerSW = async () => {
+        try {
+          const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+          console.log('[Service Worker] PWA Service Worker registered successfully scope:', reg.scope);
+        } catch (err) {
+          console.error('[Service Worker] PWA Service Worker registration failed:', err);
+        }
+      };
+
+      // Register SW when page has fully loaded
+      if (document.readyState === 'complete') {
+        registerSW();
+      } else {
+        window.addEventListener('load', registerSW);
+        return () => window.removeEventListener('load', registerSW);
+      }
+    }
+  }, []);
 
   const isCheckout = pathname.includes('/checkout');
   const isAdmin = pathname.includes('/admin');
