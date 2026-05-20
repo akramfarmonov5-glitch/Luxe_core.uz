@@ -4,8 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Sparkles, CheckCircle2 } from 'lucide-react';
 import { requestFcmToken } from '../lib/firebaseClient';
+import { useLanguage } from '../context/LanguageContext';
 
 export const PushNotificationBanner: React.FC = () => {
+  const { t } = useLanguage();
   const [isVisible, setIsVisible] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
@@ -33,6 +35,19 @@ export const PushNotificationBanner: React.FC = () => {
   const handleEnable = async () => {
     setStatus('loading');
     try {
+      // Explicitly request browser notification permission if default
+      if ('Notification' in window) {
+        let permission = Notification.permission;
+        if (permission === 'default') {
+          permission = await Notification.requestPermission();
+        }
+        if (permission !== 'granted') {
+          setStatus('error');
+          localStorage.setItem('luxecore_push_dismissed', 'true');
+          return;
+        }
+      }
+
       const token = await requestFcmToken();
       if (token) {
         // Retrieve client lead registration if they entered name/phone in AI Chat previously
@@ -60,10 +75,12 @@ export const PushNotificationBanner: React.FC = () => {
         }
       } else {
         setStatus('error');
+        localStorage.setItem('luxecore_push_dismissed', 'true');
       }
     } catch (err) {
       console.error('Error enabling notifications:', err);
       setStatus('error');
+      localStorage.setItem('luxecore_push_dismissed', 'true');
     }
   };
 
@@ -91,9 +108,9 @@ export const PushNotificationBanner: React.FC = () => {
               <CheckCircle2 size={26} />
             </div>
             <div>
-              <h4 className="text-white font-bold text-base">Bildirishnomalar Yoqildi!</h4>
+              <h4 className="text-white font-bold text-base">{t('push_success_title')}</h4>
               <p className="text-gray-400 text-xs mt-1 px-4 leading-relaxed">
-                Aksiya va maxsus chegirmalar haqidagi bildirishnomalar endi to'g'ridan-to'g'ri ekraningizda ko'rsatiladi.
+                {t('push_success_subtitle')}
               </p>
             </div>
           </motion.div>
@@ -106,10 +123,10 @@ export const PushNotificationBanner: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="text-white font-bold text-sm md:text-base flex items-center gap-1.5">
-                    Chegirmalar va Aksiyalar <Sparkles size={14} className="text-gold-400" />
+                    {t('push_title')} <Sparkles size={14} className="text-gold-400" />
                   </h4>
                   <p className="text-gray-400 text-xs md:text-sm mt-1 leading-relaxed">
-                    LuxeCore eksklyuziv takliflari va yangi premium to'plamlari haqida birinchilardan bo'lib bilib oling.
+                    {t('push_subtitle')}
                   </p>
                 </div>
               </div>
@@ -127,7 +144,7 @@ export const PushNotificationBanner: React.FC = () => {
                 disabled={status === 'loading'}
                 className="px-4 py-2 text-xs font-semibold text-gray-400 hover:text-white transition-colors"
               >
-                Keyinroq
+                {t('push_later')}
               </button>
               <button
                 onClick={handleEnable}
@@ -137,10 +154,10 @@ export const PushNotificationBanner: React.FC = () => {
                 {status === 'loading' ? (
                   <>
                     <span className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin"></span>
-                    Yoqilmoqda...
+                    {t('push_enabling')}
                   </>
                 ) : (
-                  'Ruxsat berish'
+                  t('push_allow')
                 )}
               </button>
             </div>
@@ -150,7 +167,7 @@ export const PushNotificationBanner: React.FC = () => {
                 animate={{ opacity: 1 }}
                 className="text-red-400 text-[10px] text-right"
               >
-                Ruxsat berilmadi yoki xatolik yuz berdi. Iltimos brauzer sozlamalarini tekshiring.
+                {t('push_error')}
               </motion.p>
             )}
           </>
