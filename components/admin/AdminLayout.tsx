@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Package, ShoppingCart, FileText, LogOut, Layers, Image as ImageIcon, Menu, MessageCircle, Users, X } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, FileText, LogOut, Layers, Image as ImageIcon, Menu, MessageCircle, Users, X, Bell } from 'lucide-react';
 import AdminDashboard from './AdminDashboard';
 import AdminProducts from './AdminProducts';
 import AdminCategories from './AdminCategories';
@@ -9,6 +9,7 @@ import AdminHero from './AdminHero';
 import AdminNavigation from './AdminNavigation';
 import AdminLeads from './AdminLeads';
 import AdminReviews from './AdminReviews';
+import AdminPush from './AdminPush';
 import { Product, Category, HeroContent, NavigationSettings, BlogPost } from '../../types';
 
 interface AdminLayoutProps {
@@ -38,7 +39,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     blogPosts,
     setBlogPosts
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'orders' | 'leads' | 'reviews' | 'blog' | 'hero' | 'navigation'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'categories' | 'orders' | 'leads' | 'reviews' | 'blog' | 'push' | 'hero' | 'navigation'>('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
@@ -49,6 +50,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     { id: 'products', label: 'Mahsulotlar', icon: Package },
     { id: 'categories', label: 'Kategoriyalar', icon: Layers },
     { id: 'blog', label: 'SEO Blog & AI', icon: FileText },
+    { id: 'push', label: 'Push Xabarlar', icon: Bell },
     { id: 'hero', label: 'Banner (Hero)', icon: ImageIcon },
     { id: 'navigation', label: 'Navigatsiya', icon: Menu },
   ];
@@ -85,6 +87,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
             return <AdminBlog posts={blogPosts} setPosts={setBlogPosts} />;
         }
         return <div>Blog posts loading...</div>;
+      case 'push':
+        return <AdminPush />;
       default:
         return <AdminDashboard products={products} categories={categories} />;
     }
