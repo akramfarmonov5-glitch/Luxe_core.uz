@@ -64,6 +64,30 @@ export const requestFcmToken = async (): Promise<string | null> => {
       `/firebase-messaging-sw.js?${queryParams}`
     );
 
+    // Wait until the service worker is active to prevent FCM "no active Service Worker" error
+    if (!swRegistration.active) {
+      await new Promise<void>((resolve) => {
+        const activeWorker = swRegistration.active || swRegistration.installing || swRegistration.waiting;
+        if (activeWorker) {
+          if (activeWorker.state === 'activated') {
+            resolve();
+            return;
+          }
+          const stateChangeListener = (e: any) => {
+            if (e.target.state === 'activated') {
+              activeWorker.removeEventListener('statechange', stateChangeListener);
+              resolve();
+            }
+          };
+          activeWorker.addEventListener('statechange', stateChangeListener);
+        } else {
+          resolve();
+        }
+        // Fallback timeout after 3 seconds
+        setTimeout(resolve, 3000);
+      });
+    }
+
     const token = await getToken(messaging, {
       vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
       serviceWorkerRegistration: swRegistration,
