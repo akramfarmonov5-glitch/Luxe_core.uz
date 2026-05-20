@@ -5,6 +5,7 @@ import { Sparkles, X, Send, MessageCircle, User, Phone, ChevronRight, Volume2, V
 import { Product } from '../types';
 import { hasSupabaseCredentials, supabase } from '../lib/supabaseClient';
 import { getLocalizedText } from '../lib/i18nUtils';
+import { formatPhoneNumber } from '../lib/phoneUtils';
 
 interface Message {
   role: 'user' | 'model';
@@ -53,14 +54,18 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
     e.preventDefault();
     setFormLoading(true);
 
-    localStorage.setItem('luxecore_chat_user', JSON.stringify(formData));
+    const formattedPhone = formatPhoneNumber(formData.phone);
+    const updatedFormData = { ...formData, phone: formattedPhone };
+
+    localStorage.setItem('luxecore_chat_user', JSON.stringify(updatedFormData));
+    setFormData(updatedFormData);
 
     if (hasSupabaseCredentials) {
       try {
         await supabase.from('leads').insert({
           id: `lead_${Date.now()}`,
           name: formData.name,
-          phone: formData.phone,
+          phone: formattedPhone,
           created_at: new Date().toISOString()
         });
       } catch (error) {

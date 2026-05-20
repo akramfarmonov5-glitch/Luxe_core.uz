@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
+import { formatPhoneNumber } from '@/lib/phoneUtils';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
 
     // If phone number is supplied, check if lead exists or create a new lead
     if (phone) {
-      const cleanPhone = phone.replace(/\s+/g, '');
+      const cleanPhone = formatPhoneNumber(phone);
       const { data: existingLead } = await supabase
         .from('leads')
         .select('id')

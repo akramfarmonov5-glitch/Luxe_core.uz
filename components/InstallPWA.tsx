@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X, Share } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const InstallPWA: React.FC = () => {
   const { isDark } = useTheme();
+  const { t } = useLanguage();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
@@ -101,16 +103,21 @@ const InstallPWA: React.FC = () => {
             </div>
             
             <div className="flex-1">
-              <h3 className={`font-bold text-base md:text-lg mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>LUXECORE Ilovasi</h3>
+              <h3 className={`font-bold text-base md:text-lg mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('pwa_title')}</h3>
               <p className={`text-xs md:text-sm leading-relaxed mb-4 pr-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
-                {isIOS 
-                  ? "Tezkor ishlash uchun ilovani o'rnating." 
-                  : "Saytni qulay ilova (App) ko'rinishida telefoningizga o'rnating."}
+                {isIOS ? t('pwa_desc_ios') : t('pwa_desc_android')}
               </p>
-
+ 
               {isIOS ? (
                 <div className={`text-xs md:text-sm font-medium p-3 rounded-xl ${isDark ? 'bg-white/5 text-gray-300' : 'bg-gray-50 text-gray-600'}`}>
-                  Qo'shish uchun pastdagi <Share size={14} className="inline mx-1" /> tugmani bosib <b>"Ekranga qo'shish"</b> (Add to Home Screen) ni tanlang.
+                  {t('pwa_ios_instruction').split('{icon}').map((part, index, array) => (
+                    <React.Fragment key={index}>
+                      {part}
+                      {index < array.length - 1 && (
+                        <Share size={14} className="inline mx-1" />
+                      )}
+                    </React.Fragment>
+                  ))}
                 </div>
               ) : (
                 <button
@@ -118,7 +125,7 @@ const InstallPWA: React.FC = () => {
                   className="w-full bg-gold-400 text-black font-bold text-sm md:text-base py-3 md:py-3.5 rounded-xl hover:bg-gold-500 transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(251,191,36,0.3)]"
                 >
                   <Download size={18} />
-                  O'rnatish (Tez va bepul)
+                  {t('pwa_install_btn')}
                 </button>
               )}
             </div>

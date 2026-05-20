@@ -34,24 +34,25 @@ const AdminHero: React.FC<AdminHeroProps> = ({ heroContent, setHeroContent }) =>
         try {
             // Prepare data for save (stringify objects)
             const savePayload = {
-                id: 2, // Explicitly use integer ID for hero_content
+                id: 'main', // ID must be 'main' for hero_content text primary key
                 badge: JSON.stringify(formData.badge),
                 title: JSON.stringify(formData.title),
                 description: JSON.stringify(formData.description),
-                button_text: JSON.stringify(formData.buttonText),
-                images: formData.images
+                buttonText: JSON.stringify(formData.buttonText), // Column name in DB is exactly case-sensitive buttonText
+                images: formData.images,
+                active: formData.active !== undefined ? formData.active : true
             };
 
             // Upsert to Supabase
             const { error } = await supabase
                 .from('hero_content')
-                .update(savePayload)
-                .eq('id', 2);
+                .upsert(savePayload, { onConflict: 'id' });
 
             if (error) throw error;
 
             setHeroContent(formData);
             setIsSaved(true);
+            showToast("Ma'lumotlar muvaffaqiyatli saqlandi!", 'success');
             setTimeout(() => setIsSaved(false), 2000);
         } catch (error) {
             console.error('Save error:', error);
@@ -195,9 +196,19 @@ const AdminHero: React.FC<AdminHeroProps> = ({ heroContent, setHeroContent }) =>
 
                     <button
                         type="submit"
-                        className={`w-full py-3.5 font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${isSaved ? 'bg-green-500 text-white' : 'bg-gold-400 text-black hover:bg-gold-500'}`}
+                        disabled={isSaving}
+                        className={`w-full py-3.5 font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
+                            isSaved 
+                                ? 'bg-green-500 text-white' 
+                                : 'bg-gold-400 text-black hover:bg-gold-500 hover:scale-[1.02] active:scale-[0.98]'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                        {isSaved ? (
+                        {isSaving ? (
+                            <>
+                                <Loader2 className="animate-spin" size={18} />
+                                Saqlanmoqda...
+                            </>
+                        ) : isSaved ? (
                             <>Saqlandi!</>
                         ) : (
                             <>

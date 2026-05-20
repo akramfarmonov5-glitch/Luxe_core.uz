@@ -80,7 +80,7 @@ const translations: Translations = {
     checkout_promo_special: { uz: 'Maxsus chegirma qo\'llanildi!', ru: 'Специальная скидка применена!', en: 'Special discount applied!' },
     checkout_promo_error: { uz: 'Bunday promo kod mavjud emas.', ru: 'Такого промокода не существует.', en: 'Such promo code does not exist.' },
     checkout_promo_applied_1: { uz: 'Kod qo\'llanildi! Siz', ru: 'Код применен! Вы сэкономили', en: 'Code applied! You saved' },
-    checkout_promo_applied_2: { uz: 'tejadingiz.', ru: '', en: '' },
+    checkout_promo_applied_2: { uz: 'tejadingiz.', ru: '.', en: '.' },
     checkout_in_progress: { uz: 'Jarayonda...', ru: 'В процессе...', en: 'In progress...' },
     checkout_paynet_title: { uz: 'Paynet orqali to\'lash', ru: 'Оплата через Paynet', en: 'Payment via Paynet' },
     checkout_paynet_desc: { uz: 'To\'lovni amalga oshirish uchun QR kodni skanerlang.', ru: 'Отсканируйте QR-код для оплаты.', en: 'Scan the QR code to make a payment.' },
@@ -89,7 +89,7 @@ const translations: Translations = {
     checkout_success_title: { uz: 'Buyurtmangiz qabul qilindi!', ru: 'Ваш заказ принят!', en: 'Your order is accepted!' },
     checkout_success_desc_1: { uz: 'Rahmat,', ru: 'Спасибо,', en: 'Thank you,' },
     checkout_success_desc_2: { uz: 'Menejerlarimiz tez orada', ru: 'Наши менеджеры скоро свяжутся с вами по номеру', en: 'Our managers will contact you soon at' },
-    checkout_success_desc_3: { uz: 'raqami orqali siz bilan bog\'lanishadi.', ru: '', en: '' },
+    checkout_success_desc_3: { uz: 'raqami orqali siz bilan bog\'lanishadi.', ru: '.', en: '.' },
     checkout_order_id_label: { uz: 'Buyurtma ID', ru: 'ID заказа', en: 'Order ID' },
     checkout_tracking_hint: {
       uz: 'Kuzatish sahifasida telefon raqamingiz bilan birga shu ID orqali buyurtmani tezroq topishingiz mumkin.',
@@ -265,6 +265,13 @@ const translations: Translations = {
     review_pending: { uz: 'Sharhingiz yuborildi. Admin tasdiqlagach saytda ko‘rinadi.', ru: 'Отзыв отправлен. Он появится на сайте после одобрения администратором.', en: 'Your review was sent and will appear after admin approval.' },
     review_customer: { uz: 'Mijoz', ru: 'Клиент', en: 'Customer' },
     error_occurred: { uz: 'Xatolik yuz berdi.', ru: 'Произошла ошибка.', en: 'An error occurred.' },
+
+    // PWA Prompt Translations
+    pwa_title: { uz: 'LUXECORE Ilovasi', ru: 'Приложение LUXECORE', en: 'LUXECORE App' },
+    pwa_desc_android: { uz: "Saytni qulay ilova (App) ko'rinishida telefoningizga o'rnating.", ru: 'Установите сайт в виде удобного приложения на телефон.', en: 'Install the website as a convenient app on your phone.' },
+    pwa_desc_ios: { uz: "Tezkor ishlash uchun ilovani o'rnating.", ru: 'Установите приложение для более быстрой работы.', en: 'Install the app for faster performance.' },
+    pwa_ios_instruction: { uz: 'Qo\'shish uchun pastdagi {icon} tugmani bosib "Ekranga qo\'shish" ni tanlang.', ru: 'Для добавления нажмите кнопку {icon} внизу и выберите "На экран Домой".', en: 'To add, press the {icon} button at the bottom and choose "Add to Home Screen".' },
+    pwa_install_btn: { uz: "O'rnatish (Tez va bepul)", ru: 'Установить (Быстро и бесплатно)', en: 'Install (Fast & Free)' },
 };
 
 interface LanguageContextType {

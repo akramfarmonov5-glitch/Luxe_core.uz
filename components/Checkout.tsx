@@ -9,6 +9,7 @@ import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedText } from '../lib/i18nUtils';
+import { formatPhoneNumber } from '../lib/phoneUtils';
 
 interface CheckoutProps {
   onBack: () => void;
@@ -133,6 +134,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   };
 
   const createOrder = async () => {
+    const formattedPhone = formatPhoneNumber(formData.phone);
     const response = await fetch('/api/orders', {
       method: 'POST',
       headers: {
@@ -143,7 +145,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
         source: 'checkout',
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone,
+        phone: formattedPhone,
         address: formData.address,
         city: formData.city,
         paymentMethod,
@@ -201,6 +203,9 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
     
     setErrors({});
     setIsLoading(true);
+
+    const formattedPhone = formatPhoneNumber(formData.phone);
+    setFormData(prev => ({ ...prev, phone: formattedPhone }));
 
     try {
       const orderId = await createOrder();
