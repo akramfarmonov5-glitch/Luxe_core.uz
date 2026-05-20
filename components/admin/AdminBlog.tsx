@@ -32,11 +32,15 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
 
   const handleOpenAdd = () => {
     setFormData({
-      title: '',
+      title: { uz: '', ru: '', en: '' },
       slug: { uz: '', ru: '', en: '' },
       image: '',
-      content: '',
-      seo: { title: '', description: '', keywords: [] },
+      content: { uz: '', ru: '', en: '' },
+      seo: {
+        title: { uz: '', ru: '', en: '' },
+        description: { uz: '', ru: '', en: '' },
+        keywords: { uz: '', ru: '', en: '' }
+      },
       date: new Date().toISOString().split('T')[0]
     });
     setIsModalOpen(true);
