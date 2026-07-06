@@ -52,14 +52,13 @@ $$;
 grant execute on function public.is_admin() to anon, authenticated;
 
 -- ----------------------------------------
--- 3-QISM.  <<< SHU YERNI TAHRIRLANG >>>
--- O'z admin emailingizni yozing (Supabase Authentication -> Users
--- da shu email bilan foydalanuvchi bo'lishi SHART).
--- Bu emailni auth.users dan topib, avtomatik admin qiladi.
+-- 3-QISM. Admin foydalanuvchi (email tayyor qo'yilgan)
+-- akramfarmonov5@gmail.com Supabase Authentication -> Users da
+-- foydalanuvchi bo'lishi SHART. Bu emailni topib avtomatik admin qiladi.
 -- ----------------------------------------
 insert into public.admin_users (user_id)
 select id from auth.users
-where email = 'BU_YERGA_EMAILINGIZ@example.com'   -- <<< ALMASHTIRING
+where email = 'akramfarmonov5@gmail.com'
 on conflict (user_id) do nothing;
 
 -- Tekshirish: kamida 1 qator qaytishi SHART. Agar 0 qaytsa -
