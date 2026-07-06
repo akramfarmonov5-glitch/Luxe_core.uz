@@ -121,15 +121,6 @@ export async function loadCheckoutProducts(items: CheckoutItemInput[]): Promise<
       videoUrl: product.videoUrl || '',
     })) as Product[];
 
-    // The storefront intentionally falls back to mock data while a fresh project
-    // is still empty. Mirror that behavior server-side so checkout cannot drift.
-    if (products.length === 0) {
-      const fallbackProducts = MOCK_PRODUCTS.filter((product) => ids.includes(product.id));
-      if (fallbackProducts.length === ids.length) {
-        return fallbackProducts;
-      }
-    }
-
     if (products.length !== ids.length) {
       throw new Error('One or more products were not found');
     }

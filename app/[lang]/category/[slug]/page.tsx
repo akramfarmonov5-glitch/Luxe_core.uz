@@ -1,4 +1,4 @@
-import { supabase } from '../../../../lib/supabaseClient';
+import { supabase, hasSupabaseCredentials } from '../../../../lib/supabaseClient';
 import CategoryClient from './CategoryClient';
 import { getLocalizedText } from '../../../../lib/i18nUtils';
 import { MOCK_CATEGORIES, MOCK_PRODUCTS } from '../../../../constants';
@@ -19,16 +19,16 @@ function findCategoryBySlug(slug: string, categories: Category[]): Category | un
 }
 
 async function loadCategoryData() {
+  // Mock data faqat Supabase sozlanmagan (lokal dev) muhitda ishlatiladi
+  if (!hasSupabaseCredentials) {
+    return { categories: MOCK_CATEGORIES, products: MOCK_PRODUCTS };
+  }
   const [{ data: categoriesData }, { data: productsData }] = await Promise.all([
     supabase.from('categories').select('*'),
     supabase.from('products').select('*'),
   ]);
-  const categories: Category[] = (categoriesData && categoriesData.length > 0)
-    ? (categoriesData as unknown as Category[])
-    : MOCK_CATEGORIES;
-  const products: Product[] = (productsData && productsData.length > 0)
-    ? (productsData as unknown as Product[])
-    : MOCK_PRODUCTS;
+  const categories: Category[] = (categoriesData as unknown as Category[]) || [];
+  const products: Product[] = (productsData as unknown as Product[]) || [];
   return { categories, products };
 }
 

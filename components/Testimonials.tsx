@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -151,9 +152,11 @@ const Testimonials: React.FC = () => {
                 <Quote size={40} className={`absolute top-4 right-4 md:top-6 md:right-6 ${isDark ? 'text-white/5' : 'text-gray-100'}`} />
 
                 {/* Avatar */}
-                <img
+                <Image
                   src={item.avatar}
                   alt={item.name}
+                  width={64}
+                  height={64}
                   className="w-14 h-14 md:w-16 md:h-16 rounded-full mx-auto mb-4 ring-2 ring-gold-400/50"
                 />
 

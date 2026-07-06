@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X, Share } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -99,7 +100,7 @@ const InstallPWA: React.FC = () => {
 
           <div className="flex gap-4 md:gap-5 items-start">
             <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl shrink-0 overflow-hidden bg-white flex items-center justify-center p-2 shadow-inner border border-gray-100">
-              <img src="/logo.jpg" alt="LUXECORE App" className="w-full h-full object-contain" />
+              <Image src="/logo.jpg" alt="LUXECORE App" width={80} height={80} className="w-full h-full object-contain" />
             </div>
             
             <div className="flex-1">

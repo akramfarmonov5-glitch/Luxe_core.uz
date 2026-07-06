@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, ShieldCheck, CreditCard, Truck, Send, Wallet, Banknote, X, Smartphone, ExternalLink, Ticket, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -211,15 +212,11 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
       const orderId = await createOrder();
 
       if (paymentMethod === 'paynet') {
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
-        if (isMobile) {
-          window.open(PAYNET_URL, '_blank');
-          setTimeout(() => completeOrder(orderId), 2000);
-        } else {
-          setShowPaynetModal(true);
-          setIsLoading(false);
-          return;
-        }
+        // To'lov tasdiqlanmasdan buyurtma "muvaffaqiyatli" deb belgilanmaydi:
+        // foydalanuvchi modal orqali to'lovni amalga oshirib, o'zi tasdiqlaydi
+        setShowPaynetModal(true);
+        setIsLoading(false);
+        return;
       } else {
         setTimeout(() => completeOrder(orderId), 1500);
       }
@@ -396,8 +393,8 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
             <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {cart.map((item) => (
                 <div key={item.id} className="flex gap-4">
-                  <div className={`w-16 aspect-[4/5] rounded-lg overflow-hidden shrink-0 ${isDark ? 'bg-gray-800' : 'bg-light-card'}`}>
-                    <img src={item.image} alt={getLocalizedText(item.name, lang)} className="w-full h-full object-cover" />
+                  <div className={`relative w-16 aspect-[4/5] rounded-lg overflow-hidden shrink-0 ${isDark ? 'bg-gray-800' : 'bg-light-card'}`}>
+                    <Image src={item.image} alt={getLocalizedText(item.name, lang)} fill sizes="64px" className="object-cover" />
                   </div>
                   <div className="flex-1">
                     <h4 className={`text-sm font-medium ${isDark ? 'text-white' : 'text-light-text'}`}>{getLocalizedText(item.name, lang)}</h4>
@@ -470,7 +467,12 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
                 <Smartphone size={32} className="text-gold-400" />
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">{t('checkout_paynet_title')}</h2>
-              <p className="text-gray-400 text-sm mb-6">{t('checkout_paynet_desc')}</p>
+              <p className="text-gray-400 text-sm mb-4">{t('checkout_paynet_desc')}</p>
+              {createdOrderId && (
+                <p className="mb-4 rounded-xl bg-white/5 border border-white/10 px-4 py-2 text-xs text-gray-400">
+                  {t('checkout_order_id_label')}: <span className="font-mono text-gold-400 break-all">{createdOrderId}</span>
+                </p>
+              )}
               <div className="p-4 bg-white rounded-2xl mb-6 shadow-xl">
                 <img src={PAYNET_QR_IMAGE} alt="Paynet QR Code" className="w-48 h-48 object-contain" onError={(e) => { e.currentTarget.src = QR_FALLBACK; }} />
               </div>

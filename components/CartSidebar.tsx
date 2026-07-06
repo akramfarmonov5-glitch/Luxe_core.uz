@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -91,8 +92,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                     animate={{ opacity: 1, y: 0 }}
                     className="flex gap-4 group"
                   >
-                    <div className="w-24 aspect-[4/5] rounded-xl overflow-hidden bg-gray-800 border border-white/5 shrink-0">
-                      <img src={item.image} alt={getLocalizedText(item.name, lang)} className="w-full h-full object-cover" />
+                    <div className="relative w-24 aspect-[4/5] rounded-xl overflow-hidden bg-gray-800 border border-white/5 shrink-0">
+                      <Image src={item.image} alt={getLocalizedText(item.name, lang)} fill sizes="96px" className="object-cover" />
                     </div>
                     <div className="flex-1 flex flex-col justify-between py-1">
                       <div>

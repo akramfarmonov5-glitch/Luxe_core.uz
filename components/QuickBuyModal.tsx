@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Product } from '../types';
@@ -119,8 +120,8 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
             {!isSuccess ? (
               <>
                 <div className={`flex gap-4 p-4 rounded-xl mb-6 ${isDark ? 'bg-white/5 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
-                  <div className="w-16 aspect-[4/5] rounded-lg bg-gray-800 shrink-0 overflow-hidden">
-                    <img src={product.image} alt={getLocalizedText(product.name, lang)} className="w-full h-full object-cover" />
+                  <div className="relative w-16 aspect-[4/5] rounded-lg bg-gray-800 shrink-0 overflow-hidden">
+                    <Image src={product.image} alt={getLocalizedText(product.name, lang)} fill sizes="64px" className="object-cover" />
                   </div>
                   <div>
                     <h3 className={`font-medium text-sm line-clamp-1 ${isDark ? 'text-white' : 'text-light-text'}`}>{getLocalizedText(product.name, lang)}</h3>

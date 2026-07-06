@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag } from 'lucide-react';
 import { HeroContent } from '../types';
@@ -144,17 +145,23 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
           <div className="absolute inset-0 bg-gradient-to-tr from-gold-400/20 to-purple-500/20 rounded-[2rem] md:rounded-[3rem] blur-xl opacity-50"></div>
           <div className={`relative h-full w-full rounded-[2rem] md:rounded-[2.5rem] overflow-hidden border shadow-2xl ${isDark ? 'border-white/10 bg-dark-900' : 'border-light-border bg-light-card'}`}>
             <AnimatePresence mode="wait">
-              <motion.img
+              <motion.div
                 key={currentImageIndex}
-                src={images[currentImageIndex]}
                 initial={{ opacity: 0, scale: 1.1 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.7 }}
-                alt={displayContent.title}
-                className="absolute inset-0 w-full h-full object-cover"
-                fetchPriority="high"
-              />
+                className="absolute inset-0"
+              >
+                <Image
+                  src={images[currentImageIndex]}
+                  alt={getLocalizedText(displayContent.title, lang)}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority={currentImageIndex === 0}
+                  className="object-cover"
+                />
+              </motion.div>
             </AnimatePresence>
 
             <div className="absolute bottom-4 left-4 right-4 md:bottom-8 md:left-8 md:right-8 p-4 md:p-6 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10 z-20">

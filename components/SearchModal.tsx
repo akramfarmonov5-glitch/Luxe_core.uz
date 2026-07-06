@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, ArrowRight, TrendingUp, XCircle, SearchX } from 'lucide-react';
 import { Product, Category } from '../types';
@@ -162,8 +163,8 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
                       <div className="space-y-2">
                         {filteredCategories.map(cat => (
                           <div key={cat.id} className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer group ${isDark ? 'hover:bg-white/5' : 'hover:bg-light-card'}`}>
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-800">
-                              <img src={cat.image} alt={getLocalizedText(cat.name, lang)} className="w-full h-full object-cover" />
+                            <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-gray-800">
+                              <Image src={cat.image} alt={getLocalizedText(cat.name, lang)} fill sizes="40px" className="object-cover" />
                             </div>
                             <span className={`font-medium group-hover:text-gold-400 transition-colors ${isDark ? 'text-white' : 'text-light-text'}`}>{getLocalizedText(cat.name, lang)}</span>
                             <ArrowRight size={16} className={`ml-auto group-hover:text-gold-400 ${isDark ? 'text-gray-600' : 'text-light-muted'}`} />
@@ -184,8 +185,8 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose, products, ca
                             onClick={() => handleProductClick(product.id)}
                             className={`flex items-center gap-4 p-3 rounded-xl cursor-pointer group transition-colors ${isDark ? 'hover:bg-white/5' : 'hover:bg-light-card'}`}
                           >
-                            <div className={`w-14 aspect-[4/5] rounded-lg overflow-hidden border ${isDark ? 'bg-gray-800 border-white/5' : 'bg-light-card border-light-border'}`}>
-                              <img src={product.image} alt={getLocalizedText(product.name, lang)} className="w-full h-full object-cover" />
+                            <div className={`relative w-14 aspect-[4/5] rounded-lg overflow-hidden border ${isDark ? 'bg-gray-800 border-white/5' : 'bg-light-card border-light-border'}`}>
+                              <Image src={product.image} alt={getLocalizedText(product.name, lang)} fill sizes="56px" className="object-cover" />
                             </div>
                             <div className="flex-1">
                               <h4 className={`font-medium group-hover:text-gold-400 transition-colors ${isDark ? 'text-white' : 'text-light-text'}`}>{getLocalizedText(product.name, lang)}</h4>

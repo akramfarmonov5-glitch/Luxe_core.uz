@@ -9,13 +9,14 @@ import { WishlistProvider } from '../../context/WishlistContext';
 import { CartProvider } from '../../context/CartContext';
 import { GlobalProvider } from '../../context/GlobalContext';
 import ErrorBoundary from '../../components/ErrorBoundary';
+import type { GlobalData } from '../../lib/globalData';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children, initialData }: { children: React.ReactNode; initialData?: GlobalData | null }) {
   return (
     <ErrorBoundary>
       <LanguageProvider>
         <ThemeProvider>
-          <GlobalProvider>
+          <GlobalProvider initialData={initialData}>
             <ToastProvider>
               <AuthProvider>
                 <WishlistProvider>

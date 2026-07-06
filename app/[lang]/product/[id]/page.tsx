@@ -1,4 +1,4 @@
-import { supabase } from '../../../../lib/supabaseClient';
+import { supabase, hasSupabaseCredentials } from '../../../../lib/supabaseClient';
 import ProductClient from './ProductClient';
 import { getLocalizedText } from '../../../../lib/i18nUtils';
 import { MOCK_PRODUCTS } from '../../../../constants';
@@ -19,12 +19,16 @@ function resolveProductId(raw: string): string {
 
 async function loadProduct(rawId: string) {
   const productId = resolveProductId(rawId);
+  // Mock data faqat Supabase sozlanmagan (lokal dev) muhitda ishlatiladi
+  if (!hasSupabaseCredentials) {
+    return MOCK_PRODUCTS.find((item) => item.id === Number(productId)) || null;
+  }
   const { data: product } = await supabase
     .from('products')
     .select('*')
     .eq('id', productId)
     .single();
-  return product || MOCK_PRODUCTS.find((item) => item.id === Number(productId)) || null;
+  return product || null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string, lang: string }> }) {

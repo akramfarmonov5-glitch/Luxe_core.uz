@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Instagram, Twitter, Facebook, Mail, Lock, Phone, MapPin, Clock, Send } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -7,9 +8,16 @@ interface FooterProps {
   onAdminClick?: () => void;
 }
 
+const HELP_LINKS: Record<string, { delivery: string; payment: string; returns: string; faq: string }> = {
+  uz: { delivery: 'Yetkazib berish', payment: "To'lov usullari", returns: 'Qaytarish siyosati', faq: 'FAQ' },
+  ru: { delivery: 'Доставка', payment: 'Способы оплаты', returns: 'Политика возврата', faq: 'FAQ' },
+  en: { delivery: 'Delivery', payment: 'Payment methods', returns: 'Return policy', faq: 'FAQ' },
+};
+
 const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
   const { isDark } = useTheme();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const helpLabels = HELP_LINKS[lang] || HELP_LINKS.uz;
 
   return (
     <footer className={`pt-16 pb-8 border-t transition-colors duration-300 ${isDark ? 'bg-dark-900 border-white/10' : 'bg-light-card border-light-border'}`}>
@@ -38,10 +46,10 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
           <div>
             <h4 className={`font-semibold mb-6 ${isDark ? 'text-white' : 'text-light-text'}`}>{t('footer_help')}</h4>
             <ul className={`space-y-3 text-sm ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
-              <li><a href="#!" className="hover:text-gold-400 transition-colors">Yetkazib berish</a></li>
-              <li><a href="#!" className="hover:text-gold-400 transition-colors">To'lov usullari</a></li>
-              <li><a href="#!" className="hover:text-gold-400 transition-colors">Qaytarish siyosati</a></li>
-              <li><a href="#!" className="hover:text-gold-400 transition-colors">FAQ</a></li>
+              <li><Link href={`/${lang}/delivery`} className="hover:text-gold-400 transition-colors">{helpLabels.delivery}</Link></li>
+              <li><Link href={`/${lang}/faq`} className="hover:text-gold-400 transition-colors">{helpLabels.payment}</Link></li>
+              <li><Link href={`/${lang}/returns`} className="hover:text-gold-400 transition-colors">{helpLabels.returns}</Link></li>
+              <li><Link href={`/${lang}/faq`} className="hover:text-gold-400 transition-colors">{helpLabels.faq}</Link></li>
             </ul>
           </div>
 

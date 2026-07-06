@@ -36,12 +36,18 @@ export async function GET() {
       if (blogRes.data) blogPosts = blogRes.data;
     }
 
-    if (products.length === 0) products = getFallbackProducts();
-    if (categories.length === 0) categories = getFallbackCategories();
+    // Fallback ro'yxatlar faqat Supabase sozlanmagan muhitda ishlatiladi
+    if (!supabaseUrl || !supabaseKey) {
+      if (products.length === 0) products = getFallbackProducts();
+      if (categories.length === 0) categories = getFallbackCategories();
+    }
 
     let urls = '';
 
     urls += renderLocalizedUrl('/', today, 'daily', '1.0');
+    urls += renderLocalizedUrl('/delivery', today, 'monthly', '0.5');
+    urls += renderLocalizedUrl('/returns', today, 'monthly', '0.5');
+    urls += renderLocalizedUrl('/faq', today, 'monthly', '0.5');
 
     for (const cat of categories) {
       urls += renderLocalizedCategoryUrl(cat, today, 'weekly', '0.9', {

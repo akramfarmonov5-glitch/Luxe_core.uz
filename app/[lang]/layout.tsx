@@ -2,6 +2,7 @@ import '../globals.css';
 import { Providers } from './Providers';
 import ClientLayout from './ClientLayout';
 import { SITE_URL } from '../../lib/siteUrl';
+import { fetchGlobalData } from '../../lib/globalData';
 
 const siteUrl = SITE_URL;
 const logoUrl = `${siteUrl}/logo.jpg`;
@@ -84,6 +85,7 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
+  const initialData = await fetchGlobalData().catch(() => null);
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -108,7 +110,7 @@ export default async function RootLayout({
         />
       </head>
       <body>
-        <Providers>
+        <Providers initialData={initialData}>
           <ClientLayout lang={lang}>
             {children}
           </ClientLayout>

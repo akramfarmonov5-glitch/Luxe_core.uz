@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { ArrowLeft, Calendar, User, Share2 } from 'lucide-react';
 import { BlogPost } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -38,8 +39,8 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
            </div>
         </div>
 
-        <div className="aspect-video w-full rounded-2xl overflow-hidden mb-10 bg-zinc-900 border border-white/10">
-           <img src={post.image} alt={getLocalizedText(post.title, lang)} className="w-full h-full object-cover" />
+        <div className="relative aspect-video w-full rounded-2xl overflow-hidden mb-10 bg-zinc-900 border border-white/10">
+           <Image src={post.image} alt={getLocalizedText(post.title, lang)} fill sizes="(max-width: 768px) 100vw, 768px" priority className="object-cover" />
         </div>
 
         <div className="prose prose-invert prose-lg max-w-none">

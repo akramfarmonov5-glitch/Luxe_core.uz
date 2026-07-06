@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, Box, Activity, Zap, PlayCircle, X, Youtube, ExternalLink, ArrowRight, Heart, Play } from 'lucide-react';
 import { Category, Product } from '../types';
@@ -152,10 +153,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
             <div className="sticky top-24 md:top-28 space-y-3">
               <div className="aspect-[4/5] w-full rounded-2xl md:rounded-3xl overflow-hidden border border-white/5 shadow-2xl bg-dark-800 relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-gold-500/20 to-purple-500/20 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
-                <img
+                <Image
                   src={activeImage}
                   alt={getLocalizedText(product.name, lang)}
-                  className="relative w-full h-full object-cover z-10 transition-opacity duration-300"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                  className="object-cover z-10 transition-opacity duration-300"
                 />
 
                 {hasVideo && (
@@ -174,9 +178,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   <button
                     key={idx}
                     onClick={() => setActiveImage(img)}
-                    className={`w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all ${activeImage === img ? 'border-gold-400 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                    className={`relative w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all ${activeImage === img ? 'border-gold-400 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
                   >
-                    <img src={img} alt={`View ${idx}`} className="w-full h-full object-cover" />
+                    <Image src={img} alt={`View ${idx}`} fill sizes="64px" className="object-cover" />
                   </button>
                 ))}
 
@@ -383,10 +387,12 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
               <div className="relative w-full h-full">
                 {!isPlaying ? (
                   <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black cursor-pointer group" onClick={() => setIsPlaying(true)}>
-                    <img
+                    <Image
                       src={activeImage}
                       alt="Video Cover"
-                      className="absolute inset-0 w-full h-full object-cover opacity-60 blur-sm group-hover:opacity-40 transition-opacity duration-700"
+                      fill
+                      sizes="100vw"
+                      className="object-cover opacity-60 blur-sm group-hover:opacity-40 transition-opacity duration-700"
                     />
                     <div className="z-20 transform group-hover:scale-110 transition-transform duration-300">
                       <div className="w-16 h-16 md:w-24 md:h-24 bg-red-600 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(220,38,38,0.5)]">

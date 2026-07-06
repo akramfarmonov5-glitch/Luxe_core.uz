@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { ShoppingBag, Search, User, Menu, X, ChevronRight, Instagram, Send, Facebook, Youtube, Twitter, Heart, Sun, Moon, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
@@ -63,7 +64,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
             <Menu size={24} />
           </button>
           <button onClick={onNavigateHome} className={`flex items-center gap-2 text-xl md:text-2xl font-bold tracking-wider ${isDark ? 'text-white' : 'text-light-text'}`}>
-            <img src="/logo.jpg" alt="LUXECORE" className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover" />
+            <Image src="/logo.jpg" alt="LUXECORE" width={36} height={36} className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover" />
             LUXE<span className="text-gold-400">CORE</span>
           </button>
         </div>
@@ -236,7 +237,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
               >
                 <div className="flex justify-between items-center mb-8">
                   <h2 className={`flex items-center gap-2 text-2xl font-bold tracking-wider ${isDark ? 'text-white' : 'text-light-text'}`}>
-                    <img src="/logo.jpg" alt="LUXECORE" className="w-8 h-8 rounded-full object-cover" />
+                    <Image src="/logo.jpg" alt="LUXECORE" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
                     LUXE<span className="text-gold-400">CORE</span>
                   </h2>
                   <div className="flex items-center gap-2">
