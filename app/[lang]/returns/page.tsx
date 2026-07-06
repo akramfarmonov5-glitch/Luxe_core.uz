@@ -2,8 +2,11 @@ import InfoPage from '../../../components/InfoPage';
 import { getInfoContent } from '../../../lib/infoContent';
 import { SEO_LANGUAGES } from '../../../lib/seoLanguage';
 
-// Statik kontent — 1 soat keshlanadi (har so'rovda qayta render qilinmaydi)
+// Statik kontent — build vaqtida oldindan generatsiya + 1 soat keshlanadi
 export const revalidate = 3600;
+export function generateStaticParams() {
+  return [{ lang: 'uz' }, { lang: 'ru' }, { lang: 'en' }];
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
