@@ -7,30 +7,12 @@ const rootDir = dirname(fileURLToPath(import.meta.url));
 const nextConfig = {
   reactStrictMode: true,
   images: {
+    // Admin panel istalgan https manzildan rasm URL kiritishi mumkin,
+    // shuning uchun barcha https hostlarga ruxsat beriladi
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'loremflickr.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      },
-      {
-        protocol: 'https',
-        hostname: '*.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-      },
-      {
-        protocol: 'https',
-        hostname: 'ui-avatars.com',
+        hostname: '**',
       },
     ],
   },
