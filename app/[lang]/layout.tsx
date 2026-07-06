@@ -12,16 +12,19 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const l = lang || 'uz';
   const metadataMap: Record<string, any> = {
     uz: {
-      title: 'LUXECORE | Premium Store',
-      description: 'LUXECORE - O\'zbekistondagi premium onlayn do\'kon. Soatlar, sumkalar, parfyumeriya va eksklyuziv aksessuarlarni buyurtma qiling.',
+      title: 'Sovg\'a qutilari va premium sovg\'alar — LUXECORE',
+      description: 'Premium sovg\'a qutilari (gift box), parfyumeriya va eksklyuziv aksessuarlar. O\'zbekiston bo\'ylab tez yetkazib berish, 14 kun ichida qaytarish. LUXECORE — ishonchli sovg\'a do\'koni.',
+      keywords: ['sovg\'a qutisi', 'gift box', 'sovg\'a to\'plami', 'premium sovg\'a', 'parfyumeriya', 'aksessuarlar', 'Toshkent', 'O\'zbekiston', 'onlayn sovg\'a'],
     },
     ru: {
-      title: 'LUXECORE | Premium Store',
-      description: 'LUXECORE - premium onlayn do\'kon. Chasy, sumki, parfyumeriya va eksklyuziv aksessuarlar.',
+      title: 'Подарочные коробки и премиум подарки — LUXECORE',
+      description: 'Премиальные подарочные коробки (gift box), парфюмерия и эксклюзивные аксессуары. Быстрая доставка по Узбекистану, возврат в течение 14 дней. LUXECORE — надёжный магазин подарков.',
+      keywords: ['подарочная коробка', 'gift box', 'подарочный набор', 'премиум подарки', 'парфюмерия', 'аксессуары', 'Ташкент', 'Узбекистан', 'подарки онлайн'],
     },
     en: {
-      title: 'LUXECORE | Premium Store',
-      description: 'LUXECORE is a premium online store in Uzbekistan for watches, bags, perfume, and exclusive accessories.',
+      title: 'Gift Boxes & Premium Gifts — LUXECORE',
+      description: 'Premium gift boxes, perfume and exclusive accessories. Fast delivery across Uzbekistan, 14-day returns. LUXECORE — the trusted gift store in Tashkent.',
+      keywords: ['gift box', 'gift set', 'premium gifts', 'perfume', 'accessories', 'Tashkent', 'Uzbekistan', 'gifts online'],
     },
   };
   const metadata = metadataMap[l] || metadataMap.uz;
