@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { supabase, hasSupabaseCredentials } from './supabaseClient';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, DEFAULT_HERO_CONTENT, DEFAULT_NAVIGATION } from '../constants';
 import { slugify } from './slugify';
@@ -31,7 +32,7 @@ export function mapCategories(rows: any[]): Category[] {
 
 // Mock data faqat Supabase sozlanmagan (lokal dev) muhitda ishlatiladi.
 // Credentials mavjud bo'lsa — baza bo'sh bo'lsa ham bo'sh ro'yxat qaytadi.
-export async function fetchGlobalData(): Promise<GlobalData> {
+async function fetchGlobalDataUncached(): Promise<GlobalData> {
   if (!hasSupabaseCredentials) {
     return {
       products: MOCK_PRODUCTS,
@@ -93,3 +94,12 @@ export async function fetchGlobalData(): Promise<GlobalData> {
 
   return { products, categories, heroContent, navigationSettings, blogPosts };
 }
+
+// Global ma'lumot 120 soniya keshlanadi — sahifalar har so'rovda Supabase'ni
+// urmaydi, sezilarli tezlashadi. Admin panel orqali kiritilgan o'zgarishlar
+// eng kechi 2 daqiqada saytda ko'rinadi.
+export const fetchGlobalData = unstable_cache(
+  fetchGlobalDataUncached,
+  ['global-data'],
+  { revalidate: 120, tags: ['global-data'] },
+);

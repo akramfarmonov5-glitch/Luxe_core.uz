@@ -3,6 +3,9 @@ import { SITE_URL } from '../../lib/siteUrl';
 import { loadApprovedReviews } from '../../lib/reviews';
 import type { Review } from '../../types';
 
+// Bosh sahifa 120 soniya keshlanadi (global ma'lumot keshi bilan mos)
+export const revalidate = 120;
+
 export default async function HomePage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const activeLang = lang || 'uz';
