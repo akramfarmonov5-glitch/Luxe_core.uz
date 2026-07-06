@@ -48,6 +48,8 @@ export async function GET() {
     urls += renderLocalizedUrl('/delivery', today, 'monthly', '0.5');
     urls += renderLocalizedUrl('/returns', today, 'monthly', '0.5');
     urls += renderLocalizedUrl('/faq', today, 'monthly', '0.5');
+    urls += renderLocalizedUrl('/privacy', today, 'yearly', '0.3');
+    urls += renderLocalizedUrl('/terms', today, 'yearly', '0.3');
 
     for (const cat of categories) {
       urls += renderLocalizedCategoryUrl(cat, today, 'weekly', '0.9', {

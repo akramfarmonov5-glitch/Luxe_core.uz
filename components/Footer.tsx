@@ -3,21 +3,26 @@ import Link from 'next/link';
 import { Instagram, Twitter, Facebook, Mail, Lock, Phone, MapPin, Clock, Send } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useGlobalData } from '../context/GlobalContext';
+import { getLocalizedText } from '../lib/i18nUtils';
+import { getCategorySlug } from '../lib/categoryUtils';
 
 interface FooterProps {
   onAdminClick?: () => void;
 }
 
-const HELP_LINKS: Record<string, { delivery: string; payment: string; returns: string; faq: string }> = {
-  uz: { delivery: 'Yetkazib berish', payment: "To'lov usullari", returns: 'Qaytarish siyosati', faq: 'FAQ' },
-  ru: { delivery: 'Доставка', payment: 'Способы оплаты', returns: 'Политика возврата', faq: 'FAQ' },
-  en: { delivery: 'Delivery', payment: 'Payment methods', returns: 'Return policy', faq: 'FAQ' },
+const HELP_LINKS: Record<string, { delivery: string; payment: string; returns: string; faq: string; privacy: string; terms: string }> = {
+  uz: { delivery: 'Yetkazib berish', payment: "To'lov usullari", returns: 'Qaytarish siyosati', faq: 'FAQ', privacy: 'Maxfiylik siyosati', terms: 'Foydalanish shartlari' },
+  ru: { delivery: 'Доставка', payment: 'Способы оплаты', returns: 'Политика возврата', faq: 'FAQ', privacy: 'Политика конфиденциальности', terms: 'Условия использования' },
+  en: { delivery: 'Delivery', payment: 'Payment methods', returns: 'Return policy', faq: 'FAQ', privacy: 'Privacy policy', terms: 'Terms of use' },
 };
 
 const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
   const { isDark } = useTheme();
   const { t, lang } = useLanguage();
+  const { categories } = useGlobalData();
   const helpLabels = HELP_LINKS[lang] || HELP_LINKS.uz;
+  const footerCategories = (categories || []).slice(0, 4);
 
   return (
     <footer className={`pt-16 pb-8 border-t transition-colors duration-300 ${isDark ? 'bg-dark-900 border-white/10' : 'bg-light-card border-light-border'}`}>
@@ -36,10 +41,13 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
           <div>
             <h4 className={`font-semibold mb-6 ${isDark ? 'text-white' : 'text-light-text'}`}>{t('footer_categories')}</h4>
             <ul className={`space-y-3 text-sm ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
-              <li><a href="#!" className="hover:text-gold-400 transition-colors">Soatlar</a></li>
-              <li><a href="#!" className="hover:text-gold-400 transition-colors">Sumkalar</a></li>
-              <li><a href="#!" className="hover:text-gold-400 transition-colors">Ko'zoynaklar</a></li>
-              <li><a href="#!" className="hover:text-gold-400 transition-colors">Parfyumeriya</a></li>
+              {footerCategories.map((category) => (
+                <li key={String(category.id)}>
+                  <Link href={`/${lang}/category/${getCategorySlug(category, lang)}`} className="hover:text-gold-400 transition-colors">
+                    {getLocalizedText(category.name, lang)}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -99,8 +107,8 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
         <div className={`border-t pt-8 flex flex-col md:flex-row justify-between items-center text-xs ${isDark ? 'border-white/5 text-gray-600' : 'border-light-border text-light-muted'}`}>
           <p>&copy; 2026 LUXECORE. {t('all_rights_reserved')}.</p>
           <div className="flex gap-6 mt-4 md:mt-0 items-center">
-            <a href="#!" className="hover:text-gold-400 transition-colors">Maxfiylik siyosati</a>
-            <a href="#!" className="hover:text-gold-400 transition-colors">Foydalanish shartlari</a>
+            <Link href={`/${lang}/privacy`} className="hover:text-gold-400 transition-colors">{helpLabels.privacy}</Link>
+            <Link href={`/${lang}/terms`} className="hover:text-gold-400 transition-colors">{helpLabels.terms}</Link>
             {/* Secret Admin Link */}
             {onAdminClick && (
               <button onClick={onAdminClick} className="flex items-center gap-1 hover:text-gold-400 transition-colors ml-4 opacity-50 hover:opacity-100">

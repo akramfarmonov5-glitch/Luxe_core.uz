@@ -1,4 +1,4 @@
-export type InfoTopic = 'delivery' | 'returns' | 'faq';
+export type InfoTopic = 'delivery' | 'returns' | 'faq' | 'privacy' | 'terms';
 
 export interface InfoSection {
   heading: string;
@@ -123,6 +123,82 @@ export const INFO_CONTENT: Record<InfoTopic, LocalizedInfo> = {
         { heading: 'Can I return an item?', body: 'Yes, within 14 days of receiving it. See the "Return policy" page for details.' },
         { heading: 'Are the products original?', body: 'All products are sold with a quality guarantee. Every order is inspected before shipping.' },
         { heading: 'How do I contact you?', body: 'Call +998 99 644 84 44 or write on Telegram: @luxecoreuz. Working hours: Mon–Sat, 09:00–20:00.' },
+      ],
+    },
+  },
+  privacy: {
+    uz: {
+      title: 'Maxfiylik siyosati',
+      description: "LUXECORE shaxsiy ma'lumotlaringizni qanday yig'ishi, ishlatishi va himoya qilishi haqida.",
+      intro: "Sizning shaxsiy ma'lumotlaringiz biz uchun muhim. Ushbu sahifada ularni qanday ishlatishimiz tushuntirilgan.",
+      sections: [
+        { heading: "Qanday ma'lumotlar yig'iladi", body: "Buyurtma rasmiylashtirishda ism-familiya, telefon raqami va yetkazib berish manzili so'raladi. Bu ma'lumotlar faqat buyurtmani bajarish uchun kerak." },
+        { heading: "Ma'lumotlardan foydalanish", body: "Ma'lumotlaringiz buyurtmani yetkazish, siz bilan bog'lanish va xizmat sifatini yaxshilash uchun ishlatiladi. Ma'lumotlaringiz hech qachon uchinchi shaxslarga sotilmaydi." },
+        { heading: 'Cookie va analitika', body: "Sayt tajribasini yaxshilash uchun cookie fayllari hamda analitika vositalari (Google Analytics, Meta Pixel) ishlatiladi. Ular shaxsingizni aniqlamaydi, faqat saytdan foydalanish statistikasini yig'adi." },
+        { heading: "Ma'lumotlarni himoya qilish", body: "Ma'lumotlaringiz zamonaviy xavfsizlik standartlariga mos server (Supabase) da saqlanadi va faqat vakolatli xodimlar uchun ochiq." },
+        { heading: 'Huquqlaringiz', body: "Ma'lumotlaringizni ko'rish, o'zgartirish yoki o'chirishni so'rashingiz mumkin. Buning uchun +998 99 644 84 44 raqamiga murojaat qiling." },
+      ],
+    },
+    ru: {
+      title: 'Политика конфиденциальности',
+      description: 'Как LUXECORE собирает, использует и защищает ваши персональные данные.',
+      intro: 'Ваши персональные данные важны для нас. На этой странице описано, как мы их используем.',
+      sections: [
+        { heading: 'Какие данные собираются', body: 'При оформлении заказа запрашиваются имя, номер телефона и адрес доставки. Эти данные нужны только для выполнения заказа.' },
+        { heading: 'Использование данных', body: 'Ваши данные используются для доставки заказа, связи с вами и улучшения качества сервиса. Данные никогда не продаются третьим лицам.' },
+        { heading: 'Cookie и аналитика', body: 'Для улучшения работы сайта используются cookie и аналитические инструменты (Google Analytics, Meta Pixel). Они не идентифицируют вашу личность, а собирают только статистику использования сайта.' },
+        { heading: 'Защита данных', body: 'Ваши данные хранятся на сервере, соответствующем современным стандартам безопасности (Supabase), и доступны только уполномоченным сотрудникам.' },
+        { heading: 'Ваши права', body: 'Вы можете запросить просмотр, изменение или удаление своих данных. Для этого обратитесь по номеру +998 99 644 84 44.' },
+      ],
+    },
+    en: {
+      title: 'Privacy policy',
+      description: 'How LUXECORE collects, uses and protects your personal data.',
+      intro: 'Your personal data matters to us. This page explains how we use it.',
+      sections: [
+        { heading: 'What data we collect', body: 'When placing an order we ask for your name, phone number and delivery address. This data is needed only to fulfil your order.' },
+        { heading: 'How we use it', body: 'Your data is used to deliver your order, contact you and improve our service. It is never sold to third parties.' },
+        { heading: 'Cookies and analytics', body: 'We use cookies and analytics tools (Google Analytics, Meta Pixel) to improve the site experience. They do not identify you personally; they only collect usage statistics.' },
+        { heading: 'Data protection', body: 'Your data is stored on infrastructure that meets modern security standards (Supabase) and is accessible only to authorized staff.' },
+        { heading: 'Your rights', body: 'You may request to view, change or delete your data. Contact us at +998 99 644 84 44.' },
+      ],
+    },
+  },
+  terms: {
+    uz: {
+      title: 'Foydalanish shartlari',
+      description: 'LUXECORE onlayn do\'konidan foydalanish shartlari: buyurtma, to\'lov, yetkazib berish va qaytarish tartibi.',
+      intro: "Saytdan foydalanish va buyurtma berish orqali siz quyidagi shartlarga rozilik bildirasiz.",
+      sections: [
+        { heading: 'Umumiy qoidalar', body: "LUXECORE — premium mahsulotlar sotuvchi onlayn do'kon. Saytdagi barcha narxlar O'zbekiston so'mida ko'rsatilgan va qo'shimcha yashirin to'lovlar yo'q." },
+        { heading: 'Buyurtma berish', body: "Buyurtma rasmiylashtirilgach, operatorimiz telefon orqali bog'lanib buyurtmani tasdiqlaydi. Minimal buyurtma summasi — 500 000 so'm." },
+        { heading: "To'lov", body: "To'lov Paynet orqali onlayn yoki mahsulotni qabul qilishda naqd pul bilan amalga oshiriladi. Onlayn to'lov holati operator tomonidan tekshirib tasdiqlanadi." },
+        { heading: 'Yetkazib berish va qaytarish', body: "Yetkazib berish shartlari \"Yetkazib berish\" sahifasida, qaytarish tartibi \"Qaytarish siyosati\" sahifasida batafsil yoritilgan." },
+        { heading: 'Javobgarlik', body: "Mahsulot tavsiflari imkon qadar aniq berilgan; ekran sozlamalariga qarab rang biroz farq qilishi mumkin. Savollar bo'lsa: +998 99 644 84 44." },
+      ],
+    },
+    ru: {
+      title: 'Условия использования',
+      description: 'Условия использования магазина LUXECORE: заказ, оплата, доставка и возврат.',
+      intro: 'Используя сайт и оформляя заказ, вы соглашаетесь со следующими условиями.',
+      sections: [
+        { heading: 'Общие положения', body: 'LUXECORE — интернет-магазин премиальных товаров. Все цены на сайте указаны в узбекских сумах, скрытых платежей нет.' },
+        { heading: 'Оформление заказа', body: 'После оформления заказа наш оператор свяжется с вами по телефону для подтверждения. Минимальная сумма заказа — 500 000 сум.' },
+        { heading: 'Оплата', body: 'Оплата производится онлайн через Paynet или наличными при получении. Статус онлайн-оплаты проверяется и подтверждается оператором.' },
+        { heading: 'Доставка и возврат', body: 'Условия доставки описаны на странице «Доставка», порядок возврата — на странице «Политика возврата».' },
+        { heading: 'Ответственность', body: 'Описания товаров даны максимально точно; цвет может незначительно отличаться в зависимости от настроек экрана. Вопросы: +998 99 644 84 44.' },
+      ],
+    },
+    en: {
+      title: 'Terms of use',
+      description: 'LUXECORE store terms of use: ordering, payment, delivery and returns.',
+      intro: 'By using this site and placing an order you agree to the following terms.',
+      sections: [
+        { heading: 'General', body: 'LUXECORE is an online store for premium goods. All prices are listed in Uzbek soums with no hidden fees.' },
+        { heading: 'Ordering', body: 'After you place an order, our operator will call you to confirm it. The minimum order amount is 500,000 UZS.' },
+        { heading: 'Payment', body: 'Payment is made online via Paynet or in cash on delivery. Online payment status is verified and confirmed by our operator.' },
+        { heading: 'Delivery and returns', body: 'Delivery terms are described on the "Delivery" page; the return procedure — on the "Return policy" page.' },
+        { heading: 'Liability', body: 'Product descriptions are as accurate as possible; colors may differ slightly depending on your screen settings. Questions: +998 99 644 84 44.' },
       ],
     },
   },

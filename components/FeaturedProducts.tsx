@@ -17,8 +17,17 @@ interface FeaturedProductsProps {
     isLoading?: boolean;
 }
 
+const PAGE_SIZE = 12;
+
+const LOAD_MORE_LABELS: Record<string, string> = {
+    uz: "Ko'proq ko'rish",
+    ru: 'Показать ещё',
+    en: 'Show more',
+};
+
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categories, onNavigateToProduct, activeCategory, isLoading }) => {
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
     // Sync internal state with prop
     useEffect(() => {
@@ -26,6 +35,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
             setSelectedCategory(activeCategory);
         }
     }, [activeCategory]);
+
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortOrder, setSortOrder] = useState<string>('newest');
@@ -33,6 +43,11 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
     const [maxPrice, setMaxPrice] = useState<string>('');
     const { isDark } = useTheme();
     const { lang, t } = useLanguage();
+
+    // Filtr o'zgarganda sahifalash boshiga qaytadi
+    useEffect(() => {
+        setVisibleCount(PAGE_SIZE);
+    }, [selectedCategory, searchQuery, sortOrder, minPrice, maxPrice]);
 
     // Derive active products based on filter and sorting
     const filteredProducts = products.filter(p => {
@@ -188,29 +203,41 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                         </button>
                                     </div>
                                 ) : (
-                                    <motion.div
-                                        layout
-                                        className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8"
-                                    >
-                                        <AnimatePresence>
-                                            {filteredProducts.map((product) => (
-                                                <motion.div
-                                                    key={product.id}
-                                                    layout
-                                                    initial={{ opacity: 0, scale: 0.9 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
-                                                    exit={{ opacity: 0, scale: 0.9 }}
-                                                    transition={{ duration: 0.3 }}
+                                    <>
+                                        <motion.div
+                                            layout
+                                            className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8"
+                                        >
+                                            <AnimatePresence>
+                                                {filteredProducts.slice(0, visibleCount).map((product) => (
+                                                    <motion.div
+                                                        key={product.id}
+                                                        layout
+                                                        initial={{ opacity: 0, scale: 0.9 }}
+                                                        animate={{ opacity: 1, scale: 1 }}
+                                                        exit={{ opacity: 0, scale: 0.9 }}
+                                                        transition={{ duration: 0.3 }}
+                                                    >
+                                                        <ProductCard
+                                                            product={product}
+                                                            onNavigate={() => onNavigateToProduct(product.id)}
+                                                            categories={categories}
+                                                        />
+                                                    </motion.div>
+                                                ))}
+                                            </AnimatePresence>
+                                        </motion.div>
+                                        {filteredProducts.length > visibleCount && (
+                                            <div className="mt-8 md:mt-12 text-center">
+                                                <button
+                                                    onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+                                                    className={`px-8 py-3 rounded-full border font-medium transition-all duration-300 ${isDark ? 'border-white/20 text-white hover:bg-white/10' : 'border-light-border text-light-text hover:bg-light-card'}`}
                                                 >
-                                                    <ProductCard
-                                                        product={product}
-                                                        onNavigate={() => onNavigateToProduct(product.id)}
-                                                        categories={categories}
-                                                    />
-                                                </motion.div>
-                                            ))}
-                                        </AnimatePresence>
-                                    </motion.div>
+                                                    {LOAD_MORE_LABELS[lang] || LOAD_MORE_LABELS.uz} ({filteredProducts.length - visibleCount})
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </>
                         )}
