@@ -17,7 +17,7 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: SITE_URL
-        value: https://luxe-core-uz-three.vercel.app
+        value: https://luxe-core.uz
       - key: CHANNEL_URL
         value: https://t.me/luxecoreuz
       - key: CONTACT_PHONE
