@@ -3,7 +3,7 @@ import { InlineKeyboard } from 'grammy';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { config } from '../config';
 import { supabase } from '../supabase';
-import { t, getLang, localizeText, getProductUrl } from '../i18n';
+import { t, getLang, localizeText, getProductUrl, getSitePageUrl } from '../i18n';
 import { Lang } from '../types';
 
 const aiState = new Map<number, boolean>();
@@ -64,7 +64,13 @@ export async function handleAiPrompt(ctx: Context) {
     aiHistory.delete(userId);
     await ctx.reply(
         t(userId, 'ai_prompt'),
-        { parse_mode: 'Markdown' }
+        {
+            parse_mode: 'Markdown',
+            reply_markup: new InlineKeyboard()
+                .webApp(t(userId, 'btn_shop'), getSitePageUrl(config.SITE_URL, '', userId))
+                .row()
+                .text(t(userId, 'btn_home'), 'home'),
+        }
     );
 }
 
@@ -120,6 +126,8 @@ export async function handleAiMessage(ctx: Context) {
 
         await ctx.reply(aiText, {
             reply_markup: new InlineKeyboard()
+                .webApp(t(userId, 'btn_shop'), getSitePageUrl(config.SITE_URL, '', userId))
+                .row()
                 .text('🔚 Chiqish', 'exit_ai')
                 .text(t(userId, 'btn_home'), 'home'),
         });

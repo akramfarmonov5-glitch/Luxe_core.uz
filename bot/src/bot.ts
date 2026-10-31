@@ -3,7 +3,7 @@ import { config } from './config';
 import { handleStart, handleHome, handleContactMessage, handleStartLangSelect } from './handlers/start';
 import { handleCategories, handleCategorySelect, handleCategoryPage } from './handlers/categories';
 import { handleSearchPrompt, handleSearchQuery, isInSearchMode, clearSearchMode } from './handlers/search';
-import { handleAddToCart, handleShowCart, handleClearCart, handleCheckout, handleCheckoutInput, isInCheckoutMode, clearCheckoutMode, setBotInstance, handleCartPlus, handleCartMinus, handleCartDelete, handlePayCard, handlePayCash } from './handlers/cart';
+import { handleAddToCart, handleShowCart, handleClearCart, handleCheckout, handleCheckoutInput, isInCheckoutMode, clearCheckoutMode, setBotInstance, handleCartPlus, handleCartMinus, handleCartDelete, handlePayCard, handlePayCash, handleSkipPromo, handleCardPaidConfirm } from './handlers/cart';
 import { handleAiPrompt, handleAiMessage, handleExitAi, isInAiMode, clearAiMode } from './handlers/ai';
 import { handleContact, handleHelp, handleChannel } from './handlers/info';
 import { handleLangPrompt, handleLangSet } from './handlers/lang';
@@ -36,6 +36,13 @@ export function createBot() {
         }
         return handleStart(ctx);
     });
+
+    // Customer commands
+    bot.command('cart', handleShowCart);
+    bot.command('categories', handleCategories);
+    bot.command('ai', handleAiPrompt);
+    bot.command('help', handleHelp);
+    bot.command('myorders', handleOrdersPrompt);
 
     // Admin commands
     bot.command('admin', handleAdminDashboard);
@@ -114,8 +121,11 @@ export function createBot() {
         return handleCategories(ctx);
     });
     bot.callbackQuery('show_cart', handleShowCart);
+    bot.callbackQuery('view_cart', handleShowCart);
     bot.callbackQuery('clear_cart', handleClearCart);
     bot.callbackQuery('checkout', handleCheckout);
+    bot.callbackQuery('checkout_skip_promo', handleSkipPromo);
+    bot.callbackQuery('checkout_card_paid', handleCardPaidConfirm);
     bot.callbackQuery('exit_ai', handleExitAi);
     bot.callbackQuery('back_to_list', (ctx) => {
         ctx.answerCallbackQuery();

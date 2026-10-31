@@ -2,7 +2,8 @@ import { Context } from 'grammy';
 import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
 import { statusEmoji } from '../keyboards';
-import { t } from '../i18n';
+import { t, getSitePageUrl } from '../i18n';
+import { config } from '../config';
 import { ensureUser } from './profile';
 
 export async function handleOrdersPrompt(ctx: Context) {
@@ -20,9 +21,16 @@ export async function handleOrdersPrompt(ctx: Context) {
             .order('created_at', { ascending: false })
             .limit(10);
 
+        const shopUrl = getSitePageUrl(config.SITE_URL, '', userId);
+        const trackingUrl = getSitePageUrl(config.SITE_URL, '/tracking', userId);
+
         if (error || !orders || orders.length === 0) {
             await ctx.reply(t(userId, 'orders_empty'), {
                 reply_markup: new InlineKeyboard()
+                    .webApp(t(userId, 'btn_shop'), shopUrl)
+                    .row()
+                    .webApp(t(userId, 'btn_track_on_site'), trackingUrl)
+                    .row()
                     .text(t(userId, 'btn_home'), 'home'),
             });
             return;
@@ -41,6 +49,9 @@ export async function handleOrdersPrompt(ctx: Context) {
         await ctx.reply(text, {
             parse_mode: 'Markdown',
             reply_markup: new InlineKeyboard()
+                .webApp(t(userId, 'btn_track_on_site'), trackingUrl)
+                .webApp(t(userId, 'btn_shop'), shopUrl)
+                .row()
                 .text(t(userId, 'btn_home'), 'home'),
         });
     } catch (err) {

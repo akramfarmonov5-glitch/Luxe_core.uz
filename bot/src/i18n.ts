@@ -28,7 +28,13 @@ const translations: Record<string, Record<Lang, string>> = {
     },
     choose_lang: { uz: '🌐 Tilni tanlang / Выберите язык:', ru: '🌐 Tilni tanlang / Выберите язык:' },
     lang_set: { uz: '✅ Til o\'zbek tiliga o\'zgartirildi!', ru: '✅ Язык изменён на русский!' },
-    btn_shop: { uz: '🛒 Do\'kon', ru: '🛒 Магазин' },
+    btn_shop: { uz: '🛍 Do\'konni ochish (Katalog)', ru: '🛍 Открыть магазин (Каталог)' },
+    btn_buy_on_site: { uz: '🛍 Saytda xarid qilish', ru: '🛍 Купить на сайте' },
+    btn_open_category_site: { uz: '🌐 Bo\'limni saytda ochish', ru: '🌐 Открыть раздел на сайте' },
+    btn_track_on_site: { uz: '🔍 Saytda kuzatish', ru: '🔍 Отследить на сайте' },
+    btn_skip_promo: { uz: '⏭ Promo-kod yo\'q (O\'tkazish)', ru: '⏭ Нет промо-кода (Пропустить)' },
+    btn_paid_confirm: { uz: '✅ To\'lov qildim', ru: '✅ Я оплатил(а)' },
+    btn_checkout_site: { uz: '⚡ Sayt orqali xarid qilish', ru: '⚡ Оформить на сайте' },
     btn_search: { uz: '🔍 Qidirish', ru: '🔍 Поиск' },
     btn_categories: { uz: '📂 Kategoriyalar', ru: '📂 Категории' },
     btn_orders: { uz: '📦 Buyurtmalarim', ru: '📦 Мои заказы' },
@@ -183,5 +189,12 @@ export function getProductUrl(siteUrl: string, productId: number | string, userI
     const lang = userId ? getLang(userId) : 'uz';
     const base = siteUrl.replace(/\/$/, '');
     return `${base}/${lang}/product/${productId}`;
+}
+
+export function getSitePageUrl(siteUrl: string, subPath = '', userId?: number): string {
+    const lang = userId ? getLang(userId) : 'uz';
+    const base = siteUrl.replace(/\/$/, '');
+    const cleanPath = subPath ? (subPath.startsWith('/') ? subPath : `/${subPath}`) : '';
+    return `${base}/${lang}${cleanPath}`;
 }
 

@@ -63,9 +63,12 @@ export async function handleSearchQuery(ctx: Context) {
                 `${t(userId, 'product_price')} *${p.formattedPrice || price + ' UZS'}*\n` +
                 `${t(userId, 'product_status')} ${stockText}`;
 
+            const productUrl = getProductUrl(config.SITE_URL, p.id, userId);
             const kb = new InlineKeyboard()
+                .webApp(t(userId, 'btn_buy_on_site'), productUrl)
+                .row()
                 .text(t(userId, 'btn_add_cart'), `addcart:${p.id}`)
-                .url(t(userId, 'btn_view_site'), getProductUrl(config.SITE_URL, p.id, userId));
+                .url(t(userId, 'btn_view_site'), productUrl);
 
             try {
                 await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {

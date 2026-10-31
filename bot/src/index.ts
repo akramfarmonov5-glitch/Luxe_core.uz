@@ -15,7 +15,29 @@ async function startBot(retries = 5): Promise<void> {
 
             await bot.start({
                 drop_pending_updates: true,
-                onStart: () => console.log('🤖 LUXECORE Bot ishga tushdi! (polling mode)'),
+                onStart: async () => {
+                    console.log('🤖 LUXECORE Bot ishga tushdi! (polling mode)');
+                    try {
+                        const webAppUrl = `${config.SITE_URL.replace(/\/$/, '')}/uz`;
+                        await bot.api.setChatMenuButton({
+                            menu_button: {
+                                type: 'web_app',
+                                text: '🛍 Do\'kon',
+                                web_app: { url: webAppUrl },
+                            },
+                        });
+                        await bot.api.setMyCommands([
+                            { command: 'start', description: '🏠 Bosh menyu / Главное меню' },
+                            { command: 'categories', description: '📂 Kategoriyalar / Категории' },
+                            { command: 'cart', description: '🛒 Savatcha / Корзина' },
+                            { command: 'myorders', description: '📦 Buyurtmalarim / Мои заказы' },
+                            { command: 'ai', description: '🤖 AI Maslahatchi / AI Помощник' },
+                            { command: 'help', description: 'ℹ️ Yordam / Помощь' },
+                        ]);
+                    } catch (menuErr) {
+                        console.warn('Menu button setup warning:', menuErr);
+                    }
+                },
             });
             return; // success
         } catch (err: any) {
@@ -45,7 +67,7 @@ async function main() {
     const server = http.createServer((req, res) => {
         if (req.url === '/health' || req.url === '/') {
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: 'ok', bot: 'LUXECORE Bot', version: '2.1.0', startedAt, uptime: process.uptime() }));
+            res.end(JSON.stringify({ status: 'ok', bot: 'LUXECORE Bot', version: '2.2.0', startedAt, uptime: process.uptime() }));
         } else {
             res.writeHead(404);
             res.end('Not found');

@@ -3,7 +3,7 @@ import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
 import { CartItem } from '../types';
 import { config } from '../config';
-import { t, getLang, localizeText } from '../i18n';
+import { t, getLang, localizeText, getProductUrl, getSitePageUrl } from '../i18n';
 import { notifyAdmin } from './admin';
 import { getUserProfile, ensureUser } from './profile';
 import { createTelegramOrder, quoteTelegramCart, type CheckoutQuote } from '../orderApi';
@@ -82,6 +82,9 @@ export async function handleAddToCart(ctx: Context) {
                 parse_mode: 'Markdown',
                 reply_markup: new InlineKeyboard()
                     .text(`🛒 ${t(userId, 'btn_cart')} (${cart.length})`, 'show_cart')
+                    .text(t(userId, 'btn_checkout'), 'checkout')
+                    .row()
+                    .webApp(t(userId, 'btn_buy_on_site'), getProductUrl(config.SITE_URL, product.id, userId))
                     .row()
                     .text(t(userId, 'btn_home'), 'home'),
             }
@@ -99,6 +102,8 @@ export async function handleShowCart(ctx: Context) {
     if (cart.length === 0) {
         await ctx.reply(t(userId, 'cart_empty'), {
             reply_markup: new InlineKeyboard()
+                .webApp(t(userId, 'btn_shop'), getSitePageUrl(config.SITE_URL, '', userId))
+                .row()
                 .text(t(userId, 'btn_categories'), 'show_categories')
                 .text(t(userId, 'btn_home'), 'home'),
         });
@@ -126,6 +131,8 @@ export async function handleShowCart(ctx: Context) {
 
     kb.text(t(userId, 'btn_checkout'), 'checkout')
         .text(t(userId, 'btn_clear_cart'), 'clear_cart')
+        .row()
+        .webApp(t(userId, 'btn_checkout_site'), getSitePageUrl(config.SITE_URL, '', userId))
         .row()
         .text(t(userId, 'btn_home'), 'home');
 
@@ -186,6 +193,20 @@ export async function handleClearCart(ctx: Context) {
     await ctx.reply(t(userId, 'cart_cleared'));
 }
 
+function promoPromptKeyboard(userId: number) {
+    return new InlineKeyboard()
+        .text(t(userId, 'btn_skip_promo'), 'checkout_skip_promo')
+        .row()
+        .text(t(userId, 'btn_home'), 'home');
+}
+
+function cardConfirmKeyboard(userId: number) {
+    return new InlineKeyboard()
+        .text(t(userId, 'btn_paid_confirm'), 'checkout_card_paid')
+        .row()
+        .text(t(userId, 'btn_home'), 'home');
+}
+
 export async function handleCheckout(ctx: Context) {
     if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     const userId = ctx.from?.id || 0;
@@ -206,7 +227,10 @@ export async function handleCheckout(ctx: Context) {
         });
         if (profile.address) {
             checkoutState.get(userId)!.step = 'promo';
-            await ctx.reply(t(userId, 'checkout_promo'), { parse_mode: 'Markdown' });
+            await ctx.reply(t(userId, 'checkout_promo'), {
+                parse_mode: 'Markdown',
+                reply_markup: promoPromptKeyboard(userId),
+            });
         } else {
             await ctx.reply(t(userId, 'checkout_address'));
         }
@@ -264,60 +288,89 @@ export async function handleCheckoutInput(ctx: Context) {
             address: state.address,
         }, { onConflict: 'telegram_id' });
 
-        await ctx.reply(t(userId, 'checkout_promo'), { parse_mode: 'Markdown' });
+        await ctx.reply(t(userId, 'checkout_promo'), {
+            parse_mode: 'Markdown',
+            reply_markup: promoPromptKeyboard(userId),
+        });
         return;
     }
 
     if (state.step === 'promo') {
-        const cart = getUserCart(userId);
-        const promoCode = isPromoSkipped(text) ? undefined : text;
-
-        try {
-            const quote = await quoteTelegramCart(cart, promoCode, userId);
-
-            if (promoCode && quote.promoStatus !== 'valid') {
-                await ctx.reply(quote.promoStatus === 'expired' ? t(userId, 'promo_expired') : t(userId, 'promo_invalid'));
-                await ctx.reply(t(userId, 'checkout_promo'), { parse_mode: 'Markdown' });
-                return;
-            }
-
-            if (!quote.meetsMinimumOrderAmount) {
-                await ctx.reply(
-                    t(userId, 'checkout_minimum').replace('{amount}', formatPrice(quote.minimumOrderAmount)),
-                    { parse_mode: 'Markdown' },
-                );
-                return;
-            }
-
-            state.promo = quote.appliedPromo || undefined;
-            state.quote = quote;
-            state.step = 'payment';
-            checkoutState.set(userId, state);
-
-            const { paymentKeyboard } = require('../keyboards');
-            await ctx.reply(
-                `${t(userId, 'checkout_payment')}\n\n${formatQuoteSummary(userId, quote)}`,
-                {
-                    parse_mode: 'Markdown',
-                    reply_markup: paymentKeyboard(userId),
-                },
-            );
-        } catch (err) {
-            console.error('Quote error:', err);
-            await ctx.reply(t(userId, 'checkout_error'));
-        }
+        await processPromoStep(ctx, userId, state, isPromoSkipped(text) ? undefined : text);
         return;
     }
 
     if (state.step === 'card_confirm') {
         if (!isCardConfirmation(text)) {
-            await ctx.reply(t(userId, 'checkout_card_confirm_again'), { parse_mode: 'Markdown' });
+            await ctx.reply(t(userId, 'checkout_card_confirm_again'), {
+                parse_mode: 'Markdown',
+                reply_markup: cardConfirmKeyboard(userId),
+            });
             return;
         }
 
         await finalizeOrder(ctx, userId, state, 'card');
         return;
     }
+}
+
+async function processPromoStep(ctx: Context, userId: number, state: any, promoCode: string | undefined) {
+    const cart = getUserCart(userId);
+    try {
+        const quote = await quoteTelegramCart(cart, promoCode, userId);
+
+        if (promoCode && quote.promoStatus !== 'valid') {
+            await ctx.reply(quote.promoStatus === 'expired' ? t(userId, 'promo_expired') : t(userId, 'promo_invalid'));
+            await ctx.reply(t(userId, 'checkout_promo'), {
+                parse_mode: 'Markdown',
+                reply_markup: promoPromptKeyboard(userId),
+            });
+            return;
+        }
+
+        if (!quote.meetsMinimumOrderAmount) {
+            await ctx.reply(
+                t(userId, 'checkout_minimum').replace('{amount}', formatPrice(quote.minimumOrderAmount)),
+                { parse_mode: 'Markdown' },
+            );
+            return;
+        }
+
+        state.promo = quote.appliedPromo || undefined;
+        state.quote = quote;
+        state.step = 'payment';
+        checkoutState.set(userId, state);
+
+        const { paymentKeyboard } = require('../keyboards');
+        await ctx.reply(
+            `${t(userId, 'checkout_payment')}\n\n${formatQuoteSummary(userId, quote)}`,
+            {
+                parse_mode: 'Markdown',
+                reply_markup: paymentKeyboard(userId),
+            },
+        );
+    } catch (err) {
+        console.error('Quote error:', err);
+        await ctx.reply(t(userId, 'checkout_error'));
+    }
+}
+
+export async function handleSkipPromo(ctx: Context) {
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
+    const userId = ctx.from?.id || 0;
+    const state = checkoutState.get(userId);
+    if (!state || state.step !== 'promo') return;
+
+    await processPromoStep(ctx, userId, state, undefined);
+}
+
+export async function handleCardPaidConfirm(ctx: Context) {
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
+    const userId = ctx.from?.id || 0;
+    const state = checkoutState.get(userId);
+    if (!state || state.step !== 'card_confirm') return;
+
+    await finalizeOrder(ctx, userId, state, 'card');
 }
 
 export async function handlePayCard(ctx: Context) {
@@ -334,7 +387,10 @@ export async function handlePayCard(ctx: Context) {
         .replace('{card}', config.CARD_NUMBER)
         .replace('{holder}', config.CARD_HOLDER);
 
-    await ctx.reply(cardInfo, { parse_mode: 'Markdown' });
+    await ctx.reply(cardInfo, {
+        parse_mode: 'Markdown',
+        reply_markup: cardConfirmKeyboard(userId),
+    });
 }
 
 export async function handlePayCash(ctx: Context) {

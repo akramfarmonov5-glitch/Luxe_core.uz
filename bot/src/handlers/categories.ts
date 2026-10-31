@@ -2,7 +2,7 @@ import { Context } from 'grammy';
 import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
 import { categoriesKeyboard } from '../keyboards';
-import { t, getLang, localizeText, getProductUrl } from '../i18n';
+import { t, getLang, localizeText, getProductUrl, getSitePageUrl } from '../i18n';
 import { config } from '../config';
 
 export async function handleCategories(ctx: Context) {
@@ -115,10 +115,22 @@ export async function sendProductCard(
     if (page < totalPages - 1) kb.text('▶️', `${prefix}:${page + 1}`);
     if (totalPages > 1) kb.row();
 
-    // Actions
+    // Primary CTA: Open product directly inside Telegram WebApp
+    const productUrl = getProductUrl(config.SITE_URL, p.id, userId);
+    kb.webApp(t(userId, 'btn_buy_on_site'), productUrl).row();
+
+    // Secondary actions: Add to bot cart & open in external browser
     kb.text(t(userId, 'btn_add_cart'), `addcart:${p.id}`);
-    kb.url(t(userId, 'btn_view_site'), getProductUrl(config.SITE_URL, p.id, userId));
+    kb.url(t(userId, 'btn_view_site'), productUrl);
     kb.row();
+
+    // If browsing a category, allow opening the whole category on the website
+    if (prefix.startsWith('catpage:')) {
+        const slug = prefix.replace('catpage:', '');
+        kb.webApp(t(userId, 'btn_open_category_site'), getSitePageUrl(config.SITE_URL, `/category/${slug}`, userId)).row();
+    }
+
+    kb.text(t(userId, 'btn_categories'), 'show_categories');
     kb.text(t(userId, 'btn_home'), 'home');
 
     // Check if product has multiple images
