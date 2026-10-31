@@ -154,6 +154,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
 
   const createOrder = async () => {
     const formattedPhone = formatPhoneNumber(formData.phone);
+    const tgUserId = typeof window !== 'undefined' ? (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id : undefined;
     const response = await fetch('/api/orders', {
       method: 'POST',
       headers: {
@@ -169,6 +170,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
         city: formData.city,
         paymentMethod,
         promoCode: appliedPromo || promoCode,
+        telegramUserId: tgUserId,
         items: cart.map((item) => ({ id: item.id, quantity: item.quantity })),
       }),
     });

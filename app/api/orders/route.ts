@@ -104,6 +104,24 @@ export async function POST(req: NextRequest) {
     const customerName = `${firstName} ${lastName}`.trim();
     const today = new Date().toISOString().split('T')[0];
 
+    let resolvedTelegramUserId: number | null =
+      Number.isSafeInteger(telegramUserId) && telegramUserId > 0 ? telegramUserId : null;
+
+    if (!resolvedTelegramUserId && phone) {
+      const digits = phone.replace(/\D/g, '').slice(-9);
+      if (digits.length === 9) {
+        const { data: botUser } = await supabase
+          .from('bot_users')
+          .select('telegram_id')
+          .ilike('phone', `%${digits}%`)
+          .limit(1)
+          .maybeSingle();
+        if (botUser?.telegram_id) {
+          resolvedTelegramUserId = Number(botUser.telegram_id);
+        }
+      }
+    }
+
     const { error } = await supabase.from('orders').insert({
       id: orderId,
       customerName,
@@ -116,7 +134,7 @@ export async function POST(req: NextRequest) {
       items: orderItems,
       shipping_address: address || null,
       city: city || null,
-      telegram_user_id: source === 'telegram-bot' ? telegramUserId : null,
+      telegram_user_id: resolvedTelegramUserId,
     });
 
     if (error) {
@@ -133,6 +151,7 @@ export async function POST(req: NextRequest) {
         paymentMethod,
         items: orderItems,
         pricing,
+        customerTelegramId: resolvedTelegramUserId,
       });
     }
 
@@ -161,6 +180,7 @@ async function sendTelegramNotification({
   paymentMethod,
   items,
   pricing,
+  customerTelegramId,
 }: {
   orderId: string;
   customerName: string;
@@ -175,6 +195,7 @@ async function sendTelegramNotification({
     total: number;
     appliedPromo: string | null;
   };
+  customerTelegramId?: number | null;
 }) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -244,6 +265,34 @@ ${itemsList}
 
     if (!response.ok) {
       console.error('Telegram notification failed:', await response.text());
+    }
+
+    if (customerTelegramId && String(customerTelegramId) !== String(chatId)) {
+      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://luxe-core.uz').replace(/\/+$/, '');
+      const customerMsg = `
+🎉 <b>Buyurtmangiz qabul qilindi!</b>
+
+🧾 <b>Buyurtma ID:</b> #${orderId}
+💰 <b>Jami to'lov:</b> ${formatPrice(pricing.total)}
+📦 <b>Holat:</b> ⏳ Kutilmoqda
+
+Tez orada operatorimiz siz bilan bog'lanadi. Xaridingiz uchun rahmat!
+      `.trim();
+
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: customerTelegramId,
+          text: customerMsg,
+          parse_mode: 'HTML',
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🔍 Buyurtmani kuzatish', url: `${siteUrl}/uz/tracking` }],
+            ],
+          },
+        }),
+      }).catch(() => {});
     }
   } catch (error) {
     console.error('Telegram notification error:', error);

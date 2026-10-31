@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { BlogPost } from '../../types';
-import { Sparkles, Image as ImageIcon, Plus, Trash2, Calendar, Wand2, Search, Edit, X, Save } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, Plus, Trash2, Calendar, Wand2, Search, Edit, X, Save, Send } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
 import { useToast } from '../../context/ToastContext';
 import { requestGeminiJson } from '../../lib/geminiApi';
 import { parseLocalizedObject, getLocalizedText } from '../../lib/i18nUtils';
 import { Globe } from 'lucide-react';
 import { slugify } from '../../lib/slugify';
+import CloudinaryUpload from '../CloudinaryUpload';
 
 interface AdminBlogProps {
   posts: BlogPost[];
@@ -19,7 +20,42 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [broadcastingPostId, setBroadcastingPostId] = useState<number | null>(null);
   const [activeLang, setActiveLang] = useState<'uz' | 'ru' | 'en'>('uz');
+
+  const handleBroadcastPost = async (post: BlogPost) => {
+    setBroadcastingPostId(post.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const titleUz = getLocalizedText(post.title, 'uz');
+      const contentUz = getLocalizedText(post.content, 'uz');
+      const excerpt = contentUz.length > 350 ? contentUz.slice(0, 350) + '...' : contentUz;
+
+      const res = await fetch('/api/admin/telegram-broadcast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({
+          mode: 'custom_message',
+          title: `📖 ${titleUz}`,
+          body: excerpt,
+          imageUrl: post.image || undefined,
+          clickUrl: `/uz/blog/${post.id}`,
+          sendToChannel: true,
+          sendToBotUsers: false,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Kanalga yuborishda xatolik');
+      showToast('📢 Maqola @luxecoreuz kanaliga joylandi!', 'success');
+    } catch (err: any) {
+      showToast(err.message || 'Xatolik', 'error');
+    } finally {
+      setBroadcastingPostId(null);
+    }
+  };
 
   const [formData, setFormData] = useState<any>({
     title: '',
@@ -361,6 +397,15 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
                 <span className="text-xs text-gray-500">ID: {post.id}</span>
                 <div className="flex gap-2">
                   <button
+                    onClick={() => handleBroadcastPost(post)}
+                    disabled={broadcastingPostId === post.id}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-sky-400 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 rounded-lg transition-colors disabled:opacity-50"
+                    title="@luxecoreuz kanaliga ulashish"
+                  >
+                    <Send size={13} className={broadcastingPostId === post.id ? 'animate-spin' : ''} />
+                    <span>{broadcastingPostId === post.id ? '...' : 'Kanalga'}</span>
+                  </button>
+                  <button
                     onClick={() => handleOpenEdit(post)}
                     className="p-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white rounded-lg transition-colors"
                   >
@@ -449,16 +494,21 @@ const AdminBlog: React.FC<AdminBlogProps> = ({ posts, setPosts }) => {
 
               <div className="space-y-2">
                 <label className="text-sm text-gray-400 flex items-center gap-2">
-                  <ImageIcon size={16} /> Rasm URL
+                  <ImageIcon size={16} /> Rasm (URL yoki Yuklash)
                 </label>
-                <input
-                  required
-                  type="text"
-                  value={formData.image}
-                  onChange={e => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none"
-                  placeholder="https://..."
-                />
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    required
+                    type="text"
+                    value={formData.image}
+                    onChange={e => setFormData({ ...formData, image: e.target.value })}
+                    className="flex-1 bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none"
+                    placeholder="https://..."
+                  />
+                  <CloudinaryUpload
+                    onUpload={(url) => setFormData({ ...formData, image: url })}
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">

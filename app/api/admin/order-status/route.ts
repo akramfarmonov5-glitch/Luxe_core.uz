@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     const { data: existingOrder, error: fetchErr } = await supabase
       .from('orders')
-      .select('id, status, items, telegram_id, total')
+      .select('id, status, items, telegram_user_id, phone, total')
       .eq('id', orderId)
       .single();
 
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     if (status === 'Bekor qilindi' && existingOrder.status !== 'Bekor qilindi') {
       const items = Array.isArray(existingOrder.items) ? existingOrder.items : [];
       for (const item of items) {
-        const productId = Number(item?.id);
+        const productId = Number(item?.id ?? item?.productId);
         const qty = Number(item?.quantity);
         if (productId && qty > 0) {
           const { data: prod } = await supabase
@@ -70,10 +70,29 @@ export async function POST(req: NextRequest) {
       throw updateErr;
     }
 
-    // Notify customer on Telegram if telegram_id exists
+    // Resolve customer's Telegram chat ID (direct or via phone lookup in bot_users)
+    let targetTelegramId: number | null = existingOrder.telegram_user_id
+      ? Number(existingOrder.telegram_user_id)
+      : null;
+
+    if (!targetTelegramId && existingOrder.phone) {
+      const digits = String(existingOrder.phone).replace(/\D/g, '').slice(-9);
+      if (digits.length === 9) {
+        const { data: botUser } = await supabase
+          .from('bot_users')
+          .select('telegram_id')
+          .ilike('phone', `%${digits}%`)
+          .limit(1)
+          .maybeSingle();
+        if (botUser?.telegram_id) {
+          targetTelegramId = Number(botUser.telegram_id);
+        }
+      }
+    }
+
     let notifiedTelegram = false;
     const token = process.env.TELEGRAM_BOT_TOKEN;
-    if (token && existingOrder.telegram_id && STATUS_MESSAGES[status]) {
+    if (token && targetTelegramId && STATUS_MESSAGES[status]) {
       try {
         const text =
           `📦 <b>Buyurtma #${existingOrder.id}</b>\n\n` +
@@ -82,7 +101,7 @@ export async function POST(req: NextRequest) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            chat_id: existingOrder.telegram_id,
+            chat_id: targetTelegramId,
             text,
             parse_mode: 'HTML',
           }),

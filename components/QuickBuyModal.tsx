@@ -63,6 +63,7 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
     setError('');
 
     try {
+      const tgUserId = typeof window !== 'undefined' ? (window as any)?.Telegram?.WebApp?.initDataUnsafe?.user?.id : undefined;
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
@@ -74,6 +75,7 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
           firstName: formData.firstName,
           phone: formData.phone,
           paymentMethod: 'cash',
+          telegramUserId: tgUserId,
           items: [{ id: product.id, quantity }],
         }),
       });
