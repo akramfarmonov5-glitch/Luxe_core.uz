@@ -28,6 +28,32 @@ export default function ClientLayout({ children, lang }: { children: React.React
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    // Telegram Mini App (WebApp) auto-expand & user prefill
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg) {
+      try {
+        tg.ready();
+        tg.expand();
+        const tgUser = tg.initDataUnsafe?.user;
+        if (tgUser?.first_name) {
+          const existing = JSON.parse(localStorage.getItem('luxecore_customer_info') || '{}');
+          if (!existing.firstName) {
+            localStorage.setItem(
+              'luxecore_customer_info',
+              JSON.stringify({
+                ...existing,
+                firstName: tgUser.first_name,
+                lastName: tgUser.last_name || existing.lastName || '',
+              }),
+            );
+          }
+        }
+      } catch {
+        // Ignore Telegram WebApp errors
+      }
+    }
+
     const hash = window.location.hash;
     if (hash && hash.startsWith('#product/')) {
       const id = hash.replace('#product/', '').trim();
