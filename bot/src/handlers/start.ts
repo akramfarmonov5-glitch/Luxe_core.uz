@@ -3,14 +3,44 @@ import { InlineKeyboard } from 'grammy';
 import { mainMenuKeyboard } from '../keyboards';
 import { t, setLang, loadLang } from '../i18n';
 import { ensureUser } from './profile';
+import { sendProductCard } from './categories';
 import { supabase } from '../supabase';
 
 // Track users waiting for phone number (after lang selection)
 const awaitingPhone = new Set<number>();
+const pendingStartProduct = new Map<number, number>();
+
+async function showStartProductIfAny(ctx: Context, userId: number): Promise<boolean> {
+    const productId = pendingStartProduct.get(userId);
+    if (!productId) return false;
+    pendingStartProduct.delete(userId);
+
+    const { data: product } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
+
+    if (product) {
+        await sendProductCard(ctx, [product], 0, `startprod:${product.id}`, userId);
+        return true;
+    }
+    return false;
+}
 
 export async function handleStart(ctx: Context) {
     const userId = ctx.from?.id || 0;
     const name = ctx.from?.first_name || 'Foydalanuvchi';
+
+    // Check deep link payload (/start product_123)
+    const text = ctx.message?.text || '';
+    const payload = text.split(' ')[1] || '';
+    if (payload.startsWith('product_')) {
+        const pid = parseInt(payload.replace('product_', ''), 10);
+        if (!isNaN(pid)) {
+            pendingStartProduct.set(userId, pid);
+        }
+    }
 
     // Register user in DB
     await ensureUser(userId, name, ctx.from?.username);
@@ -34,6 +64,10 @@ export async function handleStart(ctx: Context) {
                     .text('🇷🇺 Русский', 'start_lang:ru'),
             }
         );
+        return;
+    }
+
+    if (await showStartProductIfAny(ctx, userId)) {
         return;
     }
 
@@ -118,6 +152,10 @@ export async function handleContactMessage(ctx: Context) {
 
     // Remove from awaiting set
     awaitingPhone.delete(userId);
+
+    if (await showStartProductIfAny(ctx, userId)) {
+        return;
+    }
 
     // 3. Send welcome menu (remove custom keyboard, show inline)
     await ctx.reply(

@@ -1,11 +1,13 @@
 import { InlineKeyboard } from 'grammy';
 import { config } from '../config';
-import { t } from '../i18n';
+import { t, getLang, localizeText } from '../i18n';
 
 // ========== BOSH MENYU ==========
 export function mainMenuKeyboard(userId: number) {
+    const lang = getLang(userId);
+    const shopUrl = `${config.SITE_URL.replace(/\/$/, '')}/${lang}`;
     return new InlineKeyboard()
-        .webApp(t(userId, 'btn_shop'), config.SITE_URL)
+        .webApp(t(userId, 'btn_shop'), shopUrl)
         .text(t(userId, 'btn_search'), 'menu:search')
         .row()
         .text(t(userId, 'btn_categories'), 'menu:categories')
@@ -22,10 +24,11 @@ export function mainMenuKeyboard(userId: number) {
 }
 
 // ========== KATEGORIYALAR ==========
-export function categoriesKeyboard(categories: { id: string; name: string; slug: string }[], userId: number) {
+export function categoriesKeyboard(categories: { id: string; name: any; slug: string }[], userId: number) {
+    const lang = getLang(userId);
     const kb = new InlineKeyboard();
     categories.forEach((cat, i) => {
-        kb.text(cat.name, `cat:${cat.slug}`);
+        kb.text(localizeText(cat.name, lang) || cat.slug, `cat:${cat.slug}`);
         if (i % 2 === 1) kb.row();
     });
     if (categories.length % 2 !== 0) kb.row();

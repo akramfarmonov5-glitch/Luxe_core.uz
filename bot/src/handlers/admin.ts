@@ -78,7 +78,62 @@ async function notifyUserStatusChange(bot: Bot, orderId: string, newStatus: stri
     }
 }
 
+// Helper to restore stock when order is cancelled
+async function restoreOrderStockIfNeeded(orderId: string) {
+    try {
+        const { data: order } = await supabase
+            .from('orders')
+            .select('status, items')
+            .eq('id', orderId)
+            .single();
+
+        if (!order || order.status === 'Bekor qilindi' || !Array.isArray(order.items)) {
+            return;
+        }
+
+        for (const item of order.items) {
+            const productId = Number(item.id ?? item.productId);
+            const qty = Number(item.quantity);
+            if (!productId || isNaN(qty) || qty <= 0) continue;
+
+            const { data: product } = await supabase
+                .from('products')
+                .select('stock')
+                .eq('id', productId)
+                .single();
+
+            if (product && typeof product.stock === 'number') {
+                await supabase
+                    .from('products')
+                    .update({ stock: product.stock + qty })
+                    .eq('id', productId);
+            }
+        }
+    } catch (err) {
+        console.error('Restore stock error:', err);
+    }
+}
+
+async function safeEditOrderMessage(ctx: Context, badgeText: string, kb?: InlineKeyboard) {
+    const baseText = (ctx.callbackQuery?.message?.text || '').replace(/\n\n(✅|❌|🚚).*$/s, '');
+    const nextText = `${baseText}\n\n${badgeText}`;
+    try {
+        await ctx.editMessageText(nextText, {
+            parse_mode: 'Markdown',
+            reply_markup: kb,
+        });
+    } catch {
+        await ctx.editMessageText(nextText.replace(/\*/g, ''), {
+            reply_markup: kb,
+        });
+    }
+}
+
 export async function handleAdminAccept(ctx: Context) {
+    if (ctx.from?.id !== config.ADMIN_ID) {
+        await ctx.answerCallbackQuery({ text: '⛔ Faqat admin uchun!', show_alert: true });
+        return;
+    }
     try {
         await ctx.answerCallbackQuery('✅ Buyurtma qabul qilindi!');
         const data = ctx.callbackQuery?.data;
@@ -87,10 +142,13 @@ export async function handleAdminAccept(ctx: Context) {
 
         await supabase.from('orders').update({ status: 'To\'landi' }).eq('id', orderId);
 
-        await ctx.editMessageText(
-            ctx.callbackQuery?.message?.text + '\n\n✅ *QABUL QILINDI*',
-            { parse_mode: 'Markdown' }
-        );
+        const kb = new InlineKeyboard()
+            .text('🚚 Yetkazilmoqda', `admin_ship:${orderId}`)
+            .text('✅ Yakunlandi', `admin_done:${orderId}`)
+            .row()
+            .text('❌ Bekor qilish', `admin_reject:${orderId}`);
+
+        await safeEditOrderMessage(ctx, '✅ *QABUL QILINDI (To\'landi)*', kb);
 
         if (botRef) await notifyUserStatusChange(botRef, orderId, 'To\'landi');
     } catch (err) {
@@ -99,18 +157,20 @@ export async function handleAdminAccept(ctx: Context) {
 }
 
 export async function handleAdminReject(ctx: Context) {
+    if (ctx.from?.id !== config.ADMIN_ID) {
+        await ctx.answerCallbackQuery({ text: '⛔ Faqat admin uchun!', show_alert: true });
+        return;
+    }
     try {
         await ctx.answerCallbackQuery('❌ Buyurtma bekor qilindi!');
         const data = ctx.callbackQuery?.data;
         if (!data) return;
         const orderId = data.replace('admin_reject:', '');
 
+        await restoreOrderStockIfNeeded(orderId);
         await supabase.from('orders').update({ status: 'Bekor qilindi' }).eq('id', orderId);
 
-        await ctx.editMessageText(
-            ctx.callbackQuery?.message?.text + '\n\n❌ *BEKOR QILINDI*',
-            { parse_mode: 'Markdown' }
-        );
+        await safeEditOrderMessage(ctx, '❌ *BEKOR QILINDI*');
 
         if (botRef) await notifyUserStatusChange(botRef, orderId, 'Bekor qilindi');
     } catch (err) {
@@ -119,6 +179,10 @@ export async function handleAdminReject(ctx: Context) {
 }
 
 export async function handleAdminShip(ctx: Context) {
+    if (ctx.from?.id !== config.ADMIN_ID) {
+        await ctx.answerCallbackQuery({ text: '⛔ Faqat admin uchun!', show_alert: true });
+        return;
+    }
     try {
         await ctx.answerCallbackQuery('🚚 Yetkazilmoqda!');
         const data = ctx.callbackQuery?.data;
@@ -127,10 +191,11 @@ export async function handleAdminShip(ctx: Context) {
 
         await supabase.from('orders').update({ status: 'Yetkazilmoqda' }).eq('id', orderId);
 
-        await ctx.editMessageText(
-            ctx.callbackQuery?.message?.text + '\n\n🚚 *YETKAZILMOQDA*',
-            { parse_mode: 'Markdown' }
-        );
+        const kb = new InlineKeyboard()
+            .text('✅ Yakunlandi', `admin_done:${orderId}`)
+            .text('❌ Bekor qilish', `admin_reject:${orderId}`);
+
+        await safeEditOrderMessage(ctx, '🚚 *YETKAZILMOQDA*', kb);
 
         if (botRef) await notifyUserStatusChange(botRef, orderId, 'Yetkazilmoqda');
     } catch (err) {
@@ -139,6 +204,10 @@ export async function handleAdminShip(ctx: Context) {
 }
 
 export async function handleAdminDone(ctx: Context) {
+    if (ctx.from?.id !== config.ADMIN_ID) {
+        await ctx.answerCallbackQuery({ text: '⛔ Faqat admin uchun!', show_alert: true });
+        return;
+    }
     try {
         await ctx.answerCallbackQuery('✅ Yakunlandi!');
         const data = ctx.callbackQuery?.data;
@@ -147,10 +216,7 @@ export async function handleAdminDone(ctx: Context) {
 
         await supabase.from('orders').update({ status: 'Yakunlandi' }).eq('id', orderId);
 
-        await ctx.editMessageText(
-            ctx.callbackQuery?.message?.text + '\n\n✅ *YAKUNLANDI*',
-            { parse_mode: 'Markdown' }
-        );
+        await safeEditOrderMessage(ctx, '✅ *YAKUNLANDI*');
 
         if (botRef) await notifyUserStatusChange(botRef, orderId, 'Yakunlandi');
     } catch (err) {

@@ -1,10 +1,58 @@
 import { Context } from 'grammy';
 import { InlineKeyboard } from 'grammy';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { config } from '../config';
-import { t, getLang } from '../i18n';
+import { supabase } from '../supabase';
+import { t, getLang, localizeText, getProductUrl } from '../i18n';
+import { Lang } from '../types';
 
 const aiState = new Map<number, boolean>();
 const aiHistory = new Map<number, { role: string; parts: { text: string }[] }[]>();
+
+let cachedCatalogContext: { uz: string; ru: string; expiresAt: number } | null = null;
+
+async function getCatalogSummary(lang: Lang): Promise<string> {
+    const now = Date.now();
+    if (cachedCatalogContext && cachedCatalogContext.expiresAt > now) {
+        return cachedCatalogContext[lang];
+    }
+
+    try {
+        const { data: products } = await supabase
+            .from('products')
+            .select('id, name, price, category, stock, shortDescription')
+            .order('created_at', { ascending: false })
+            .limit(40);
+
+        if (!products || products.length === 0) {
+            return '';
+        }
+
+        const buildForLang = (l: Lang) =>
+            products
+                .map((p: any) => {
+                    const name = localizeText(p.name, l);
+                    const cat = localizeText(p.category, l);
+                    const price = Number(p.price).toLocaleString('uz-UZ') + ' UZS';
+                    const inStock = p.stock === undefined || p.stock === null || p.stock > 0
+                        ? (l === 'ru' ? 'В наличии' : 'Mavjud')
+                        : (l === 'ru' ? 'Нет в наличии' : 'Tugagan');
+                    const url = getProductUrl(config.SITE_URL, p.id);
+                    return `- [ID:${p.id}] ${name} (${cat}) — ${price} [${inStock}] | Link: ${url}`;
+                })
+                .join('\n');
+
+        cachedCatalogContext = {
+            uz: buildForLang('uz'),
+            ru: buildForLang('ru'),
+            expiresAt: now + 2 * 60 * 1000,
+        };
+
+        return cachedCatalogContext[lang];
+    } catch {
+        return '';
+    }
+}
 
 export function setAiMode(userId: number) { aiState.set(userId, true); }
 export function isInAiMode(userId: number): boolean { return aiState.has(userId); }
@@ -34,17 +82,23 @@ export async function handleAiMessage(ctx: Context) {
     try {
         await ctx.replyWithChatAction('typing');
 
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
         const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY);
 
         const lang = getLang(userId);
         const langName = lang === 'ru' ? 'Русский' : 'O\'zbek';
+        const catalogSummary = await getCatalogSummary(lang);
 
         const systemInstruction =
-            `Sen LUXECORE premium do'konining yordamchisisiga. ` +
-            `${langName} tilida javob ber. LUXECORE - O'zbekistondagi premium onlayn do'kon. ` +
-            `Soatlar, sumkalar, ko'zoynaklar, parfyumeriya va aksessuarlar sotadi. ` +
-            `Qisqa va foydali javoblar ber. Emoji ishlat. Sayt: ${config.SITE_URL}`;
+            `Sen LUXECORE premium do'konining rasmiy AI sotuvchi-konsultantisan. ` +
+            `${langName} tilida xushmuomala, qisqa va aniq javob ber. Emoji ishlat.\n` +
+            `Do'kon ma'lumotlari:\n` +
+            `- Minimal buyurtma summasi: 500,000 UZS\n` +
+            `- Yetkazib berish: O'zbekiston bo'ylab 40,000 UZS (2,000,000 UZS dan oshsa BEPUL)\n` +
+            `- Aloqa: ${config.CONTACT_PHONE} (${config.CONTACT_USERNAME})\n` +
+            `- Sayt: ${config.SITE_URL}\n` +
+            (catalogSummary
+                ? `\nDo'kondagi mavjud mahsulotlar katalogi:\n${catalogSummary}\nFaqat shu katalogdagi haqiqiy mahsulot va narxlarni tavsiya qil.`
+                : '');
 
         const model = genAI.getGenerativeModel({
             model: 'gemini-2.5-flash',

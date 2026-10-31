@@ -27,3 +27,4 @@ tsconfig.tsbuildinfo
 .vercel
 .claude/
 .env*.local
+.agent_chat_history.json

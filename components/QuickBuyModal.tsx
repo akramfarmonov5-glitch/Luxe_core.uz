@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, ShieldCheck, CheckCircle2 } from 'lucide-react';
@@ -26,6 +26,22 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
     firstName: '',
     phone: '',
   });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      const saved = localStorage.getItem('luxecore_customer_info');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setFormData((prev) => ({
+          firstName: parsed.firstName || prev.firstName,
+          phone: parsed.phone || prev.phone,
+        }));
+      }
+    } catch {
+      // Ignore localStorage read errors
+    }
+  }, [isOpen]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -65,6 +81,20 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error || 'Buyurtma yuborilmadi');
+      }
+
+      try {
+        const prevSaved = JSON.parse(localStorage.getItem('luxecore_customer_info') || '{}');
+        localStorage.setItem(
+          'luxecore_customer_info',
+          JSON.stringify({
+            ...prevSaved,
+            firstName: formData.firstName.trim(),
+            phone: formData.phone.trim(),
+          }),
+        );
+      } catch {
+        // Ignore localStorage write errors
       }
 
       fpixel.trackPurchase(data.orderId, Number(data.total || total), [product.id.toString()], 'UZS');

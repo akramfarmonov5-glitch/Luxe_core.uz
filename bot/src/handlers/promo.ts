@@ -1,10 +1,10 @@
 import { Context } from 'grammy';
 import { supabase } from '../supabase';
+import { config } from '../config';
 
 // Admin command: /addpromo CODE PERCENT
 export async function handleAddPromo(ctx: Context) {
     const userId = ctx.from?.id;
-    const { config } = require('../config');
     if (userId !== config.ADMIN_ID) {
         await ctx.reply('⛔ Bu komanda faqat admin uchun.');
         return;
@@ -65,8 +65,10 @@ export async function handleAddPromo(ctx: Context) {
 // Admin: /delpromo CODE
 export async function handleDelPromo(ctx: Context) {
     const userId = ctx.from?.id;
-    const { config } = require('../config');
-    if (userId !== config.ADMIN_ID) return;
+    if (userId !== config.ADMIN_ID) {
+        await ctx.reply('⛔ Bu komanda faqat admin uchun.');
+        return;
+    }
 
     const text = ctx.message?.text || '';
     const code = text.split(' ')[1]?.toUpperCase();

@@ -3,7 +3,7 @@ import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
 import { CartItem } from '../types';
 import { config } from '../config';
-import { t } from '../i18n';
+import { t, getLang, localizeText } from '../i18n';
 import { notifyAdmin } from './admin';
 import { getUserProfile, ensureUser } from './profile';
 import { createTelegramOrder, quoteTelegramCart, type CheckoutQuote } from '../orderApi';
@@ -53,15 +53,17 @@ export async function handleAddToCart(ctx: Context) {
 
         if (!product) return;
 
+        const productName = localizeText(product.name, getLang(userId));
         const cart = getUserCart(userId);
         const existing = cart.find(i => i.productId === productId);
 
         if (existing) {
             existing.quantity += 1;
+            existing.name = productName;
         } else {
             cart.push({
                 productId: product.id,
-                name: product.name,
+                name: productName,
                 price: product.price,
                 quantity: 1,
                 image: product.image,
@@ -74,7 +76,7 @@ export async function handleAddToCart(ctx: Context) {
         await ensureUser(userId, ctx.from?.first_name);
 
         await ctx.reply(
-            `🛒 *${product.name}* ${t(userId, 'cart_added')}\n\n` +
+            `🛒 *${productName}* ${t(userId, 'cart_added')}\n\n` +
             `Savatda: ${cart.length} xil, ${cart.reduce((s, i) => s + i.quantity, 0)} dona`,
             {
                 parse_mode: 'Markdown',

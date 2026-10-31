@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import CartSidebar from '../../components/CartSidebar';
@@ -25,6 +25,27 @@ export default function ClientLayout({ children, lang }: { children: React.React
   const pathname = usePathname() || '/';
   const router = useRouter();
   const langPrefix = `/${lang || 'uz'}`;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#product/')) {
+      const id = hash.replace('#product/', '').trim();
+      if (id) {
+        router.replace(`${langPrefix}/product/${id}`);
+      }
+    } else if (hash && hash.startsWith('#category/')) {
+      const slug = hash.replace('#category/', '').trim();
+      if (slug) {
+        router.replace(`${langPrefix}/category/${slug}`);
+      }
+    } else if (hash && hash.startsWith('#blog/')) {
+      const id = hash.replace('#blog/', '').trim();
+      if (id) {
+        router.replace(`${langPrefix}/blog/${id}`);
+      }
+    }
+  }, [langPrefix, router]);
 
   const isCheckout = pathname.includes('/checkout');
   const isAdmin = pathname.includes('/admin');

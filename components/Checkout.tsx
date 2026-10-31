@@ -48,6 +48,24 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
     city: 'Toshkent',
   });
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('luxecore_customer_info');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setFormData((prev) => ({
+          firstName: parsed.firstName || prev.firstName,
+          lastName: parsed.lastName || prev.lastName,
+          phone: parsed.phone || prev.phone,
+          address: parsed.address || prev.address,
+          city: parsed.city || prev.city,
+        }));
+      }
+    } catch {
+      // Ignore localStorage read errors
+    }
+  }, []);
+
   const discountedSubtotal = Math.max(0, cartTotal - discountAmount);
   const deliveryFee = discountedSubtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
   const finalTotal = discountedSubtotal + deliveryFee;
@@ -207,6 +225,21 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
 
     const formattedPhone = formatPhoneNumber(formData.phone);
     setFormData(prev => ({ ...prev, phone: formattedPhone }));
+
+    try {
+      localStorage.setItem(
+        'luxecore_customer_info',
+        JSON.stringify({
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          phone: formattedPhone,
+          address: formData.address.trim(),
+          city: formData.city,
+        }),
+      );
+    } catch {
+      // Ignore localStorage write errors
+    }
 
     try {
       const orderId = await createOrder();

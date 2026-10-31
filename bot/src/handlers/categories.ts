@@ -2,7 +2,7 @@ import { Context } from 'grammy';
 import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
 import { categoriesKeyboard } from '../keyboards';
-import { t } from '../i18n';
+import { t, getLang, localizeText, getProductUrl } from '../i18n';
 import { config } from '../config';
 
 export async function handleCategories(ctx: Context) {
@@ -83,7 +83,7 @@ export async function handleCategoryPage(ctx: Context) {
     }
 }
 
-async function sendProductCard(
+export async function sendProductCard(
     ctx: Context,
     products: any[],
     page: number,
@@ -95,26 +95,29 @@ async function sendProductCard(
     const p = products[page];
     if (!p) return;
 
+    const lang = getLang(userId);
+    const productName = localizeText(p.name, lang);
+    const shortDesc = localizeText(p.shortDescription || p.description, lang);
     const price = Number(p.price).toLocaleString('uz-UZ');
     const stockText = p.stock && p.stock > 0 ? t(userId, 'product_stock_yes') : t(userId, 'product_stock_no');
 
     const caption =
-        `🏷 *${p.name}*\n\n` +
+        `🏷 *${productName}*\n\n` +
         `${t(userId, 'product_price')} *${p.formattedPrice || price + ' UZS'}*\n` +
         `${t(userId, 'product_status')} ${stockText}\n` +
-        `${p.shortDescription ? `\n📝 ${p.shortDescription}` : ''}`;
+        `${shortDesc ? `\n📝 ${shortDesc}` : ''}`;
 
     const kb = new InlineKeyboard();
 
     // Navigation
     if (page > 0) kb.text('◀️', `${prefix}:${page - 1}`);
-    kb.text(`${page + 1}/${totalPages}`, 'noop');
+    if (totalPages > 1) kb.text(`${page + 1}/${totalPages}`, 'noop');
     if (page < totalPages - 1) kb.text('▶️', `${prefix}:${page + 1}`);
-    kb.row();
+    if (totalPages > 1) kb.row();
 
     // Actions
     kb.text(t(userId, 'btn_add_cart'), `addcart:${p.id}`);
-    kb.url(t(userId, 'btn_view_site'), `${config.SITE_URL}/#product/${p.id}`);
+    kb.url(t(userId, 'btn_view_site'), getProductUrl(config.SITE_URL, p.id, userId));
     kb.row();
     kb.text(t(userId, 'btn_home'), 'home');
 
@@ -133,7 +136,7 @@ async function sendProductCard(
         try {
             await ctx.replyWithMediaGroup(mediaGroup);
             // Send inline keyboard separately 
-            await ctx.reply(`👆 *${p.name}*`, {
+            await ctx.reply(`👆 *${productName}*`, {
                 parse_mode: 'Markdown',
                 reply_markup: kb,
             });

@@ -218,10 +218,28 @@ ${itemsList}
   `.trim();
 
   try {
+    const inlineKeyboard = {
+      inline_keyboard: [
+        [
+          { text: '✅ Qabul qilish', callback_data: `admin_accept:${orderId}` },
+          { text: '❌ Bekor qilish', callback_data: `admin_reject:${orderId}` },
+        ],
+        [
+          { text: '🚚 Yetkazilmoqda', callback_data: `admin_ship:${orderId}` },
+          { text: '✅ Yakunlandi', callback_data: `admin_done:${orderId}` },
+        ],
+      ],
+    };
+
     const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'HTML',
+        reply_markup: inlineKeyboard,
+      }),
     });
 
     if (!response.ok) {

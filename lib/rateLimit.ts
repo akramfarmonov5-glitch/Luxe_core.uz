@@ -4,9 +4,21 @@ type RateLimitEntry = {
 };
 
 const buckets = new Map<string, RateLimitEntry>();
+const MAX_BUCKETS = 5000;
+
+function pruneExpired(now: number) {
+  if (buckets.size < MAX_BUCKETS) return;
+  for (const [key, entry] of buckets.entries()) {
+    if (entry.resetAt <= now) {
+      buckets.delete(key);
+    }
+  }
+}
 
 export function checkRateLimit(key: string, limit: number, windowMs: number) {
   const now = Date.now();
+  pruneExpired(now);
+
   const existing = buckets.get(key);
 
   if (!existing || existing.resetAt <= now) {
@@ -27,6 +39,10 @@ export function getClientIp(req: Request): string {
   const forwardedFor = req.headers.get('x-forwarded-for');
   if (forwardedFor && forwardedFor.length > 0) {
     return forwardedFor.split(',')[0].trim();
+  }
+  const realIp = req.headers.get('x-real-ip') || req.headers.get('cf-connecting-ip');
+  if (realIp && realIp.trim().length > 0) {
+    return realIp.trim();
   }
   return 'unknown';
 }

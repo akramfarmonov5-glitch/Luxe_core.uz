@@ -1,7 +1,7 @@
 import { Context } from 'grammy';
 import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
-import { t } from '../i18n';
+import { t, getLang, localizeText, getProductUrl } from '../i18n';
 import { config } from '../config';
 
 const searchState = new Map<number, boolean>();
@@ -24,13 +24,21 @@ export async function handleSearchQuery(ctx: Context) {
     clearSearchMode(userId);
 
     try {
-        const { data: products, error } = await supabase
+        const { data: allProducts, error } = await supabase
             .from('products')
             .select('*')
-            .ilike('name', `%${query}%`)
-            .limit(10);
+            .order('created_at', { ascending: false });
 
-        if (error || !products || products.length === 0) {
+        const q = query.toLowerCase();
+        const products = (allProducts || []).filter((p: any) => {
+            const nameUz = localizeText(p.name, 'uz').toLowerCase();
+            const nameRu = localizeText(p.name, 'ru').toLowerCase();
+            const rawName = typeof p.name === 'string' ? p.name.toLowerCase() : JSON.stringify(p.name || '').toLowerCase();
+            const cat = localizeText(p.category, 'uz').toLowerCase();
+            return nameUz.includes(q) || nameRu.includes(q) || rawName.includes(q) || cat.includes(q);
+        });
+
+        if (error || products.length === 0) {
             await ctx.reply(
                 `${t(userId, 'search_no_result')}\n\n"${query}" bo'yicha hech narsa topilmadi.`,
                 {
@@ -44,18 +52,20 @@ export async function handleSearchQuery(ctx: Context) {
             return;
         }
 
+        const lang = getLang(userId);
         // Show results as list
         for (const p of products.slice(0, 5)) {
+            const productName = localizeText(p.name, lang);
             const price = Number(p.price).toLocaleString('uz-UZ');
             const stockText = p.stock && p.stock > 0 ? t(userId, 'product_stock_yes') : t(userId, 'product_stock_no');
             const caption =
-                `🏷 *${p.name}*\n\n` +
+                `🏷 *${productName}*\n\n` +
                 `${t(userId, 'product_price')} *${p.formattedPrice || price + ' UZS'}*\n` +
                 `${t(userId, 'product_status')} ${stockText}`;
 
             const kb = new InlineKeyboard()
                 .text(t(userId, 'btn_add_cart'), `addcart:${p.id}`)
-                .url(t(userId, 'btn_view_site'), `${config.SITE_URL}/#product/${p.id}`);
+                .url(t(userId, 'btn_view_site'), getProductUrl(config.SITE_URL, p.id, userId));
 
             try {
                 await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {

@@ -156,3 +156,32 @@ export function t(userId: number, key: string): string {
     const lang = getLang(userId);
     return translations[key]?.[lang] || translations[key]?.['uz'] || key;
 }
+
+export function localizeText(field: any, lang: Lang = 'uz'): string {
+    if (!field) return '';
+    if (typeof field === 'string') {
+        const trimmed = field.trim();
+        if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+            try {
+                const parsed = JSON.parse(trimmed);
+                if (parsed && typeof parsed === 'object') {
+                    return String(parsed[lang] || parsed.uz || parsed.ru || parsed.en || Object.values(parsed)[0] || '');
+                }
+            } catch {
+                return field;
+            }
+        }
+        return field;
+    }
+    if (typeof field === 'object') {
+        return String(field[lang] || field.uz || field.ru || field.en || Object.values(field)[0] || '');
+    }
+    return String(field);
+}
+
+export function getProductUrl(siteUrl: string, productId: number | string, userId?: number): string {
+    const lang = userId ? getLang(userId) : 'uz';
+    const base = siteUrl.replace(/\/$/, '');
+    return `${base}/${lang}/product/${productId}`;
+}
+

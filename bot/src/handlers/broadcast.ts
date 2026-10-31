@@ -2,6 +2,7 @@ import { Bot, Context } from 'grammy';
 import { InlineKeyboard } from 'grammy';
 import { supabase } from '../supabase';
 import { config } from '../config';
+import { localizeText, getProductUrl } from '../i18n';
 
 // /broadcast ID — send single product to channel
 export async function handleBroadcast(ctx: Context) {
@@ -38,7 +39,7 @@ export async function handleBroadcast(ctx: Context) {
         }
 
         await sendProductToChannel(ctx, product);
-        await ctx.reply(`✅ "${product.name}" kanalga yuborildi!`);
+        await ctx.reply(`✅ "${localizeText(product.name, 'uz')}" kanalga yuborildi!`);
     } catch (err) {
         console.error('Broadcast error:', err);
         await ctx.reply('❌ Broadcast xatolik.');
@@ -87,18 +88,20 @@ export async function handleBroadcastAll(ctx: Context) {
 }
 
 async function sendProductToChannel(ctx: Context, product: any) {
+    const productName = localizeText(product.name, 'uz');
+    const shortDesc = localizeText(product.shortDescription || product.description, 'uz');
     const price = Number(product.price).toLocaleString('uz-UZ');
     const stock = product.stock && product.stock > 0 ? '✅ Mavjud' : '❌ Tugagan';
 
     const caption =
-        `🏷 *${product.name}*\n\n` +
+        `🏷 *${productName}*\n\n` +
         `💰 Narxi: *${product.formattedPrice || price + ' UZS'}*\n` +
         `📦 ${stock}\n` +
-        `${product.shortDescription ? `\n📝 ${product.shortDescription}\n` : ''}` +
+        `${shortDesc ? `\n📝 ${shortDesc}\n` : ''}` +
         `\n🛒 Buyurtma berish uchun botga yozing yoki saytga kiring!`;
 
     const kb = new InlineKeyboard()
-        .url('🛒 Saytda xarid', `${config.SITE_URL}/#product/${product.id}`)
+        .url('🛒 Saytda xarid', getProductUrl(config.SITE_URL, product.id))
         .url('🤖 Botda xarid', `https://t.me/${(await ctx.api.getMe()).username}?start=product_${product.id}`);
 
     if (product.images && product.images.length > 1) {
@@ -112,7 +115,7 @@ async function sendProductToChannel(ctx: Context, product: any) {
 
         await ctx.api.sendMediaGroup(config.CHANNEL_ID, mediaGroup);
         // Send keyboard separately
-        await ctx.api.sendMessage(config.CHANNEL_ID, `👆 *${product.name}* — sotib olish uchun bosing:`, {
+        await ctx.api.sendMessage(config.CHANNEL_ID, `👆 *${productName}* — sotib olish uchun bosing:`, {
             parse_mode: 'Markdown',
             reply_markup: kb,
         });
