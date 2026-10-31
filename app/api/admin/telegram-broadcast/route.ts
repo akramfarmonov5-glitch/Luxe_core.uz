@@ -3,7 +3,7 @@ import { getAuthenticatedUserId, getServiceSupabaseClient } from '@/lib/checkout
 import { isAdminUser } from '@/lib/admin';
 import { getLocalizedText } from '@/lib/i18nUtils';
 
-const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || process.env.CHANNEL_ID || '-1003605314914';
+const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || process.env.CHANNEL_ID || '@luxecoreuz';
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://luxe-core.uz').replace(/\/+$/, '');
 
 function escapeHtml(value: string): string {
@@ -12,6 +12,53 @@ function escapeHtml(value: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+async function postTelegramMessage(
+  token: string,
+  payload: { photo?: string; text?: string; caption?: string; reply_markup: any }
+): Promise<void> {
+  const targetIds = Array.from(
+    new Set([
+      process.env.TELEGRAM_CHANNEL_ID,
+      process.env.CHANNEL_ID,
+      '@luxecoreuz',
+      '-1003605314914',
+    ])
+  ).filter(Boolean) as string[];
+
+  let lastError: Error | null = null;
+  for (const chatId of targetIds) {
+    try {
+      const endpoint = payload.photo ? 'sendPhoto' : 'sendMessage';
+      const body: Record<string, any> = {
+        chat_id: chatId,
+        parse_mode: 'HTML',
+        reply_markup: payload.reply_markup,
+      };
+      if (payload.photo) {
+        body.photo = payload.photo;
+        body.caption = payload.caption;
+      } else {
+        body.text = payload.text;
+      }
+
+      const res = await fetch(`https://api.telegram.org/bot${token}/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        return;
+      }
+      lastError = new Error(data?.description || `Telegram ${endpoint} error on ${chatId}`);
+    } catch (err: any) {
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('Telegram post failed on all channel targets');
 }
 
 async function getBotUsername(token: string): Promise<string> {
@@ -63,36 +110,16 @@ async function sendProductPostToChannel(token: string, botUsername: string, prod
       : '');
 
   if (mainImage) {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: CHANNEL_ID,
-        photo: mainImage,
-        caption,
-        parse_mode: 'HTML',
-        reply_markup: replyMarkup,
-      }),
+    await postTelegramMessage(token, {
+      photo: mainImage,
+      caption,
+      reply_markup: replyMarkup,
     });
-    const data = await res.json();
-    if (!res.ok || !data.ok) {
-      throw new Error(data?.description || 'Telegram sendPhoto error');
-    }
   } else {
-    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: CHANNEL_ID,
-        text: caption,
-        parse_mode: 'HTML',
-        reply_markup: replyMarkup,
-      }),
+    await postTelegramMessage(token, {
+      text: caption,
+      reply_markup: replyMarkup,
     });
-    const data = await res.json();
-    if (!res.ok || !data.ok) {
-      throw new Error(data?.description || 'Telegram sendMessage error');
-    }
   }
 }
 
@@ -240,25 +267,16 @@ export async function POST(req: NextRequest) {
       let botSentCount = 0;
 
       if (sendToChannel) {
-        const endpoint = imageUrl ? 'sendPhoto' : 'sendMessage';
-        const reqBody: Record<string, any> = {
-          chat_id: CHANNEL_ID,
-          parse_mode: 'HTML',
-          reply_markup: replyMarkup,
-        };
-        if (imageUrl) {
-          reqBody.photo = imageUrl;
-          reqBody.caption = textHtml;
-        } else {
-          reqBody.text = textHtml;
-        }
-        const res = await fetch(`https://api.telegram.org/bot${token}/${endpoint}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(reqBody),
-        });
-        if (res.ok) {
+        try {
+          await postTelegramMessage(token, {
+            photo: imageUrl,
+            caption: textHtml,
+            text: textHtml,
+            reply_markup: replyMarkup,
+          });
           channelSent = true;
+        } catch (err) {
+          console.error('Channel custom message error:', err);
         }
       }
 
