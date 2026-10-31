@@ -4,7 +4,7 @@ import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 import { normalizePhone } from '../../../lib/checkout.server';
 
 export async function POST(req: NextRequest) {
-  const rateLimit = checkRateLimit(`order-tracking:${getClientIp(req)}`, 10, 60 * 1000);
+  const rateLimit = checkRateLimit(`order-tracking:${getClientIp(req)}`, 15, 60 * 1000);
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
   }
@@ -20,24 +20,30 @@ export async function POST(req: NextRequest) {
     const { phone, orderId } = await req.json();
     const rawPhone = String(phone || '').trim();
     const normalizedPhone = normalizePhone(phone);
-    const normalizedOrderId = String(orderId || '').trim();
+    const digits = rawPhone.replace(/\D/g, '').slice(-9);
+    const normalizedOrderId = String(orderId || '').trim().replace(/^#/, '');
 
-    if (normalizedPhone.length < 9) {
+    if (digits.length < 9) {
       return NextResponse.json({ error: 'Valid phone is required' }, { status: 400 });
     }
+
+    const formattedWithSpaces = `+998 ${digits.slice(0, 2)} ${digits.slice(2, 5)} ${digits.slice(5, 7)} ${digits.slice(7, 9)}`;
+    const compactPlus = `+998${digits}`;
+    const compact998 = `998${digits}`;
+    const phoneVariants = [...new Set([rawPhone, normalizedPhone, formattedWithSpaces, compactPlus, compact998, digits].filter(Boolean))];
 
     const supabase = createClient(supabaseUrl, serviceRoleKey);
     let query = supabase
       .from('orders')
       .select('id, customerName, phone, total, status, date, paymentMethod, items, created_at')
-      .in('phone', [...new Set([rawPhone, normalizedPhone].filter(Boolean))])
+      .in('phone', phoneVariants)
       .order('created_at', { ascending: false });
 
     if (normalizedOrderId) {
-      query = query.eq('id', normalizedOrderId);
+      query = query.ilike('id', `%${normalizedOrderId}%`);
     }
 
-    const { data, error } = await query.limit(normalizedOrderId ? 1 : 20);
+    const { data, error } = await query.limit(20);
 
     if (error) {
       throw error;

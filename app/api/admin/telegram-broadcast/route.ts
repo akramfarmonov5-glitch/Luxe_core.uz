@@ -110,13 +110,18 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ botUsersCount: 0, promos: [] });
     }
 
-    const [{ count: botUsersCount }, { data: promos }] = await Promise.all([
-      supabase.from('bot_users').select('*', { count: 'exact', head: true }),
+    const [{ count: botUsersCount, data: botUsers }, { data: promos }] = await Promise.all([
+      supabase
+        .from('bot_users')
+        .select('telegram_id, name, phone, address, lang, created_at', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .limit(500),
       supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
     ]);
 
     return NextResponse.json({
       botUsersCount: botUsersCount || 0,
+      botUsers: botUsers || [],
       promos: promos || [],
     });
   } catch (err: any) {

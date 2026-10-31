@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Package, Clock, Truck, CheckCircle, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Package, Clock, Truck, CheckCircle, ArrowLeft, XCircle } from 'lucide-react';
 import { hasSupabaseCredentials } from '../lib/supabaseClient';
 import { Order } from '../types';
 import { getLocalizedText } from '../lib/i18nUtils';
@@ -15,46 +15,25 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phoneNumber) return;
-
+  const runSearch = async (phoneToSearch: string, orderIdToSearch = '') => {
+    if (!phoneToSearch) return;
     setLoading(true);
     setSearched(true);
 
     try {
       if (!hasSupabaseCredentials) {
-        setTimeout(() => {
-          if (phoneNumber.includes('901234567')) {
-            setOrders([
-              {
-                id: 'ORD-DEMO-1',
-                created_at: new Date().toISOString(),
-                status: 'Yetkazilmoqda',
-                total: 12500000,
-                date: new Date().toISOString().split('T')[0],
-                paymentMethod: 'Naqd',
-                phone: phoneNumber,
-                customerName: 'Demo mijoz',
-                items: [{ name: 'Midnight Chronograph', quantity: 1 }],
-              },
-            ]);
-          } else {
-            setOrders([]);
-          }
-          setLoading(false);
-        }, 1000);
+        setOrders([]);
+        setLoading(false);
         return;
       }
 
       const response = await fetch('/api/order-tracking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber, orderId }),
+        body: JSON.stringify({ phone: phoneToSearch, orderId: orderIdToSearch }),
       });
 
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.error || 'Tracking API xatosi');
       }
@@ -68,14 +47,41 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
     }
   };
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('luxecore_customer_info');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.phone) {
+          const digits = String(parsed.phone).replace(/\D/g, '').slice(-9);
+          if (digits.length === 9) {
+            setPhoneNumber(digits);
+            runSearch(digits);
+          }
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await runSearch(phoneNumber, orderId);
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Kutilmoqda':
         return <Clock size={20} className="text-yellow-400" />;
+      case "To'landi":
+        return <CheckCircle size={20} className="text-sky-400" />;
       case 'Yetkazilmoqda':
         return <Truck size={20} className="text-blue-400" />;
       case 'Yakunlandi':
         return <CheckCircle size={20} className="text-green-400" />;
+      case 'Bekor qilindi':
+        return <XCircle size={20} className="text-red-400" />;
       default:
         return <Package size={20} className="text-gray-400" />;
     }
@@ -160,7 +166,7 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
                     <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-white/5 pb-4">
                       <div>
                         <span className="text-xs text-gray-500 block mb-1">Buyurtma ID</span>
-                        <span className="font-mono text-white font-medium">{order.id.slice(0, 8)}...</span>
+                        <span className="font-mono text-white font-medium">#{order.id}</span>
                       </div>
                       <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full w-fit">
                         {getStatusIcon(order.status || 'Kutilmoqda')}

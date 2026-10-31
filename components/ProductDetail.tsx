@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, Box, Activity, Zap, PlayCircle, X, Youtube, ExternalLink, ArrowRight, Heart, Play } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, Box, Activity, Zap, PlayCircle, X, Youtube, ExternalLink, ArrowRight, Heart, Play, Share2 } from 'lucide-react';
 import { Category, Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -107,6 +107,31 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
   const handleBuyNow = () => {
     addToCart(product);
     onCheckout();
+  };
+
+  const handleShare = async () => {
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+    const title = getLocalizedText(product.name, lang);
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${title} — LUXECORE`,
+          text: `${title} (${product.formattedPrice})`,
+          url: shareUrl,
+        });
+        return;
+      } catch {
+        // user cancelled or share failed
+      }
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard && shareUrl) {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast(lang === 'ru' ? 'Ссылка скопирована!' : 'Havola nusxalandi!', 'success');
+      } catch {
+        // ignore
+      }
+    }
   };
 
   const getYoutubeId = (url: string | undefined) => {
@@ -241,12 +266,21 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   <p className="text-gray-400 text-xs mb-1">{t('total_sum')}</p>
                   <p className={`text-3xl md:text-4xl font-light ${isDark ? 'text-white' : 'text-gray-900'}`}>{product.formattedPrice}</p>
                 </div>
-                <button
-                  onClick={handleToggleWishlist}
-                  className={`p-3 rounded-xl border transition-all ${isLiked ? 'bg-gold-400 border-gold-400 text-black' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/30'}`}
-                >
-                  <Heart size={22} className={isLiked ? 'fill-black' : ''} />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleShare}
+                    title={lang === 'ru' ? 'Поделиться' : 'Ulashish'}
+                    className="p-3 rounded-xl border bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/30 transition-all"
+                  >
+                    <Share2 size={22} />
+                  </button>
+                  <button
+                    onClick={handleToggleWishlist}
+                    className={`p-3 rounded-xl border transition-all ${isLiked ? 'bg-gold-400 border-gold-400 text-black' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/30'}`}
+                  >
+                    <Heart size={22} className={isLiked ? 'fill-black' : ''} />
+                  </button>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-3 md:gap-4 mb-3">
                 <button
