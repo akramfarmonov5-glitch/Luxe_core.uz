@@ -40,11 +40,12 @@ async function main() {
     }
 
     // HTTP server for Render Web Service health checks
+    const startedAt = new Date().toISOString();
     const PORT = parseInt(process.env.PORT || '10000');
     const server = http.createServer((req, res) => {
         if (req.url === '/health' || req.url === '/') {
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: 'ok', bot: 'LUXECORE Bot', uptime: process.uptime() }));
+            res.end(JSON.stringify({ status: 'ok', bot: 'LUXECORE Bot', version: '2.1.0', startedAt, uptime: process.uptime() }));
         } else {
             res.writeHead(404);
             res.end('Not found');
