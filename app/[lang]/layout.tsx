@@ -77,6 +77,10 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       description: metadata.description,
       images: [logoUrl],
     },
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+      yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
+    },
   };
 }
 
@@ -95,6 +99,14 @@ export default async function RootLayout({
     name: 'LUXECORE',
     url: siteUrl,
     logo: logoUrl,
+    sameAs: ['https://t.me/luxecoreuz'],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+998-99-644-84-44',
+      contactType: 'customer service',
+      areaServed: 'UZ',
+      availableLanguage: ['Uzbek', 'Russian', 'English'],
+    },
   };
 
   return (

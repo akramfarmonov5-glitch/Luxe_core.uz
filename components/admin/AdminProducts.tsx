@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Edit, Trash2, Plus, Search, Check, X, Save, PlusCircle, MinusCircle, Image as ImageIcon, Youtube, Wand2, Sparkles, Box, Globe } from 'lucide-react';
+import { Edit, Trash2, Plus, Search, Check, X, Save, PlusCircle, MinusCircle, Image as ImageIcon, Youtube, Wand2, Sparkles, Box, Globe, Send } from 'lucide-react';
 import { Product, Category } from '../../types';
 import { supabase } from '../../lib/supabaseClient';
 import { useToast } from '../../context/ToastContext';
@@ -22,6 +22,8 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [broadcastingId, setBroadcastingId] = useState<number | null>(null);
+  const [isBroadcastingAll, setIsBroadcastingAll] = useState(false);
   const [activeLang, setActiveLang] = useState<'uz' | 'ru' | 'en'>('uz');
   const [formData, setFormData] = useState<any>({
     name: { uz: '', ru: '', en: '' },
@@ -36,8 +38,54 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
     itemsPerPackage: 1,
     is_premium: false,
     is_bestseller: false,
+    postToChannel: false,
     specs: []
   });
+
+  const handleBroadcastProduct = async (productId: number) => {
+    setBroadcastingId(productId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/admin/telegram-broadcast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ mode: 'product', productId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Kanalga yuborishda xatolik');
+      showToast('📢 Mahsulot @luxecoreuz kanaliga joylandi!', 'success');
+    } catch (err: any) {
+      showToast(err.message || 'Telegram kanalga yuborishda xatolik', 'error');
+    } finally {
+      setBroadcastingId(null);
+    }
+  };
+
+  const handleBroadcastAll = async () => {
+    if (!confirm("Oxirgi 10 ta mahsulotni @luxecoreuz Telegram kanaliga joylashni tasdiqlaysizmi?")) return;
+    setIsBroadcastingAll(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/admin/telegram-broadcast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ mode: 'all_products', limit: 10 }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Kanalga yuborishda xatolik');
+      showToast(`📢 ${data.sentCount}/${data.total} ta mahsulot kanalga joylandi!`, 'success');
+    } catch (err: any) {
+      showToast(err.message || 'Telegram kanalga yuborishda xatolik', 'error');
+    } finally {
+      setIsBroadcastingAll(false);
+    }
+  };
 
   const handleOpenAdd = () => {
     setFormData({
@@ -53,6 +101,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
       itemsPerPackage: 1,
       is_premium: false,
       is_bestseller: false,
+      postToChannel: true,
       specs: [{ label: { uz: '', ru: '', en: '' }, value: { uz: '', ru: '', en: '' } }]
     });
     setIsModalOpen(true);
@@ -76,6 +125,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
       images,
       is_premium: Boolean(product.is_premium),
       is_bestseller: Boolean(product.is_bestseller),
+      postToChannel: false,
     });
     setIsModalOpen(true);
   };
@@ -245,6 +295,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
     }
 
     try {
+      let savedProductId: number | null = null;
       if (formData.id) {
         // Update
         const { data, error } = await supabase
@@ -256,6 +307,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
         if (error) throw error;
 
         if (data && data.length > 0) {
+          savedProductId = data[0].id;
           const newProduct = {
             ...data[0],
             formattedPrice: new Intl.NumberFormat('uz-UZ').format(Number(data[0].price)) + ' UZS',
@@ -275,6 +327,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
         if (error) throw error;
 
         if (data && data.length > 0) {
+          savedProductId = data[0].id;
           const newProduct = {
             ...data[0],
             formattedPrice: new Intl.NumberFormat('uz-UZ').format(Number(data[0].price)) + ' UZS',
@@ -286,6 +339,11 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
         }
       }
       setIsModalOpen(false);
+      showToast('Mahsulot muvaffaqiyatli saqlandi!', 'success');
+
+      if (formData.postToChannel && savedProductId) {
+        await handleBroadcastProduct(savedProductId);
+      }
     } catch (error) {
       console.error('Error saving product:', error);
       showToast("Saqlashda xatolik yuz berdi: " + (error as any).message, 'error');
@@ -330,18 +388,29 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-3xl font-bold text-white mb-2">Mahsulotlar Ombori</h2>
           <p className="text-gray-400">Jami {products.length} ta mahsulot mavjud.</p>
         </div>
-        <button
-          onClick={handleOpenAdd}
-          className="flex items-center gap-2 px-4 py-2 bg-gold-400 text-black font-bold rounded-xl hover:bg-gold-500 transition-colors"
-        >
-          <Plus size={18} />
-          Yangi Qo'shish
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleBroadcastAll}
+            disabled={isBroadcastingAll || products.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-sky-500/15 text-sky-400 border border-sky-500/30 font-bold rounded-xl hover:bg-sky-500/25 transition-colors disabled:opacity-50"
+            title="Oxirgi 10 ta mahsulotni @luxecoreuz kanaliga joylash"
+          >
+            <Send size={16} className={isBroadcastingAll ? 'animate-pulse' : ''} />
+            {isBroadcastingAll ? 'Yuborilmoqda...' : 'Kanalga chiqarish (10 ta)'}
+          </button>
+          <button
+            onClick={handleOpenAdd}
+            className="flex items-center gap-2 px-4 py-2 bg-gold-400 text-black font-bold rounded-xl hover:bg-gold-500 transition-colors"
+          >
+            <Plus size={18} />
+            Yangi Qo'shish
+          </button>
+        </div>
       </div>
 
       <div className="relative">
@@ -395,6 +464,15 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                 </td>
                 <td className="p-4 text-right">
                   <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => handleBroadcastProduct(product.id)}
+                      disabled={broadcastingId === product.id}
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-sky-400 bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/20 rounded-lg transition-colors disabled:opacity-50"
+                      title="@luxecoreuz Telegram kanaliga joylash"
+                    >
+                      <Send size={13} className={broadcastingId === product.id ? 'animate-spin' : ''} />
+                      <span>{broadcastingId === product.id ? '...' : 'Kanalga'}</span>
+                    </button>
                     <button
                       onClick={() => handleOpenEdit(product)}
                       className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
@@ -564,6 +642,22 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                   />
                 </label>
               </div>
+
+              <label className="flex items-center justify-between gap-4 rounded-xl border border-sky-500/30 bg-sky-500/10 px-4 py-3 cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <Send size={18} className="text-sky-400 shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-white">Telegram kanalga (@luxecoreuz) ham joylash</p>
+                    <p className="text-xs text-sky-300/80">Saqlangandan so'ng avtomatik rasm va xarid tugmalari bilan kanalga chiqariladi.</p>
+                  </div>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={Boolean(formData.postToChannel)}
+                  onChange={e => setFormData({ ...formData, postToChannel: e.target.checked })}
+                  className="h-5 w-5 accent-sky-400"
+                />
+              </label>
 
               <div className="space-y-3 bg-black/40 p-4 rounded-xl border border-white/5">
                 <div className="flex justify-between items-center">

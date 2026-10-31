@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Order, OrderStatus } from '../../types';
-import { Clock, CheckCircle, Truck, Package, Search, Download, Trash2 } from 'lucide-react';
+import { Clock, CheckCircle, Truck, Package, Search, Download, Trash2, XCircle } from 'lucide-react';
 
 import { supabase } from '../../lib/supabaseClient';
 import { useToast } from '../../context/ToastContext';
@@ -39,6 +39,7 @@ const AdminOrders: React.FC = () => {
       case 'To\'landi': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
       case 'Yetkazilmoqda': return 'text-purple-400 bg-purple-400/10 border-purple-400/20';
       case 'Yakunlandi': return 'text-green-400 bg-green-400/10 border-green-400/20';
+      case 'Bekor qilindi': return 'text-red-400 bg-red-400/10 border-red-400/20';
       default: return 'text-gray-400';
     }
   };
@@ -49,6 +50,7 @@ const AdminOrders: React.FC = () => {
       case 'To\'landi': return CheckCircle;
       case 'Yetkazilmoqda': return Truck;
       case 'Yakunlandi': return Package;
+      case 'Bekor qilindi': return XCircle;
       default: return Clock;
     }
   };
@@ -60,17 +62,34 @@ const AdminOrders: React.FC = () => {
     ));
 
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', id);
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/admin/order-status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+        },
+        body: JSON.stringify({ orderId: id, status: newStatus }),
+      });
 
-      if (error) {
-        console.error("Status update failed:", error);
-        // Revert if needed
+      if (!res.ok) {
+        const { error } = await supabase
+          .from('orders')
+          .update({ status: newStatus })
+          .eq('id', id);
+        if (error) throw error;
+      } else {
+        const data = await res.json();
+        showToast(
+          data.notifiedTelegram
+            ? `Holat "${newStatus}" ga o'zgartirildi va mijozga Telegram xabar yuborildi!`
+            : `Buyurtma holati "${newStatus}" ga o'zgartirildi`,
+          'success'
+        );
       }
     } catch (err) {
       console.error(err);
+      showToast('Status yangilashda xatolik yuz berdi', 'error');
     }
   };
 
@@ -180,6 +199,7 @@ const AdminOrders: React.FC = () => {
                       <option className="bg-zinc-900 text-white" value="To'landi">To'landi</option>
                       <option className="bg-zinc-900 text-white" value="Yetkazilmoqda">Yetkazilmoqda</option>
                       <option className="bg-zinc-900 text-white" value="Yakunlandi">Yakunlandi</option>
+                      <option className="bg-zinc-900 text-red-400" value="Bekor qilindi">Bekor qilindi</option>
                     </select>
                   </td>
                   <td className="p-4 text-center">
