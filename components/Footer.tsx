@@ -88,10 +88,10 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
 
             {/* Social Links */}
             <div className="flex gap-3">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
+              <a href="https://instagram.com/luxe_core_uz" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
                 <Instagram size={16} />
               </a>
-              <a href="https://t.me/luxecoreuz" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
+              <a href="https://t.me/Luxecoreuzbot" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
                 <Send size={16} />
               </a>
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>

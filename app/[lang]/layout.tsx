@@ -12,19 +12,19 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const l = lang || 'uz';
   const metadataMap: Record<string, any> = {
     uz: {
-      title: 'Sovg\'a qutilari va premium sovg\'alar — LUXECORE',
-      description: 'Premium sovg\'a qutilari (gift box), parfyumeriya va eksklyuziv aksessuarlar. O\'zbekiston bo\'ylab tez yetkazib berish, 14 kun ichida qaytarish. LUXECORE — ishonchli sovg\'a do\'koni.',
-      keywords: ['sovg\'a qutisi', 'gift box', 'sovg\'a to\'plami', 'premium sovg\'a', 'parfyumeriya', 'aksessuarlar', 'Toshkent', 'O\'zbekiston', 'onlayn sovg\'a'],
+      title: 'Sovg\'a qutilari, Yangi Yil 2027 va Paketlar ulgurji narxda — LUXECORE',
+      description: 'Sovg\'a qutilari, To\'y va Sarpo qutilari, Yangi Yil 2027 qadoqlari, Zip-Lock va Kraft paketlar ulgurji narxlarda. O\'rikzor omboridan butun O\'zbekistonga tezkor yetkazib beramiz.',
+      keywords: ['sovg\'a qutisi', 'yangi yil 2027 qutilari', 'to\'y qutilari', 'sarpo qutisi', 'kraft paket', 'zip lock paket', 'bopp paket', 'ulgurji savdo', 'O\'rikzor', 'Toshkent'],
     },
     ru: {
-      title: 'Подарочные коробки и премиум подарки — LUXECORE',
-      description: 'Премиальные подарочные коробки (gift box), парфюмерия и эксклюзивные аксессуары. Быстрая доставка по Узбекистану, возврат в течение 14 дней. LUXECORE — надёжный магазин подарков.',
-      keywords: ['подарочная коробка', 'gift box', 'подарочный набор', 'премиум подарки', 'парфюмерия', 'аксессуары', 'Ташкент', 'Узбекистан', 'подарки онлайн'],
+      title: 'Подарочные коробки, Новогодняя упаковка 2027 и пакеты оптом — LUXECORE',
+      description: 'Подарочные и свадебные коробки, новогодняя упаковка 2027, крафт и Zip-Lock пакеты по оптовым ценам со склада Урикзор. Доставка по всему Узбекистану.',
+      keywords: ['подарочные коробки оптом', 'новогодняя упаковка 2027', 'свадебные коробки', 'крафт пакеты', 'зип лок пакеты', 'БОПП пакеты', 'Урикзор', 'Ташкент'],
     },
     en: {
-      title: 'Gift Boxes & Premium Gifts — LUXECORE',
-      description: 'Premium gift boxes, perfume and exclusive accessories. Fast delivery across Uzbekistan, 14-day returns. LUXECORE — the trusted gift store in Tashkent.',
-      keywords: ['gift box', 'gift set', 'premium gifts', 'perfume', 'accessories', 'Tashkent', 'Uzbekistan', 'gifts online'],
+      title: 'Gift Boxes, New Year 2027 Packaging & Bags Wholesale — LUXECORE',
+      description: 'Wholesale gift boxes, wedding boxes, New Year 2027 packaging, Kraft & Zip-Lock bags directly from warehouse. Fast delivery across Uzbekistan.',
+      keywords: ['wholesale gift boxes', 'packaging boxes', 'craft bags', 'zip lock bags', 'wedding boxes', 'holiday packaging', 'Tashkent', 'Uzbekistan'],
     },
   };
   const metadata = metadataMap[l] || metadataMap.uz;

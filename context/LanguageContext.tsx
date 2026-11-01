@@ -31,12 +31,12 @@ const translations: Translations = {
     // Hero & General UI
     shop_now: { uz: 'Hozir Xarid Qilish', ru: 'Купить Сейчас', en: 'Shop Now' },
     add_to_cart: { uz: 'Savatga', ru: 'В Корзину', en: 'Add to Cart' },
-    hero_chip_delivery: { uz: "2 mln so'mdan bepul yetkazish", ru: 'Бесплатная доставка от 2 млн сум', en: 'Free delivery from 2M UZS' },
-    hero_chip_returns: { uz: '14 kun ichida qaytarish', ru: 'Возврат в течение 14 дней', en: '14-day returns' },
+    hero_chip_delivery: { uz: "Toshkentda 2 soatda, viloyatga 1 kunda", ru: 'По Ташкенту за 2 часа, в регионы за 1 день', en: 'In Tashkent in 2h, regions in 1 day' },
+    hero_chip_returns: { uz: '100 donadan ulgurji narxlar', ru: 'Оптовые цены от 100 штук', en: 'Wholesale prices from 100 pcs' },
     hero_chip_tracking: { uz: 'Buyurtmani kuzatish', ru: 'Отслеживание заказа', en: 'Order tracking' },
 
     // Footer
-    footer_desc: { uz: 'Premium mahsulotlar, soatlar, sumkalar va aksessuarlarni ishonchli yetkazib beramiz.', ru: 'Надёжно доставляем премиальные часы, сумки, парфюмерию и аксессуары.', en: 'Reliable delivery of premium watches, bags, perfume, and accessories.' },
+    footer_desc: { uz: 'Sovg‘a qutilari, paketlar va qadoqlash mahsulotlari O‘rikzor omboridan to‘g‘ridan-to‘g‘ri ulgurji narxlarda.', ru: 'Подарочные коробки, пакеты и упаковочные материалы со склада Урикзор по оптовым ценам.', en: 'Gift boxes, packaging, and bags directly from warehouse at wholesale prices.' },
     footer_categories: { uz: 'Kategoriyalar', ru: 'Категории', en: 'Categories' },
     footer_help: { uz: 'Yordam', ru: 'Помощь', en: 'Help' },
     footer_contact: { uz: 'Bog\'lanish', ru: 'Контакты', en: 'Contact Us' },
@@ -144,7 +144,7 @@ const translations: Translations = {
     category_section_desc: { uz: 'Mos bo‘limdan boshlang va kerakli mahsulotni tezroq toping.', ru: 'Начните с нужной категории и быстрее найдите подходящий товар.', en: 'Start with the right category and find the product you need faster.' },
     view: { uz: 'Ko\'rish', ru: 'Посмотреть', en: 'View' },
     items_per_package: { uz: 'To\'plamdagi soni', ru: 'Количество в наборе', en: 'Items per set' },
-    items_per_package_desc: { uz: 'Har bir to\'plamda', ru: 'в наборе', en: 'In each set' },
+    items_per_package_desc: { uz: 'dona (minimal buyurtma)', ru: 'шт (минимальный заказ)', en: 'pcs (minimum order)' },
 
     // Toast Messages
     toast_added_to_cart: { uz: 'Mahsulot savatchaga qo\'shildi', ru: 'Товар добавлен в корзину', en: 'Product added to cart' },
@@ -181,14 +181,14 @@ const translations: Translations = {
     trust_badge_label: { uz: 'Kafolatlar', ru: 'Гарантии', en: 'Guarantees' },
     trust_title: { uz: 'Nima uchun bizni', ru: 'Почему выбирают', en: 'Why choose' },
     trust_title_highlight: { uz: 'tanlashadi?', ru: 'нас?', en: 'us?' },
-    trust_delivery_title: { uz: 'Bepul yetkazish', ru: 'Бесплатная доставка', en: 'Free Delivery' },
-    trust_delivery_desc: { uz: '2 mln so\'mdan yuqori buyurtmalar uchun butun O\'zbekiston bo\'ylab', ru: 'Для заказов свыше 2 млн сум по всему Узбекистану', en: 'For orders over 2M UZS across Uzbekistan' },
-    trust_quality_title: { uz: 'Sifat kafolati', ru: 'Гарантия качества', en: 'Quality Guarantee' },
-    trust_quality_desc: { uz: 'Barcha mahsulotlar sertifikatlangan va sifat nazoratidan o\'tgan', ru: 'Вся продукция сертифицирована и прошла контроль качества', en: 'All products are certified and quality controlled' },
+    trust_delivery_title: { uz: 'Tezkor yetkazish', ru: 'Быстрая доставка', en: 'Fast Delivery' },
+    trust_delivery_desc: { uz: 'Toshkentda 2 soatda, viloyatlarga 1 kunda yetkazib beramiz', ru: 'Доставка по Ташкенту за 2 часа, в регионы за 1 день', en: 'Tashkent in 2 hours, regions in 1 day' },
+    trust_quality_title: { uz: 'Ulgurji narxlar', ru: 'Оптовые цены', en: 'Wholesale Prices' },
+    trust_quality_desc: { uz: '100 donadan boshlab to\'g\'ridan-to\'g\'ri ombor narxida', ru: 'От 100 штук напрямую по ценам склада', en: 'Direct warehouse prices from 100 pcs' },
     trust_payment_title: { uz: 'Xavfsiz to\'lov', ru: 'Безопасная оплата', en: 'Secure Payment' },
     trust_payment_desc: { uz: 'Payme, Click, Naqd va boshqa qulay usullar', ru: 'Payme, Click, наличные и другие удобные способы', en: 'Payme, Click, Cash and other convenient methods' },
-    trust_return_title: { uz: '14 kun qaytarish', ru: 'Возврат 14 дней', en: '14 Day Returns' },
-    trust_return_desc: { uz: 'Mahsulot yoqmasa, 14 kun ichida qaytarishingiz mumkin', ru: 'Если товар не подошел, вернуть можно в течение 14 дней', en: 'Return within 14 days if you\'re not satisfied' },
+    trust_return_title: { uz: 'Sifat nazorati', ru: 'Контроль качества', en: 'Quality Control' },
+    trust_return_desc: { uz: 'Barcha partiyalar soni va butunligi qat\'iy tekshiriladi', ru: 'Строгая проверка количества и целостности всех партий', en: 'Strict check on quantity and item integrity' },
 
     // Testimonials
     testimonials_label: { uz: 'Mijozlar fikrlari', ru: 'Отзывы клиентов', en: 'Customer Reviews' },

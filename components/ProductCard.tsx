@@ -62,6 +62,11 @@ const handleAddToCart = (e: React.MouseEvent) => {
 
         {/* Badges */}
         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex flex-col gap-1.5 z-10">
+          {product.itemsPerPackage && product.itemsPerPackage > 1 && (
+            <span className="px-2 py-0.5 bg-blue-600/90 text-white text-[10px] md:text-[11px] font-bold rounded-md tracking-wider shadow-lg">
+              Min: {product.itemsPerPackage} dona
+            </span>
+          )}
           {product.is_bestseller && (
             <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] md:text-[11px] font-bold rounded-md uppercase tracking-wider shadow-lg">
               Bestseller

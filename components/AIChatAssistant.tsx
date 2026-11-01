@@ -24,7 +24,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
   const [formLoading, setFormLoading] = useState(false);
 
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: "Assalomu alaykum! Men LUXECORE onlayn do'koni yordamchisiman. Sizga qanday yordam bera olaman? Masalan, 'premium soatlar bormi' yoki 'sumkalar narxini ayt' deb so'rashingiz mumkin." }
+    { role: 'model', text: "Assalomu alaykum! Men LUXECORE ulgurji savdo yordamchisiman. Sizga qanday sovg'a qutilari, Yangi Yil qutilari yoki paketlar kerak? Masalan, 'Yangi Yil qutilari narxlari' yoki 'Kraft paketlar minimal partiyasi' deb so'rashingiz mumkin." }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -83,7 +83,7 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
     ).join('\n');
 
     return `
-      Siz LUXECORE onlayn do'konining sotuvchi-konsultantisiz.
+      Siz LUXECORE sovg'a qutilari, paketlar va qadoqlash mahsulotlari ulgurji do'konining sotuvchi-konsultantisiz. Barcha tovarlar O'rikzor omboridan 100 donadan boshlab ulgurji narxda sotiladi.
       Mijozingizning ismi: ${formData.name}. Unga ismi bilan murojaat qiling.
       Siz xushmuomala, "siz"lab va o'zbek tilida gaplashing.
       

@@ -23,7 +23,7 @@ export const INFO_CONTENT: Record<InfoTopic, LocalizedInfo> = {
       sections: [
         { heading: 'Yetkazib berish muddati', body: "Toshkent shahri bo'ylab — 1–2 ish kuni. Viloyatlarga — 2–5 ish kuni. Buyurtma tasdiqlangandan so'ng operatorimiz siz bilan bog'lanib, aniq vaqtni kelishib oladi." },
         { heading: 'Yetkazib berish narxi', body: "2 000 000 so'mdan yuqori buyurtmalar uchun yetkazib berish bepul. Undan kam summadagi buyurtmalar uchun yetkazib berish narxi — 40 000 so'm." },
-        { heading: 'Minimal buyurtma', body: "Minimal buyurtma summasi — 500 000 so'm." },
+        { heading: 'Minimal buyurtma', body: "Minimal buyurtma summasi — 200 000 so'm (yoki 100 dona)." },
         { heading: 'Buyurtmani kuzatish', body: "Buyurtma raqamingiz orqali saytdagi \"Kuzatish\" sahifasida buyurtma holatini istalgan vaqtda tekshirishingiz mumkin." },
       ],
     },
@@ -34,7 +34,7 @@ export const INFO_CONTENT: Record<InfoTopic, LocalizedInfo> = {
       sections: [
         { heading: 'Сроки доставки', body: 'По Ташкенту — 1–2 рабочих дня. В регионы — 2–5 рабочих дней. После подтверждения заказа наш оператор свяжется с вами и согласует точное время.' },
         { heading: 'Стоимость доставки', body: 'Для заказов на сумму свыше 2 000 000 сум доставка бесплатная. Для заказов на меньшую сумму стоимость доставки — 40 000 сум.' },
-        { heading: 'Минимальный заказ', body: 'Минимальная сумма заказа — 500 000 сум.' },
+        { heading: 'Минимальный заказ', body: 'Минимальная сумма заказа — 200 000 сум (или 100 шт).' },
         { heading: 'Отслеживание заказа', body: 'По номеру заказа вы можете в любой момент проверить статус на странице «Отслеживание».' },
       ],
     },
@@ -45,7 +45,7 @@ export const INFO_CONTENT: Record<InfoTopic, LocalizedInfo> = {
       sections: [
         { heading: 'Delivery time', body: 'Tashkent city — 1–2 business days. Regions — 2–5 business days. After your order is confirmed, our operator will contact you to agree on the exact time.' },
         { heading: 'Delivery cost', body: 'Delivery is free for orders over 2,000,000 UZS. For smaller orders the delivery fee is 40,000 UZS.' },
-        { heading: 'Minimum order', body: 'The minimum order amount is 500,000 UZS.' },
+        { heading: 'Minimum order', body: 'The minimum order amount is 200,000 UZS (or 100 pcs).' },
         { heading: 'Order tracking', body: 'You can check your order status at any time on the "Tracking" page using your order number.' },
       ],
     },

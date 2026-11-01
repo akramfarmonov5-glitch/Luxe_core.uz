@@ -95,10 +95,10 @@ export async function handleAiMessage(ctx: Context) {
         const catalogSummary = await getCatalogSummary(lang);
 
         const systemInstruction =
-            `Sen LUXECORE premium do'konining rasmiy AI sotuvchi-konsultantisan. ` +
+            `Sen LUXECORE sovg'a qutilari, paketlar va qadoqlash mahsulotlari ulgurji savdosining rasmiy AI sotuvchi-konsultantisan. ` +
             `${langName} tilida xushmuomala, qisqa va aniq javob ber. Emoji ishlat.\n` +
             `Do'kon ma'lumotlari:\n` +
-            `- Minimal buyurtma summasi: 500,000 UZS\n` +
+            `- Minimal buyurtma summasi: 200,000 UZS\n` +
             `- Yetkazib berish: O'zbekiston bo'ylab 40,000 UZS (2,000,000 UZS dan oshsa BEPUL)\n` +
             `- Aloqa: ${config.CONTACT_PHONE} (${config.CONTACT_USERNAME})\n` +
             `- Sayt: ${config.SITE_URL}\n` +

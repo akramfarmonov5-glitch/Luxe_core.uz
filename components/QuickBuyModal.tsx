@@ -47,7 +47,14 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  const total = product.price * quantity;
+  const initialQty = quantity > 1 ? quantity : (product.itemsPerPackage || 100);
+  const [selectedQty, setSelectedQty] = useState<number>(initialQty);
+
+  useEffect(() => {
+    setSelectedQty(quantity > 1 ? quantity : (product.itemsPerPackage || 100));
+  }, [quantity, product.itemsPerPackage]);
+
+  const total = product.price * selectedQty;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('uz-UZ').format(price) + ' UZS';
@@ -76,7 +83,7 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
           phone: formData.phone,
           paymentMethod: 'cash',
           telegramUserId: tgUserId,
-          items: [{ id: product.id, quantity }],
+          items: [{ id: product.id, quantity: selectedQty }],
         }),
       });
 
@@ -157,8 +164,58 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
                   </div>
                   <div>
                     <h3 className={`font-medium text-sm line-clamp-1 ${isDark ? 'text-white' : 'text-light-text'}`}>{getLocalizedText(product.name, lang)}</h3>
-                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>Soni: {quantity} ta</p>
-                    <p className="text-gold-400 font-bold mt-1 max-w-full truncate">{formatPrice(total)}</p>
+                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>Narxi: {formatPrice(product.price)} / dona</p>
+                    <p className="text-gold-400 font-bold mt-1 max-w-full truncate">Jami: {formatPrice(total)} ({selectedQty} dona)</p>
+                  </div>
+                </div>
+
+                <div className="mb-5 p-3 rounded-2xl border border-gold-500/20 bg-gold-500/5">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-gold-400' : 'text-amber-800'}`}>
+                      📦 Buyurtma miqdori:
+                    </label>
+                    <span className="text-xs text-gold-400 font-semibold">
+                      {selectedQty} dona
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1.5 mb-2.5">
+                    {[
+                      product.itemsPerPackage || 100,
+                      (product.itemsPerPackage || 100) * 2,
+                      (product.itemsPerPackage || 100) * 5,
+                      (product.itemsPerPackage || 100) * 10,
+                    ].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setSelectedQty(preset)}
+                        className={`py-1.5 px-1 text-xs font-bold rounded-xl transition-all border ${
+                          selectedQty === preset
+                            ? 'bg-gold-500 text-black border-gold-500 shadow-md scale-105'
+                            : isDark
+                            ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-100'
+                        }`}
+                      >
+                        {preset} ta
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min={product.itemsPerPackage || 1}
+                      step={product.itemsPerPackage || 10}
+                      value={selectedQty}
+                      onChange={(e) => setSelectedQty(Math.max(1, Number(e.target.value) || 1))}
+                      className={`flex-1 border rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-gold-400/50 transition-all ${
+                        isDark
+                          ? 'bg-dark-800 border-white/10 text-white placeholder-gray-600'
+                          : 'bg-white border-gray-200 text-light-text placeholder-gray-400'
+                      }`}
+                      placeholder="Miqdor kiriting"
+                    />
+                    <span className={`text-xs font-semibold ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>dona</span>
                   </div>
                 </div>
 

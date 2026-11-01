@@ -4,7 +4,7 @@ import { MOCK_PRODUCTS } from '../constants';
 import { getLocalizedText } from './i18nUtils';
 import type { Product } from '../types';
 
-export const MIN_ORDER_AMOUNT = 500_000;
+export const MIN_ORDER_AMOUNT = 200_000;
 export const FREE_DELIVERY_THRESHOLD = 2_000_000;
 export const DELIVERY_FEE = 40_000;
 

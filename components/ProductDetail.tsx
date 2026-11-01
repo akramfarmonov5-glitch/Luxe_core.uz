@@ -73,8 +73,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
       try {
         const languageName = lang === 'uz' ? 'Uzbek (Cyrillic or Latin as common)' : lang === 'ru' ? 'Russian' : 'English';
         const text = await requestGeminiText({
-          systemInstruction: 'You write elegant but concise product copy for e-commerce product pages.',
-          message: `Write a short, sophisticated, and persuasive product description for a luxury e-commerce item named "${getLocalizedText(product.name, 'uz')}" in the "${getCategoryDisplayName(product.category, categories, 'uz')}" category. The description must be in ${languageName}. Keep it premium, minimal, and limited to 3 sentences.`,
+          systemInstruction: 'You write concise, compelling product copy for wholesale gift boxes, packaging and bag supplies.',
+          message: `Write a short, practical, and persuasive product description for a wholesale packaging item named "${getLocalizedText(product.name, 'uz')}" in the "${getCategoryDisplayName(product.category, categories, 'uz')}" category. The description must be in ${languageName}. Emphasize quality, business suitability, and wholesale bulk availability. Keep it within 3 sentences.`,
         });
         clearTimeout(timeoutId);
 
@@ -465,7 +465,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
         isOpen={isQuickBuyOpen}
         onClose={() => setIsQuickBuyOpen(false)}
         product={product}
-        quantity={1}
+        quantity={product.itemsPerPackage || 100}
       />
       {product.stock !== 0 && (
         <div className={`fixed inset-x-0 bottom-0 z-40 border-t px-4 py-3 md:hidden ${
