@@ -138,10 +138,12 @@ const translations: Record<string, Record<Lang, string>> = {
             '🌐 Язык — сменить язык',
     },
 
-    product_price: { uz: '💰 Narxi:', ru: '💰 Цена:' },
-    product_stock_yes: { uz: '✅ Mavjud', ru: '✅ В наличии' },
+    product_price: { uz: '💰 Narxi (1 dona):', ru: '💰 Цена (за 1 шт):' },
+    product_min_order: { uz: '📦 Min. buyurtma:', ru: '📦 Мин. заказ:' },
+    product_pcs: { uz: 'dona', ru: 'шт' },
+    product_stock_yes: { uz: '✅ Omborda mavjud', ru: '✅ В наличии на складе' },
     product_stock_no: { uz: '❌ Tugagan', ru: '❌ Нет в наличии' },
-    product_status: { uz: '📦 Holat:', ru: '📦 Статус:' },
+    product_status: { uz: '🏷 Holat:', ru: '🏷 Статус:' },
 
     new_order: { uz: '🆕 Yangi buyurtma!', ru: '🆕 Новый заказ!' },
 

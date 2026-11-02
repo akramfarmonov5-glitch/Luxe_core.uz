@@ -67,7 +67,7 @@ async function main() {
     const server = http.createServer((req, res) => {
         if (req.url === '/health' || req.url === '/') {
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ status: 'ok', bot: 'LUXECORE Bot', version: '2.2.0', startedAt, uptime: process.uptime() }));
+            res.end(JSON.stringify({ status: 'ok', bot: 'LUXECORE Bot', version: '2.3.0', startedAt, uptime: process.uptime() }));
         } else {
             res.writeHead(404);
             res.end('Not found');

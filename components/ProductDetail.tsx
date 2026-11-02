@@ -263,8 +263,17 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
             <div className="py-4 md:py-6 border-t border-white/10 border-b border-white/10 mb-4 md:mb-6">
               <div className="flex items-end justify-between mb-3 md:mb-4">
                 <div>
-                  <p className="text-gray-400 text-xs mb-1">{t('total_sum')}</p>
+                  <p className="text-gray-400 text-xs mb-1">{t('unit_wholesale_price')}</p>
                   <p className={`text-3xl md:text-4xl font-light ${isDark ? 'text-white' : 'text-gray-900'}`}>{product.formattedPrice}</p>
+                  {(() => {
+                    const minQty = product.itemsPerPackage && product.itemsPerPackage > 1 ? product.itemsPerPackage : 100;
+                    const packSum = (Number(product.price || 0) * minQty).toLocaleString('uz-UZ');
+                    return (
+                      <p className="text-xs text-gold-400 mt-1 font-medium">
+                        {t('pack_total_label')} ({minQty} {t('stock_in')}): {packSum} UZS
+                      </p>
+                    );
+                  })()}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -282,6 +291,28 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   </button>
                 </div>
               </div>
+
+              {(() => {
+                const minQty = product.itemsPerPackage && product.itemsPerPackage > 1 ? product.itemsPerPackage : 100;
+                const basePrice = Number(product.price || 0);
+                const tier2Price = Math.max(50, Math.round((basePrice * 0.95) / 50) * 50);
+                return (
+                  <div className={`grid grid-cols-3 gap-2 mb-4 p-2.5 rounded-xl border text-center ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                    <div className="px-2 py-1.5 rounded-lg bg-gold-500/10 border border-gold-500/20">
+                      <p className="text-[10px] text-gold-400 font-semibold">{minQty}–499 {t('stock_in')}</p>
+                      <p className={`text-xs md:text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{basePrice.toLocaleString('uz-UZ')} UZS</p>
+                    </div>
+                    <div className="px-2 py-1.5 rounded-lg">
+                      <p className="text-[10px] text-gray-400 font-semibold">500–999 {t('stock_in')}</p>
+                      <p className={`text-xs md:text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{tier2Price.toLocaleString('uz-UZ')} UZS</p>
+                    </div>
+                    <div className="px-2 py-1.5 rounded-lg">
+                      <p className="text-[10px] text-gray-400 font-semibold">1000+ {t('stock_in')}</p>
+                      <p className="text-xs md:text-sm font-bold text-emerald-400">{t('wholesale_tier_vip')}</p>
+                    </div>
+                  </div>
+                );
+              })()}
               <div className="grid grid-cols-2 gap-3 md:gap-4 mb-3">
                 <button
                   onClick={handleAddToCart}

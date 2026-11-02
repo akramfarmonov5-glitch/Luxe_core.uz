@@ -145,6 +145,10 @@ const translations: Translations = {
     view: { uz: 'Ko\'rish', ru: 'Посмотреть', en: 'View' },
     items_per_package: { uz: 'To\'plamdagi soni', ru: 'Количество в наборе', en: 'Items per set' },
     items_per_package_desc: { uz: 'dona (minimal buyurtma)', ru: 'шт (минимальный заказ)', en: 'pcs (minimum order)' },
+    unit_wholesale_price: { uz: '1 dona ulgurji narxi', ru: 'Оптовая цена за 1 шт', en: 'Wholesale price per 1 pc' },
+    pack_total_label: { uz: '1 pachka', ru: '1 упаковка', en: '1 pack' },
+    wholesale_tiers_title: { uz: 'Ulgurji narx pog\'onalari', ru: 'Оптовые ценовые уровни', en: 'Wholesale price tiers' },
+    wholesale_tier_vip: { uz: 'Kelishilgan (VIP)', ru: 'Договорная (VIP)', en: 'Negotiable (VIP)' },
 
     // Toast Messages
     toast_added_to_cart: { uz: 'Mahsulot savatchaga qo\'shildi', ru: 'Товар добавлен в корзину', en: 'Product added to cart' },

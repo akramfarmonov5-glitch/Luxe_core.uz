@@ -54,19 +54,22 @@ export async function handleAddToCart(ctx: Context) {
         if (!product) return;
 
         const productName = localizeText(product.name, getLang(userId));
+        const step = Number(product.itemsPerPackage) > 1 ? Number(product.itemsPerPackage) : 100;
         const cart = getUserCart(userId);
         const existing = cart.find(i => i.productId === productId);
 
         if (existing) {
-            existing.quantity += 1;
+            existing.quantity += step;
             existing.name = productName;
+            existing.itemsPerPackage = step;
         } else {
             cart.push({
                 productId: product.id,
                 name: productName,
                 price: product.price,
-                quantity: 1,
+                quantity: step,
                 image: product.image,
+                itemsPerPackage: step,
             });
         }
 
@@ -76,8 +79,8 @@ export async function handleAddToCart(ctx: Context) {
         await ensureUser(userId, ctx.from?.first_name);
 
         await ctx.reply(
-            `🛒 *${productName}* ${t(userId, 'cart_added')}\n\n` +
-            `Savatda: ${cart.length} xil, ${cart.reduce((s, i) => s + i.quantity, 0)} dona`,
+            `🛒 *${productName}* (+${step} ${t(userId, 'product_pcs')}) ${t(userId, 'cart_added')}\n\n` +
+            `Savatda: ${cart.length} xil, ${cart.reduce((s, i) => s + i.quantity, 0)} ${t(userId, 'product_pcs')}`,
             {
                 parse_mode: 'Markdown',
                 reply_markup: new InlineKeyboard()
@@ -149,7 +152,8 @@ export async function handleCartPlus(ctx: Context) {
     const cart = getUserCart(userId);
     const item = cart.find(i => i.productId === productId);
     if (item) {
-        item.quantity += 1;
+        const step = item.itemsPerPackage && item.itemsPerPackage > 1 ? item.itemsPerPackage : 100;
+        item.quantity += step;
         carts.set(userId, cart);
     }
     await ctx.answerCallbackQuery(t(userId, 'cart_updated'));
@@ -163,8 +167,9 @@ export async function handleCartMinus(ctx: Context) {
     const cart = getUserCart(userId);
     const idx = cart.findIndex(i => i.productId === productId);
     if (idx >= 0) {
-        if (cart[idx].quantity > 1) {
-            cart[idx].quantity -= 1;
+        const step = cart[idx].itemsPerPackage && cart[idx].itemsPerPackage! > 1 ? cart[idx].itemsPerPackage! : 100;
+        if (cart[idx].quantity > step) {
+            cart[idx].quantity -= step;
         } else {
             cart.splice(idx, 1);
         }

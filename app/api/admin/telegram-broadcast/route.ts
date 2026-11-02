@@ -79,12 +79,15 @@ async function sendProductPostToChannel(token: string, botUsername: string, prod
   const descUz = getLocalizedText(product.description || product.shortDescription, 'uz') || '';
   const formattedPrice =
     product.formattedPrice || `${Number(product.price || 0).toLocaleString('uz-UZ')} UZS`;
-  const stockText = product.stock && Number(product.stock) > 0 ? '✅ Mavjud' : '❌ Tugagan';
+  const minQty = Number(product.itemsPerPackage) > 1 ? Number(product.itemsPerPackage) : 100;
+  const packSum = (Number(product.price || 0) * minQty).toLocaleString('uz-UZ');
+  const stockText = product.stock && Number(product.stock) > 0 ? '✅ Omborda mavjud' : '❌ Tugagan';
 
   const caption =
     `🏷 <b>${escapeHtml(nameUz)}</b>\n\n` +
-    `💰 Narxi: <b>${escapeHtml(formattedPrice)}</b>\n` +
-    `📦 Holati: ${stockText}\n` +
+    `💰 1 dona ulgurji narxi: <b>${escapeHtml(formattedPrice)}</b>\n` +
+    `📦 Min. buyurtma: <b>${minQty} dona</b> (${escapeHtml(packSum)} UZS)\n` +
+    `🏷 Holati: ${stockText}\n` +
     (descUz ? `\n📝 ${escapeHtml(descUz)}\n` : '') +
     `\n🛒 <i>Buyurtma berish uchun quyidagi tugmalardan foydalaning:</i>`;
 

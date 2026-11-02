@@ -91,12 +91,15 @@ async function sendProductToChannel(ctx: Context, product: any) {
     const productName = localizeText(product.name, 'uz');
     const shortDesc = localizeText(product.shortDescription || product.description, 'uz');
     const price = Number(product.price).toLocaleString('uz-UZ');
-    const stock = product.stock && product.stock > 0 ? '✅ Mavjud' : '❌ Tugagan';
+    const minQty = Number(product.itemsPerPackage) > 1 ? Number(product.itemsPerPackage) : 100;
+    const packSum = (Number(product.price || 0) * minQty).toLocaleString('uz-UZ');
+    const stock = product.stock && product.stock > 0 ? '✅ Omborda mavjud' : '❌ Tugagan';
 
     const caption =
         `🏷 *${productName}*\n\n` +
-        `💰 Narxi: *${product.formattedPrice || price + ' UZS'}*\n` +
-        `📦 ${stock}\n` +
+        `💰 1 dona ulgurji narxi: *${product.formattedPrice || price + ' UZS'}*\n` +
+        `📦 Min. buyurtma: *${minQty} dona* (${packSum} UZS)\n` +
+        `🏷 ${stock}\n` +
         `${shortDesc ? `\n📝 ${shortDesc}\n` : ''}` +
         `\n🛒 Buyurtma berish uchun botga yozing yoki saytga kiring!`;
 

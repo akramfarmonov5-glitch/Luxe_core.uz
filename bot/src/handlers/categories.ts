@@ -99,11 +99,14 @@ export async function sendProductCard(
     const productName = localizeText(p.name, lang);
     const shortDesc = localizeText(p.shortDescription || p.description, lang);
     const price = Number(p.price).toLocaleString('uz-UZ');
+    const minQty = Number(p.itemsPerPackage) > 1 ? Number(p.itemsPerPackage) : 100;
+    const packSum = (Number(p.price || 0) * minQty).toLocaleString('uz-UZ');
     const stockText = p.stock && p.stock > 0 ? t(userId, 'product_stock_yes') : t(userId, 'product_stock_no');
 
     const caption =
         `🏷 *${productName}*\n\n` +
         `${t(userId, 'product_price')} *${p.formattedPrice || price + ' UZS'}*\n` +
+        `${t(userId, 'product_min_order')} *${minQty} ${t(userId, 'product_pcs')}* (${packSum} UZS)\n` +
         `${t(userId, 'product_status')} ${stockText}\n` +
         `${shortDesc ? `\n📝 ${shortDesc}` : ''}`;
 

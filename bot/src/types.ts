@@ -9,6 +9,7 @@ export interface Product {
     shortDescription: string;
     specs: { label: string; value: string }[];
     stock?: number;
+    itemsPerPackage?: number;
 }
 
 export interface Category {
@@ -37,6 +38,7 @@ export interface CartItem {
     price: number;
     quantity: number;
     image: string;
+    itemsPerPackage?: number;
 }
 
 export interface PromoCode {
