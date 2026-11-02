@@ -79,7 +79,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     },
     verification: {
       google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
-      yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || undefined,
+      yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION || 'c60e9863ba102b04',
     },
   };
 }
