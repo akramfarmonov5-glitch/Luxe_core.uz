@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { useCart, getWholesaleUnitPrice } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedText } from '../lib/i18nUtils';
@@ -15,7 +15,7 @@ interface CartSidebarProps {
 }
 
 const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
-  const { cart, isCartOpen, toggleCart, closeCart, removeFromCart, updateQuantity, cartTotal } = useCart();
+  const { cart, isCartOpen, toggleCart, closeCart, removeFromCart, updateQuantity, cartTotal, wholesaleSavings } = useCart();
   const { isDark } = useTheme();
   const { lang, t } = useLanguage();
   const deliveryFee = cartTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
@@ -110,7 +110,26 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                       </div>
 
                       <div className="flex items-end justify-between">
-                        <p className="text-gold-400 font-medium">{formatPrice(item.price)}</p>
+                        <div>
+                          {(() => {
+                            const effectivePrice = getWholesaleUnitPrice(item.price, item.quantity);
+                            const hasTierDiscount = effectivePrice < item.price;
+                            const tierPct = item.quantity >= 1000 ? 10 : item.quantity >= 500 ? 5 : 0;
+                            return (
+                              <>
+                                {hasTierDiscount && (
+                                  <div className="flex items-center gap-1.5 mb-0.5">
+                                    <span className="text-[10px] line-through text-gray-500">{formatPrice(item.price)}</span>
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">
+                                      -{tierPct}% ulgurji
+                                    </span>
+                                  </div>
+                                )}
+                                <p className="text-gold-400 font-medium">{formatPrice(effectivePrice)}</p>
+                              </>
+                            );
+                          })()}
+                        </div>
 
                         <div className="flex items-center gap-3 bg-white/5 rounded-full px-2 py-1 border border-white/5">
                           <button
@@ -137,7 +156,34 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
             {/* Footer */}
             {cart.length > 0 && (
               <div className={`p-6 border-t ${isDark ? 'border-white/10 bg-dark-900' : 'border-light-border bg-light-card'}`}>
+                {(() => {
+                  const nextTierItem = cart.find((i) => i.quantity < 500);
+                  if (nextTierItem) {
+                    const needed = 500 - nextTierItem.quantity;
+                    return (
+                      <div className="mb-4 px-3 py-2 rounded-xl bg-gold-500/10 border border-gold-500/20 text-xs text-gold-400">
+                        🔥 <b>{getLocalizedText(nextTierItem.name, lang)}</b> dan yana <b>{needed} {t('stock_in')}</b> qo&apos;shsangiz, <b>-5% ulgurji chegirma</b> yonadi!
+                      </div>
+                    );
+                  }
+                  const vipTierItem = cart.find((i) => i.quantity >= 500 && i.quantity < 1000);
+                  if (vipTierItem) {
+                    const neededVip = 1000 - vipTierItem.quantity;
+                    return (
+                      <div className="mb-4 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400">
+                        💎 Yana <b>{neededVip} {t('stock_in')}</b> qo&apos;shsangiz, <b>-10% VIP ulgurji narx</b> hisoblanadi!
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
                 <div className="space-y-3 mb-6">
+                  {wholesaleSavings > 0 && (
+                    <div className="flex justify-between text-sm text-emerald-400 font-medium">
+                      <span>🔥 {lang === 'ru' ? 'Оптовая скидка' : 'Ulgurji chegirma'}</span>
+                      <span>-{formatPrice(wholesaleSavings)}</span>
+                    </div>
+                  )}
                   <div className={`flex justify-between text-sm ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
                     <span>{t('checkout_products_sum')}</span>
                     <span>{formatPrice(cartTotal)}</span>

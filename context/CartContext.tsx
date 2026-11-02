@@ -5,6 +5,18 @@ import { trackAddToCart } from '../lib/fpixel';
 import { trackAddToCart as trackGaAddToCart } from '../lib/analytics';
 import { getLocalizedText } from '../lib/i18nUtils';
 
+export function getWholesaleUnitPrice(basePrice: number, quantity: number): number {
+  const cleanBase = Number(basePrice || 0);
+  if (cleanBase <= 0) return 0;
+  if (quantity >= 1000) {
+    return Math.max(50, Math.round((cleanBase * 0.9) / 50) * 50);
+  }
+  if (quantity >= 500) {
+    return Math.max(50, Math.round((cleanBase * 0.95) / 50) * 50);
+  }
+  return cleanBase;
+}
+
 interface CartContextType {
   cart: CartItem[];
   isCartOpen: boolean;
@@ -15,6 +27,8 @@ interface CartContextType {
   closeCart: () => void;
   clearCart: () => void;
   cartTotal: number;
+  cartBaseTotal: number;
+  wholesaleSavings: number;
   cartCount: number;
 }
 
@@ -92,7 +106,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const closeCart = () => setIsCartOpen(false);
   const clearCart = () => setCart([]);
 
-  const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const cartBaseTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const cartTotal = cart.reduce(
+    (total, item) => total + getWholesaleUnitPrice(item.price, item.quantity) * item.quantity,
+    0
+  );
+  const wholesaleSavings = Math.max(0, cartBaseTotal - cartTotal);
   const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
 
   return (
@@ -107,6 +126,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         closeCart,
         clearCart,
         cartTotal,
+        cartBaseTotal,
+        wholesaleSavings,
         cartCount,
       }}
     >

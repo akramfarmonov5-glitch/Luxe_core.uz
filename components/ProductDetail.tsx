@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, Box, Activity, Zap, PlayCircle, X, Youtube, ExternalLink, ArrowRight, Heart, Play, Share2 } from 'lucide-react';
 import { Category, Product } from '../types';
-import { useCart } from '../context/CartContext';
+import { useCart, getWholesaleUnitPrice } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
@@ -299,20 +299,22 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
               {(() => {
                 const minQty = product.itemsPerPackage && product.itemsPerPackage > 1 ? product.itemsPerPackage : 100;
                 const basePrice = Number(product.price || 0);
-                const tier2Price = Math.max(50, Math.round((basePrice * 0.95) / 50) * 50);
+                const tier2Price = getWholesaleUnitPrice(basePrice, 500);
+                const tier3Price = getWholesaleUnitPrice(basePrice, 1000);
+                const activeTier = selectedQty >= 1000 ? 3 : selectedQty >= 500 ? 2 : 1;
                 return (
                   <div className={`grid grid-cols-3 gap-2 mb-4 p-2.5 rounded-xl border text-center ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-gray-50 border-gray-200'}`}>
-                    <div className="px-2 py-1.5 rounded-lg bg-gold-500/10 border border-gold-500/20">
-                      <p className="text-[10px] text-gold-400 font-semibold">{minQty}–499 {t('stock_in')}</p>
+                    <div className={`px-2 py-1.5 rounded-lg transition-all ${activeTier === 1 ? 'bg-gold-500/15 border border-gold-500/30' : ''}`}>
+                      <p className={`text-[10px] font-semibold ${activeTier === 1 ? 'text-gold-400' : 'text-gray-400'}`}>{minQty}–499 {t('stock_in')}</p>
                       <p className={`text-xs md:text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{basePrice.toLocaleString('uz-UZ')} UZS</p>
                     </div>
-                    <div className="px-2 py-1.5 rounded-lg">
-                      <p className="text-[10px] text-gray-400 font-semibold">500–999 {t('stock_in')}</p>
+                    <div className={`px-2 py-1.5 rounded-lg transition-all ${activeTier === 2 ? 'bg-gold-500/15 border border-gold-500/30' : ''}`}>
+                      <p className={`text-[10px] font-semibold ${activeTier === 2 ? 'text-gold-400' : 'text-gray-400'}`}>500–999 {t('stock_in')} (-5%)</p>
                       <p className={`text-xs md:text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{tier2Price.toLocaleString('uz-UZ')} UZS</p>
                     </div>
-                    <div className="px-2 py-1.5 rounded-lg">
-                      <p className="text-[10px] text-gray-400 font-semibold">1000+ {t('stock_in')}</p>
-                      <p className="text-xs md:text-sm font-bold text-emerald-400">{t('wholesale_tier_vip')}</p>
+                    <div className={`px-2 py-1.5 rounded-lg transition-all ${activeTier === 3 ? 'bg-emerald-500/15 border border-emerald-500/30' : ''}`}>
+                      <p className={`text-[10px] font-semibold ${activeTier === 3 ? 'text-emerald-400' : 'text-gray-400'}`}>1000+ {t('stock_in')} (-10%)</p>
+                      <p className="text-xs md:text-sm font-bold text-emerald-400">{tier3Price.toLocaleString('uz-UZ')} UZS</p>
                     </div>
                   </div>
                 );
@@ -324,7 +326,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   </span>
                   <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {Math.round(selectedQty / packSize)} {lang === 'ru' ? 'уп.' : 'pachka'} ({selectedQty} {t('stock_in')}) ={' '}
-                    <span className="text-gold-400">{(Number(product.price || 0) * selectedQty).toLocaleString('uz-UZ')} UZS</span>
+                    <span className="text-gold-400">{(getWholesaleUnitPrice(Number(product.price || 0), selectedQty) * selectedQty).toLocaleString('uz-UZ')} UZS</span>
                   </span>
                 </div>
                 <div className="grid grid-cols-4 gap-1.5 mb-2">

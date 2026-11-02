@@ -16,7 +16,7 @@ interface CheckoutProps {
   onBack: () => void;
 }
 
-const MIN_ORDER_AMOUNT = 500_000;
+const MIN_ORDER_AMOUNT = 200_000;
 const FREE_DELIVERY_THRESHOLD = 2_000_000;
 const DELIVERY_FEE = 40_000;
 

@@ -8,6 +8,18 @@ export const MIN_ORDER_AMOUNT = 200_000;
 export const FREE_DELIVERY_THRESHOLD = 2_000_000;
 export const DELIVERY_FEE = 40_000;
 
+export function getWholesaleUnitPrice(basePrice: number, quantity: number): number {
+  const cleanBase = Number(basePrice || 0);
+  if (cleanBase <= 0) return 0;
+  if (quantity >= 1000) {
+    return Math.max(50, Math.round((cleanBase * 0.9) / 50) * 50);
+  }
+  if (quantity >= 500) {
+    return Math.max(50, Math.round((cleanBase * 0.95) / 50) * 50);
+  }
+  return cleanBase;
+}
+
 const FALLBACK_PROMO_RULES: Record<string, number> = {
   LUXE2026: 0.1,
   PAKET2026: 0.1,
@@ -153,7 +165,8 @@ export async function calculateCheckoutPricing(
       throw new Error(`${getLocalizedText(product.name, 'uz')} uchun yetarli stock mavjud emas`);
     }
 
-    return sum + Number(product.price || 0) * item.quantity;
+    const unitPrice = getWholesaleUnitPrice(Number(product.price || 0), item.quantity);
+    return sum + unitPrice * item.quantity;
   }, 0);
 
   const { normalizedPromo, promoRate, promoStatus } = await resolvePromoRate(promoCode);
@@ -276,7 +289,7 @@ export function toOrderItems(items: CheckoutItemInput[], products: Product[]) {
       id: product.id,
       name: getLocalizedText(product.name, 'uz'),
       quantity: item.quantity,
-      price: Number(product.price || 0),
+      price: getWholesaleUnitPrice(Number(product.price || 0), item.quantity),
     };
   });
 }
