@@ -4,24 +4,47 @@ import { getLocalizedText } from '../../../../lib/i18nUtils';
 import { SITE_URL } from '../../../../lib/siteUrl';
 import { blogSlug } from '../../../../lib/slugify';
 import { SEO_LANGUAGES } from '../../../../lib/seoLanguage';
+import { DEFAULT_BLOG_POSTS } from '../../../../constants';
 
-function resolveBlogId(raw: string): string {
-  if (!isNaN(Number(raw))) return raw;
+function resolveBlogId(raw: string): number | null {
+  if (!isNaN(Number(raw))) return Number(raw);
   if (raw.includes('-')) {
     const parts = raw.split('-');
-    return parts[parts.length - 1];
+    const maybeId = Number(parts[parts.length - 1]);
+    if (!isNaN(maybeId)) return maybeId;
   }
-  return raw;
+  return null;
 }
 
 async function loadPost(rawId: string) {
   const blogId = resolveBlogId(rawId);
-  const { data: post } = await supabase
-    .from('blog_posts')
-    .select('*')
-    .eq('id', blogId)
-    .single();
-  return post;
+  if (blogId !== null) {
+    const { data: post } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('id', blogId)
+      .maybeSingle();
+    if (post) return post;
+  }
+
+  try {
+    const { data: bySlug } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .ilike('slug', `%${rawId}%`)
+      .limit(1);
+    if (bySlug && bySlug.length > 0) return bySlug[0];
+  } catch {}
+
+  const fallbackPost = DEFAULT_BLOG_POSTS.find((p) => {
+    if (blogId !== null && p.id === blogId) return true;
+    const slugUz = getLocalizedText(p.slug, 'uz');
+    const slugRu = getLocalizedText(p.slug, 'ru');
+    const slugEn = getLocalizedText(p.slug, 'en');
+    return slugUz === rawId || slugRu === rawId || slugEn === rawId || (typeof p.slug === 'string' && p.slug === rawId);
+  });
+
+  return fallbackPost || null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string, lang: string }> }) {
@@ -31,12 +54,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     if (!post) return { title: 'Maqola topilmadi | LUXECORE' };
 
     const lang = paramsLang || 'uz';
-    const seoTitle = getLocalizedText(post.seo?.title, lang) || getLocalizedText(post.title, lang);
+    const seoTitle = getLocalizedText(post.seo?.title || post.seo_title, lang) || getLocalizedText(post.title, lang);
     const seoDesc = (
-      getLocalizedText(post.seo?.description, lang)
+      getLocalizedText(post.seo?.description || post.seo_description, lang)
       || getLocalizedText(post.content, lang)
     ).substring(0, 160);
-    const keywordsRaw = getLocalizedText(post.seo?.keywords, lang);
+    const keywordsRaw = getLocalizedText(post.seo?.keywords || post.seo_keywords, lang);
     const keywords = typeof keywordsRaw === 'string'
       ? keywordsRaw.split(',').map((k) => k.trim()).filter(Boolean)
       : Array.isArray(keywordsRaw) ? keywordsRaw : [];
@@ -96,7 +119,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.jpg` },
     },
     description: (
-      getLocalizedText(post.seo?.description, activeLang)
+      getLocalizedText(post.seo?.description || post.seo_description, activeLang)
       || getLocalizedText(post.content, activeLang)
     ).substring(0, 160),
     mainEntityOfPage: {

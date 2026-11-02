@@ -77,3 +77,26 @@
 1. **Haqiqiy mahsulot rasmlarini yuklash:** `luxe-core.uz/uz/admin` → **Mahsulotlar** bo'limidan vaqtinchalik Unsplash rasmlarni ombordagi real mahsulot rasmlariga almashtirish.
 2. **Kanalga chiqarish:** Rasmi yangilangan mahsulotlar yonidagi **`📢 Kanalga`** tugmasini bosib `@luxecoreuz` kanaliga chiqarish.
 3. **Google Search Console & Yandex Webmaster:** Ikkala panelda `https://luxe-core.uz/sitemap.xml` faylini yuborib qo'yish.
+
+
+---
+
+## 6. Supabase B2B SEO Maqolalari (Jonli Bazaga Joylandi)
+
+Supabase `blog_posts` jadvaliga Google va Yandex qidiruv tizimlaridan to'g'ridan-to'g'ri ulgurji xaridorlarni jalb qiluvchi **4 ta yangi sotuvchi B2B SEO-maqola** (O'zbek va Rus tillarida) to'liq kiritildi va avtomatlashtirildi:
+
+| ID | Maqola Sarlavhasi | SEO-Slug | Asosiy Kalit So'zlar |
+| :--- | :--- | :--- | :--- |
+| **#26** | **Yangi yil 2027 sovg'a qutilari optom (ulgurji)** | `yangi-yil-2027-sovga-qutilari-optom-ulgurji-narxlar` | `yangi yil 2027`, `sovg'a qutilari optom`, `O'rikzor ulgurji narxlar` |
+| **#27** | **Kraft, Zip-Lock va BOPP paketlar optom Toshkentda** | `kraft-zip-lock-va-bopp-paketlar-optom-toshkent` | `kraft paket optom`, `zip lock paket toshkent`, `uzum market qadoqlash` |
+| **#28** | **Bir martalik idishlar va konteynerlar O'rikzor optom narxlarida** | `bir-martalik-odnorazoviy-idishlar-optom-orikzor-narxlari` | `bir martalik idishlar optom`, `odnorazoviy idishlar`, `kafe dostavka qadoqlari` |
+| **#29** | **To'y va sarpo qutilari hamda premium Gift Box'lar ulgurji** | `toy-va-sarpo-qutilari-sovga-qutilari-optom` | `to'y qutilari optom`, `sarpo qutilari ulgurji`, `gift box toshkent` |
+
+### Har bir maqola ichiga singdirilgan B2B Savdo Standartlari:
+1. **3 Pog'onali Ulgurji Chegirma:** `100–499 dona` (bazaviy), `500–999 dona` (**-5%**), `1000+ dona` (**-10% VIP chegirma**).
+2. **Pachkalab Tezkor Xarid:** `1x`, `2x`, `5x`, `10x` pachka tanlash imkoniyati.
+3. **📥 Excel Prays-List:** Katalog tepasidagi tugma orqali 1-bosishda narxlarni yuklab olish.
+4. **🖨 Rasmiy Yuk Xati (Накладная):** Yuridik shaxslar, korxona va do'konlar uchun muhr va imzo bilan rasmiy hujjat berilishi.
+5. **🚚 2 Mln So'mdan Bepul Yetkazish:** Toshkentda 2 soat ichida bepul, viloyatlarga 24 soatda jo'natish.
+6. **Ichki SEO Havolalar:** `/uz/catalog`, `/uz/tracking`, barcha 6 ta kategoriya va bazadagi real mahsulotlar (`/uz/product/bir-martalik-sous-idishi-75x42-mm-220-dona-28`, `/uz/product/premium-kraft-qogoz-stakanlari-250ml-qopqoq-29`) bilan bog'langan.
+7. **Interaktiv Markdown Renderer:** `BlogPostDetail.tsx` komponentida sarlavhalar, ro'yxatlar va havolalar bosiladigan oltin rangli linklar sifatida chiroyli vizual ko'rinishga keltirildi.

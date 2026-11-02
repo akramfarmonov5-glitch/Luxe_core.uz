@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { SITE_URL } from '../../lib/siteUrl';
 import { slugify, productSlug, blogSlug } from '../../lib/slugify';
+import { DEFAULT_BLOG_POSTS } from '../../constants';
 
 const BASE_URL = SITE_URL;
 const LANGUAGES = ['uz', 'ru', 'en'] as const;
@@ -35,6 +36,10 @@ export async function GET() {
       if (prodRes.data) products = prodRes.data;
       if (catRes.data) categories = catRes.data;
       if (blogRes.data) blogPosts = blogRes.data;
+    }
+
+    if (blogPosts.length === 0) {
+      blogPosts = DEFAULT_BLOG_POSTS;
     }
 
     // Fallback ro'yxatlar faqat Supabase sozlanmagan muhitda ishlatiladi

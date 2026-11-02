@@ -1,6 +1,6 @@
 import { unstable_cache } from 'next/cache';
 import { supabase, hasSupabaseCredentials } from './supabaseClient';
-import { MOCK_PRODUCTS, MOCK_CATEGORIES, DEFAULT_HERO_CONTENT, DEFAULT_NAVIGATION } from '../constants';
+import { MOCK_PRODUCTS, MOCK_CATEGORIES, DEFAULT_HERO_CONTENT, DEFAULT_NAVIGATION, DEFAULT_BLOG_POSTS } from '../constants';
 import { slugify } from './slugify';
 import { getLocalizedText } from './i18nUtils';
 import type { Product, Category, HeroContent, NavigationSettings, BlogPost } from '../types';
@@ -39,7 +39,7 @@ async function fetchGlobalDataUncached(): Promise<GlobalData> {
       categories: MOCK_CATEGORIES,
       heroContent: DEFAULT_HERO_CONTENT,
       navigationSettings: DEFAULT_NAVIGATION,
-      blogPosts: [],
+      blogPosts: DEFAULT_BLOG_POSTS,
     };
   }
 
@@ -72,7 +72,7 @@ async function fetchGlobalDataUncached(): Promise<GlobalData> {
   }
 
   let blogPosts: BlogPost[] = [];
-  if (blogRes.status === 'fulfilled' && blogRes.value.data) {
+  if (blogRes.status === 'fulfilled' && blogRes.value.data && blogRes.value.data.length > 0) {
     blogPosts = blogRes.value.data.map((post: any) => ({
       ...post,
       seo: post.seo || {
@@ -81,6 +81,8 @@ async function fetchGlobalDataUncached(): Promise<GlobalData> {
         keywords: post.seo_keywords || [],
       },
     })) as BlogPost[];
+  } else {
+    blogPosts = DEFAULT_BLOG_POSTS;
   }
 
   let navigationSettings: NavigationSettings = DEFAULT_NAVIGATION;
