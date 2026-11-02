@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import { Product, Category } from '../types';
-import { Filter, X, Check, Search, Download } from 'lucide-react';
+import { Filter, X, Check, Search, Download, Sparkles, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -39,6 +39,42 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
     }, [activeCategory]);
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isCustomLogoOpen, setIsCustomLogoOpen] = useState(false);
+    const [customForm, setCustomForm] = useState({
+        name: '',
+        phone: '',
+        packageType: "Sovg'a qutisi / Yangi yil qutisi",
+        quantity: '1 000 dona',
+        notes: '',
+    });
+    const [customSubmitting, setCustomSubmitting] = useState(false);
+    const [customSuccess, setCustomSuccess] = useState(false);
+    const [customError, setCustomError] = useState('');
+
+    const handleCustomLogoSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setCustomSubmitting(true);
+        setCustomError('');
+        try {
+            const res = await fetch('/api/custom-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customForm),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Xatolik');
+            setCustomSuccess(true);
+            setTimeout(() => {
+                setIsCustomLogoOpen(false);
+                setCustomSuccess(false);
+                setCustomForm({ name: '', phone: '', packageType: "Sovg'a qutisi / Yangi yil qutisi", quantity: '1 000 dona', notes: '' });
+            }, 2200);
+        } catch (err: any) {
+            setCustomError(err?.message || 'Xatolik yuz berdi');
+        } finally {
+            setCustomSubmitting(false);
+        }
+    };
     const [searchQuery, setSearchQuery] = useState('');
     const [sortOrder, setSortOrder] = useState<string>('newest');
     const [minPrice, setMinPrice] = useState<string>('');
@@ -119,6 +155,18 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                        <button
+                            type="button"
+                            onClick={() => setIsCustomLogoOpen(true)}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs md:text-sm font-bold border transition-all shrink-0 ${
+                                isDark
+                                    ? 'bg-white/5 border-white/15 text-white hover:border-gold-400 hover:text-gold-400'
+                                    : 'bg-white border-light-border text-light-text hover:border-gold-500'
+                            }`}
+                        >
+                            <Sparkles size={15} className="text-gold-400" />
+                            <span>{lang === 'ru' ? 'Свой логотип (1000+)' : 'Logotip tushirish (1000+)'}</span>
+                        </button>
                         <button
                             type="button"
                             onClick={handleDownloadPriceList}
@@ -378,6 +426,156 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                     </button>
                                 </div>
                             </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Custom Logo B2B Order Modal */}
+            <AnimatePresence>
+                {isCustomLogoOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsCustomLogoOpen(false)}
+                        className="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className={`w-full max-w-md rounded-2xl border p-6 shadow-2xl ${
+                                isDark ? 'bg-dark-900 border-white/15 text-white' : 'bg-white border-light-border text-light-text'
+                            }`}
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-2">
+                                    <Sparkles className="text-gold-400" size={20} />
+                                    <h3 className="text-lg font-bold">
+                                        {lang === 'ru' ? 'Индивидуальный заказ с логотипом' : 'Logotip tushirish (Individual buyurtma)'}
+                                    </h3>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsCustomLogoOpen(false)}
+                                    className="text-gray-400 hover:text-white"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            {customSuccess ? (
+                                <div className="py-8 text-center space-y-3">
+                                    <div className="w-12 h-12 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mx-auto">
+                                        <Check size={24} />
+                                    </div>
+                                    <h4 className="font-bold text-lg">
+                                        {lang === 'ru' ? 'Заявка отправлена!' : "So'rovingiz qabul qilindi!"}
+                                    </h4>
+                                    <p className="text-xs text-gray-400">
+                                        {lang === 'ru'
+                                            ? 'Наш B2B-менеджер свяжется с вами в течение 15 минут для расчета стоимости печати.'
+                                            : "B2B menejerimiz 15 daqiqa ichida siz bilan bog'lanib, logotip bosish narxini hisoblab beradi."}
+                                    </p>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleCustomLogoSubmit} className="space-y-3.5">
+                                    <p className="text-xs text-gray-400 leading-relaxed">
+                                        {lang === 'ru'
+                                            ? 'Нанесение вашего логотипа и фирменного стиля на коробки, крафт-пакеты, Zip-Lock и стаканы (от 1000 шт).'
+                                            : "Qutilar, kraft va Zip-Lock paketlar hamda kofe stakanlariga kompaniyangiz logotipini tushirib beramiz (minimal tiraj: 1000 dona)."}
+                                    </p>
+
+                                    <div>
+                                        <label className="text-xs text-gray-400 block mb-1">
+                                            {lang === 'ru' ? 'Ваше имя или название бренда *' : 'Ismingiz yoki Brend nomi *'}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={customForm.name}
+                                            onChange={(e) => setCustomForm({ ...customForm, name: e.target.value })}
+                                            placeholder={lang === 'ru' ? 'Например: OOO Baraka / Сардор' : 'Masalan: Baraka Market / Sardor'}
+                                            className={`w-full rounded-xl border px-3.5 py-2.5 text-sm focus:border-gold-400 focus:outline-none ${
+                                                isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-black'
+                                            }`}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-xs text-gray-400 block mb-1">
+                                            {lang === 'ru' ? 'Телефон для связи *' : 'Telefon raqamingiz *'}
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            required
+                                            value={customForm.phone}
+                                            onChange={(e) => setCustomForm({ ...customForm, phone: e.target.value })}
+                                            placeholder="+998 90 123 45 67"
+                                            className={`w-full rounded-xl border px-3.5 py-2.5 text-sm focus:border-gold-400 focus:outline-none ${
+                                                isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-black'
+                                            }`}
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2.5">
+                                        <div>
+                                            <label className="text-xs text-gray-400 block mb-1">
+                                                {lang === 'ru' ? 'Тип упаковки' : 'Qadoq turi'}
+                                            </label>
+                                            <select
+                                                value={customForm.packageType}
+                                                onChange={(e) => setCustomForm({ ...customForm, packageType: e.target.value })}
+                                                className={`w-full rounded-xl border px-3 py-2.5 text-xs focus:border-gold-400 focus:outline-none ${
+                                                    isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-black'
+                                                }`}
+                                            >
+                                                <option value="Sovg'a qutisi / Yangi yil qutisi">{lang === 'ru' ? 'Подарочные коробки' : "Sovg'a / Bayram qutisi"}</option>
+                                                <option value="Kraft paket (tutqichli)">{lang === 'ru' ? 'Крафт-пакеты' : 'Kraft paket'}</option>
+                                                <option value="Zip-Lock / Kuryer paket">{lang === 'ru' ? 'Zip-Lock / Курьерские' : 'Zip-Lock / Kuryer paket'}</option>
+                                                <option value="Kofe stakan / HoReCa">{lang === 'ru' ? 'Стаканы / HoReCa' : 'Kofe stakan / Idishlar'}</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="text-xs text-gray-400 block mb-1">
+                                                {lang === 'ru' ? 'Тираж (количество)' : 'Taxminiy soni (tiraj)'}
+                                            </label>
+                                            <select
+                                                value={customForm.quantity}
+                                                onChange={(e) => setCustomForm({ ...customForm, quantity: e.target.value })}
+                                                className={`w-full rounded-xl border px-3 py-2.5 text-xs focus:border-gold-400 focus:outline-none ${
+                                                    isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-gray-50 border-gray-200 text-black'
+                                                }`}
+                                            >
+                                                <option value="1 000 dona">1 000 {lang === 'ru' ? 'шт' : 'dona'}</option>
+                                                <option value="3 000 dona">3 000 {lang === 'ru' ? 'шт' : 'dona'}</option>
+                                                <option value="5 000 dona">5 000 {lang === 'ru' ? 'шт' : 'dona'}</option>
+                                                <option value="10 000+ dona">10 000+ {lang === 'ru' ? 'шт' : 'dona'}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {customError && (
+                                        <p className="text-xs text-red-400">{customError}</p>
+                                    )}
+
+                                    <button
+                                        type="submit"
+                                        disabled={customSubmitting}
+                                        className="w-full py-3 rounded-xl bg-gold-400 text-black font-bold text-sm hover:bg-gold-500 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+                                    >
+                                        <Send size={16} />
+                                        <span>
+                                            {customSubmitting
+                                                ? (lang === 'ru' ? 'Отправка...' : 'Yuborilmoqda...')
+                                                : (lang === 'ru' ? 'Запросить расчет стоимости' : 'Narx hisoblatish uchun yuborish')}
+                                        </span>
+                                    </button>
+                                </form>
+                            )}
                         </motion.div>
                     </motion.div>
                 )}
