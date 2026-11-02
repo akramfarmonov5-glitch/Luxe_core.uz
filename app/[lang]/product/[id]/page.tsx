@@ -39,13 +39,22 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
     const activeLang = lang || 'uz';
     const productName = getLocalizedText(metadataProduct.name, activeLang);
-    const productDesc = (
+    const minQty = Number(metadataProduct.itemsPerPackage) > 1 ? Number(metadataProduct.itemsPerPackage) : 100;
+    const priceStr = metadataProduct.formattedPrice || `${Number(metadataProduct.price || 0).toLocaleString('uz-UZ')} UZS`;
+    const baseDesc =
       getLocalizedText(metadataProduct.description, activeLang)
       || getLocalizedText(metadataProduct.shortDescription, activeLang)
-      || `${productName} - LUXECORE premium kolleksiyasidan`
-    ).substring(0, 160);
+      || `${productName}`;
+    const productDesc = (
+      activeLang === 'ru'
+        ? `${baseDesc} Оптовая цена: ${priceStr} (мин. заказ ${minQty} шт). Купить оптом со склада Урикзор в Ташкенте — LUXECORE.`
+        : `${baseDesc} Optom narxi: ${priceStr} (min. buyurtma ${minQty} dona). Toshkent O'rikzor omboridan ulgurji xarid — LUXECORE.`
+    ).substring(0, 165);
 
-    const title = `${productName} | LUXECORE`;
+    const title =
+      activeLang === 'ru'
+        ? `${productName} — купить оптом (${priceStr}) | LUXECORE Ташкент`
+        : `${productName} — optom ulgurji narxda (${priceStr}) | LUXECORE`;
     const canonicalPath = `/${activeLang}/product/${productSlug(metadataProduct as any, activeLang)}`;
     const languages: Record<string, string> = {};
     for (const altLang of SEO_LANGUAGES) {
