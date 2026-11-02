@@ -104,7 +104,7 @@ async function sendProductToChannel(ctx: Context, product: any) {
         `\n🛒 Buyurtma berish uchun botga yozing yoki saytga kiring!`;
 
     const kb = new InlineKeyboard()
-        .url('🛒 Saytda xarid', getProductUrl(config.SITE_URL, product.id))
+        .url('🛒 Saytda xarid', getProductUrl(config.SITE_URL, product))
         .url('🤖 Botda xarid', `https://t.me/${(await ctx.api.getMe()).username}?start=product_${product.id}`);
 
     if (product.images && product.images.length > 1) {

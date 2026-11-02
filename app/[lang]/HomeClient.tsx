@@ -11,6 +11,7 @@ import BlogGrid from '../../components/BlogGrid';
 import { useGlobalData } from '../../context/GlobalContext';
 import { useRouter, useParams } from 'next/navigation';
 import { getCategorySlug } from '../../lib/categoryUtils';
+import { productSlug, blogSlug } from '../../lib/slugify';
 import * as fpixel from '../../lib/fpixel';
 import { getLocalizedText } from '../../lib/i18nUtils';
 import type { Review } from '../../types';
@@ -40,12 +41,15 @@ export default function HomePage({ featuredReviews = [] }: HomePageProps) {
   };
 
   const navigateToProduct = (id: number) => {
-    // Navigate via id (in future map to slug)
-    router.push(`/${lang}/product/${id}`);
+    const product = products.find((p) => p.id === id);
+    const slug = product ? productSlug(product, String(lang)) : String(id);
+    router.push(`/${lang}/product/${slug}`);
   };
 
   const navigateToBlogPost = (id: number) => {
-    router.push(`/${lang}/blog/${id}`);
+    const post = blogPosts.find((p) => p.id === id);
+    const slug = post ? blogSlug(post, String(lang)) : String(id);
+    router.push(`/${lang}/blog/${slug}`);
   };
 
   return (

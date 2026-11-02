@@ -187,10 +187,39 @@ export function localizeText(field: any, lang: Lang = 'uz'): string {
     return String(field);
 }
 
-export function getProductUrl(siteUrl: string, productId: number | string, userId?: number): string {
+function slugifyBot(text: string): string {
+    const map: Record<string, string> = {
+        а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'yo', ж: 'zh',
+        з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o',
+        п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'kh', ц: 'ts',
+        ч: 'ch', ш: 'sh', щ: 'shch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu',
+        я: 'ya', ў: 'o', қ: 'q', ғ: 'g', ҳ: 'h',
+    };
+    return String(text || '')
+        .toLowerCase()
+        .trim()
+        .split('')
+        .map((c) => map[c] ?? c)
+        .join('')
+        .replace(/['`’ʻʼ]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '-')
+        .replace(/[\s_]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, '');
+}
+
+export function getProductUrl(siteUrl: string, productOrId: any, userId?: number): string {
     const lang = userId ? getLang(userId) : 'uz';
     const base = siteUrl.replace(/\/$/, '');
-    return `${base}/${lang}/product/${productId}`;
+    if (productOrId && typeof productOrId === 'object' && productOrId.id) {
+        const rawSlug = localizeText(productOrId.slug, lang) || localizeText(productOrId.slug, 'uz');
+        const rawName = localizeText(productOrId.name, lang) || localizeText(productOrId.name, 'uz');
+        const slugBase = slugifyBot(rawSlug || rawName) || 'mahsulot';
+        const suffix = `-${productOrId.id}`;
+        const finalSlug = slugBase.endsWith(suffix) ? slugBase : `${slugBase}${suffix}`;
+        return `${base}/${lang}/product/${finalSlug}`;
+    }
+    return `${base}/${lang}/product/${productOrId}`;
 }
 
 export function getSitePageUrl(siteUrl: string, subPath = '', userId?: number): string {

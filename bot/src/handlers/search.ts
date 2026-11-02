@@ -66,7 +66,7 @@ export async function handleSearchQuery(ctx: Context) {
                 `${t(userId, 'product_min_order')} *${minQty} ${t(userId, 'product_pcs')}* (${packSum} UZS)\n` +
                 `${t(userId, 'product_status')} ${stockText}`;
 
-            const productUrl = getProductUrl(config.SITE_URL, p.id, userId);
+            const productUrl = getProductUrl(config.SITE_URL, p, userId);
             const unitLabel = t(userId, 'product_pcs');
             const kb = new InlineKeyboard()
                 .webApp(t(userId, 'btn_buy_on_site'), productUrl)

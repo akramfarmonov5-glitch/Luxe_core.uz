@@ -15,6 +15,7 @@ import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useGlobalData } from '../../context/GlobalContext';
 import { usePathname, useRouter } from 'next/navigation';
+import { productSlug } from '../../lib/slugify';
 
 export default function ClientLayout({ children, lang }: { children: React.ReactNode, lang?: string }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -86,7 +87,9 @@ export default function ClientLayout({ children, lang }: { children: React.React
   const navigateToHome = () => router.push(langPrefix);
   const navigateToProduct = (id: number) => {
     const product = products.find(p => p.id === id);
-    if (product) router.push(`${langPrefix}/product/${id}`);
+    if (product) {
+      router.push(`${langPrefix}/product/${productSlug(product, lang || 'uz')}`);
+    }
   };
   const navigateToWishlist = () => router.push(`${langPrefix}/wishlist`);
   const navigateToTracking = () => router.push(`${langPrefix}/tracking`);

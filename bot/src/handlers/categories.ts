@@ -145,7 +145,7 @@ export async function sendProductCard(
     if (totalPages > 1) kb.row();
 
     // Primary CTA: Open product directly inside Telegram WebApp
-    const productUrl = getProductUrl(config.SITE_URL, p.id, userId);
+    const productUrl = getProductUrl(config.SITE_URL, p, userId);
     kb.webApp(t(userId, 'btn_buy_on_site'), productUrl).row();
 
     // Quick wholesale pack buttons (1x, 5x, 10x)

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { SITE_URL } from '../../lib/siteUrl';
+import { slugify, productSlug, blogSlug } from '../../lib/slugify';
 
 const BASE_URL = SITE_URL;
 const LANGUAGES = ['uz', 'ru', 'en'] as const;
@@ -191,8 +192,7 @@ function getCategorySlug(category: any, lang: Lang) {
 }
 
 function getEntitySlug(entityType: string, entity: any, lang: Lang) {
-  const source = entityType === 'blog' ? entity.title : entity.name;
-  return `${getLocalizedText(entity.slug, lang) || slugify(getLocalizedText(source, lang))}-${entity.id}`;
+  return entityType === 'blog' ? blogSlug(entity, lang) : productSlug(entity, lang);
 }
 
 function getLocalizedText(text: any, lang: Lang): string {
@@ -211,16 +211,6 @@ function getLocalizedText(text: any, lang: Lang): string {
     return text[lang] || text.uz || '';
   }
   return String(text);
-}
-
-function slugify(text: string) {
-  if (!text) return '';
-  return text.toString().toLowerCase().trim()
-    .replace(/['`']/g, '')
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 function escapeXml(str: string) {

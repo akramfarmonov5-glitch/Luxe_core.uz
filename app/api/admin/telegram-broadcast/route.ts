@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUserId, getServiceSupabaseClient } from '@/lib/checkout.server';
 import { isAdminUser } from '@/lib/admin';
 import { getLocalizedText } from '@/lib/i18nUtils';
+import { productSlug } from '@/lib/slugify';
 
 const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || process.env.CHANNEL_ID || '@luxecoreuz';
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://luxe-core.uz').replace(/\/+$/, '');
@@ -91,7 +92,7 @@ async function sendProductPostToChannel(token: string, botUsername: string, prod
     (descUz ? `\n📝 ${escapeHtml(descUz)}\n` : '') +
     `\n🛒 <i>Buyurtma berish uchun quyidagi tugmalardan foydalaning:</i>`;
 
-  const productSiteUrl = `${SITE_URL}/uz/product/${product.id}`;
+  const productSiteUrl = `${SITE_URL}/uz/product/${productSlug(product, 'uz')}`;
   const productBotUrl = `https://t.me/${botUsername}?start=product_${product.id}`;
 
   const replyMarkup = {
