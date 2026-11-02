@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { BlogPost } from '../types';
 import { Calendar, ArrowRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -7,6 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { BlogSkeleton } from './Skeleton';
 import { getLocalizedText } from '../lib/i18nUtils';
+import { blogSlug } from '../lib/slugify';
 
 interface BlogGridProps {
   posts: BlogPost[];
@@ -75,7 +77,15 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick, isLoading }) =>
 
               <div className="flex-1 flex flex-col">
                 <h3 className={`text-xl font-bold mb-3 group-hover:text-gold-400 transition-colors line-clamp-2 ${isDark ? 'text-white' : 'text-light-text'}`}>
-                  {getLocalizedText(post.title, lang)}
+                  <Link
+                    href={`/${lang}/blog/${blogSlug(post, lang)}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onPostClick(post.id);
+                    }}
+                  >
+                    {getLocalizedText(post.title, lang)}
+                  </Link>
                 </h3>
                 <p className={`text-sm line-clamp-3 mb-4 flex-1 ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
                   {getLocalizedText(post.content, lang)}

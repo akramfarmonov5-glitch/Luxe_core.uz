@@ -127,12 +127,47 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     },
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'LUXECORE',
+        item: `${SITE_URL}/${activeLang}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: categoryName,
+        item: canonicalUrl,
+      },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
+      <nav aria-label={categoryName} className="sr-only">
+        <h2>{categoryName}</h2>
+        <ul>
+          {categoryProducts.map((p) => (
+            <li key={p.id}>
+              <a href={`/${activeLang}/product/${productSlug(p as any, activeLang)}`}>
+                {getLocalizedText(p.name, activeLang)} — {p.formattedPrice || `${p.price} UZS`}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
       <CategoryClient />
     </>
   );

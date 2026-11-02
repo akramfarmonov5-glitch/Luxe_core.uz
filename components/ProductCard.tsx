@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Plus, Heart } from 'lucide-react';
 import { Category, Product } from '../types';
@@ -10,6 +11,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { getLocalizedText } from '../lib/i18nUtils';
 import { getCategoryDisplayName } from '../lib/categoryUtils';
+import { productSlug } from '../lib/slugify';
 
 interface ProductCardProps {
   product: Product;
@@ -25,6 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onNavigate, categori
   const { lang, t } = useLanguage();
 
   const isLiked = isInWishlist(product.id);
+  const productHref = `/${lang}/product/${productSlug(product, lang)}`;
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -48,9 +51,13 @@ const handleAddToCart = (e: React.MouseEvent) => {
       className={`group relative rounded-xl md:rounded-2xl overflow-hidden shadow-lg flex flex-col transition-colors duration-300 ${isDark ? 'bg-dark-800 border border-white/5' : 'bg-white border border-light-border'}`}
     >
       {/* Image Container */}
-      <div
-        onClick={onNavigate}
-        className="relative aspect-[4/5] w-full overflow-hidden bg-gray-900 cursor-pointer"
+      <Link
+        href={productHref}
+        onClick={(e) => {
+          e.preventDefault();
+          onNavigate();
+        }}
+        className="relative aspect-[4/5] w-full overflow-hidden bg-gray-900 cursor-pointer block"
       >
         <Image
           src={product.image}
@@ -91,11 +98,18 @@ const handleAddToCart = (e: React.MouseEvent) => {
             <Heart size={16} className={`md:w-[18px] md:h-[18px] ${isLiked ? 'fill-black' : ''}`} />
           </button>
         </div>
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="p-3 md:p-6 flex flex-col flex-grow">
-        <div className="flex-grow cursor-pointer" onClick={onNavigate}>
+        <Link
+          href={productHref}
+          onClick={(e) => {
+            e.preventDefault();
+            onNavigate();
+          }}
+          className="flex-grow cursor-pointer block"
+        >
           <span className={`text-[11px] md:text-xs uppercase tracking-wider ${isDark ? 'text-gray-500' : 'text-light-muted'}`}>
             {getCategoryDisplayName(product.category, categories, lang)}
           </span>
@@ -107,7 +121,7 @@ const handleAddToCart = (e: React.MouseEvent) => {
               ({product.itemsPerPackage} {t('items_per_package_desc')})
             </span>
           )}
-        </div>
+        </Link>
 
         <div className="flex items-center justify-between mt-2 md:mt-4">
           <span className="text-gold-400 font-semibold text-sm md:text-lg">
