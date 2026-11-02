@@ -57,9 +57,9 @@ const testimonials: Testimonial[] = [
     city: 'Namangan',
     rating: 5,
     text: {
-      uz: "Sovg'a uchun soat buyurtma berdim. Sifati zo'r, ko'rinishi juda premium. Katta rahmat LUXECORE jamoasiga!",
-      ru: 'Заказал одноразовую посуду для ресторана. Отличное качество, доступная цена. Большое спасибо команде LUXECORE!',
-      en: 'Ordered a watch as a gift. Excellent quality and a truly premium look. Thank you LUXECORE team!',
+      uz: "Do'konimiz uchun sovg'a qutilari va kraft paketlarni ulgurji oldik. Karton qalinligi zo'r, ko'rinishi juda premium. Katta rahmat LUXECORE jamoasiga!",
+      ru: 'Заказал подарочные коробки и крафт-пакеты оптом для магазина. Отличная плотность картона и доступная цена. Большое спасибо команде LUXECORE!',
+      en: 'Ordered gift boxes and kraft bags wholesale for our store. Excellent cardboard quality and a truly premium look. Thank you LUXECORE team!',
     },
     avatar: 'https://ui-avatars.com/api/?name=Sardor+A&background=DC2626&color=fff&size=80&bold=true',
   },

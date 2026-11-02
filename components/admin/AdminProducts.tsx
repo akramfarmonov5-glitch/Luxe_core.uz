@@ -805,7 +805,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                     value={formData.name?.[activeLang] || ''}
                     onChange={e => setFormData({ ...formData, name: { ...formData.name, [activeLang]: e.target.value } })}
                     className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none"
-                    placeholder="Masalan: Rolex Submariner"
+                    placeholder="Masalan: Kraft paket 25x32x11 sm (burama tutqichli)"
                   />
                 </div>
                 <div className="space-y-2">
@@ -817,7 +817,7 @@ const AdminProducts: React.FC<AdminProductsProps> = ({ products, setProducts, ca
                     value={formData.slug?.[activeLang] || ''}
                     onChange={e => setFormData({ ...formData, slug: { ...formData.slug, [activeLang]: e.target.value } })}
                     className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none font-mono text-sm"
-                    placeholder="rolex-submariner"
+                    placeholder="kraft-paket-25x32x11"
                   />
                 </div>
               </div>

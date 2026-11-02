@@ -365,7 +365,7 @@ const AdminCategories: React.FC<AdminCategoriesProps> = ({ categories, setCatego
                     value={formData.name[activeLang]}
                     onChange={e => updateLocalizedField('name', activeLang, e.target.value)}
                     className="flex-1 bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:border-gold-400 outline-none transition-colors"
-                    placeholder={activeLang === 'uz' ? 'Masalan: Soatlar' : activeLang === 'ru' ? 'Primer: Chasy' : 'For example: Watches'}
+                    placeholder={activeLang === 'uz' ? "Masalan: Sovg'a qutilari" : activeLang === 'ru' ? 'Например: Подарочные коробки' : 'For example: Gift Boxes'}
                   />
                   <button
                     type="button"
