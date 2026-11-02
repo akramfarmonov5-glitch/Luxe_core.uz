@@ -26,12 +26,14 @@ export function mainMenuKeyboard(userId: number) {
 }
 
 // ========== KATEGORIYALAR ==========
-export function categoriesKeyboard(categories: { id: string; name: any; slug: string }[], userId: number) {
+export function categoriesKeyboard(categories: { id: string | number; name: any; slug: any }[], userId: number) {
     const lang = getLang(userId);
     const kb = new InlineKeyboard();
     kb.webApp(t(userId, 'btn_shop'), getSitePageUrl(config.SITE_URL, '', userId)).row();
     categories.forEach((cat, i) => {
-        kb.text(localizeText(cat.name, lang) || cat.slug, `cat:${cat.slug}`);
+        const slugStr = (localizeText(cat.slug, 'uz') || localizeText(cat.slug, lang) || String(cat.id)).slice(0, 48);
+        const title = localizeText(cat.name, lang) || localizeText(cat.name, 'uz') || slugStr;
+        kb.text(title, `cat:${slugStr}`);
         if (i % 2 === 1) kb.row();
     });
     if (categories.length % 2 !== 0) kb.row();

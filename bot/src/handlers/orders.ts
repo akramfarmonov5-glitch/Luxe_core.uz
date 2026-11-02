@@ -7,7 +7,7 @@ import { config } from '../config';
 import { ensureUser } from './profile';
 
 export async function handleOrdersPrompt(ctx: Context) {
-    if (ctx.callbackQuery) await ctx.answerCallbackQuery();
+    if (ctx.callbackQuery) await ctx.answerCallbackQuery().catch(() => {});
     const userId = ctx.from?.id || 0;
 
     await ensureUser(userId, ctx.from?.first_name);

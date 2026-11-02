@@ -5,13 +5,49 @@ import { categoriesKeyboard } from '../keyboards';
 import { t, getLang, localizeText, getProductUrl, getSitePageUrl } from '../i18n';
 import { config } from '../config';
 
+function cleanMd(text: string): string {
+    return String(text || '').replace(/[*_`\[\]]/g, '');
+}
+
+async function fetchProductsByCategorySlug(slug: string) {
+    const [{ data: allProducts, error }, { data: categories }] = await Promise.all([
+        supabase.from('products').select('*').order('created_at', { ascending: false }),
+        supabase.from('categories').select('id, name, slug'),
+    ]);
+
+    if (error || !allProducts) return [];
+
+    const matchedCat = (categories || []).find((c: any) => {
+        const cSlugUz = localizeText(c.slug, 'uz');
+        const cSlugRu = localizeText(c.slug, 'ru');
+        return cSlugUz === slug || cSlugRu === slug || String(c.id) === slug;
+    });
+
+    const targetSlug = slug.toLowerCase();
+    const matchedNameUz = matchedCat ? localizeText(matchedCat.name, 'uz').toLowerCase() : '';
+
+    return allProducts.filter((p: any) => {
+        const pCat = localizeText(p.category, 'uz').toLowerCase();
+        const pCatRaw = typeof p.category === 'string' ? p.category.toLowerCase() : '';
+        if (pCat === targetSlug || pCatRaw === targetSlug) return true;
+        if (matchedCat && String(p.categoryId) === String(matchedCat.id)) return true;
+        if (matchedNameUz && (pCat === matchedNameUz || pCatRaw === matchedNameUz)) return true;
+        // Handle toy-va-sarpo vs toy-qutilari alias
+        if ((targetSlug.includes('toy') && pCat.includes('toy')) || (targetSlug.includes('kraft') && pCat.includes('kraft'))) {
+            return true;
+        }
+        return false;
+    });
+}
+
 export async function handleCategories(ctx: Context) {
     const userId = ctx.from?.id || 0;
     try {
+        if (ctx.callbackQuery) await ctx.answerCallbackQuery().catch(() => {});
         const { data: categories, error } = await supabase
             .from('categories')
             .select('id, name, slug, image')
-            .order('name');
+            .order('id');
 
         if (error || !categories || categories.length === 0) {
             await ctx.reply(t(userId, 'no_categories'));
@@ -34,19 +70,14 @@ export async function handleCategories(ctx: Context) {
 export async function handleCategorySelect(ctx: Context) {
     const userId = ctx.from?.id || 0;
     try {
-        await ctx.answerCallbackQuery();
+        await ctx.answerCallbackQuery().catch(() => {});
         const data = ctx.callbackQuery?.data;
         if (!data) return;
 
         const slug = data.replace('cat:', '');
+        const products = await fetchProductsByCategorySlug(slug);
 
-        const { data: products, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('category', slug)
-            .order('created_at', { ascending: false });
-
-        if (error || !products || products.length === 0) {
+        if (!products || products.length === 0) {
             await ctx.reply(t(userId, 'no_products'));
             return;
         }
@@ -61,7 +92,7 @@ export async function handleCategorySelect(ctx: Context) {
 export async function handleCategoryPage(ctx: Context) {
     const userId = ctx.from?.id || 0;
     try {
-        await ctx.answerCallbackQuery();
+        await ctx.answerCallbackQuery().catch(() => {});
         const data = ctx.callbackQuery?.data;
         if (!data) return;
 
@@ -69,13 +100,8 @@ export async function handleCategoryPage(ctx: Context) {
         const slug = parts[1];
         const page = parseInt(parts[2]) || 0;
 
-        const { data: products, error } = await supabase
-            .from('products')
-            .select('*')
-            .eq('category', slug)
-            .order('created_at', { ascending: false });
-
-        if (error || !products || products.length === 0) return;
+        const products = await fetchProductsByCategorySlug(slug);
+        if (!products || products.length === 0) return;
 
         await sendProductCard(ctx, products, page, `catpage:${slug}`, userId, true);
     } catch (err) {
@@ -96,8 +122,8 @@ export async function sendProductCard(
     if (!p) return;
 
     const lang = getLang(userId);
-    const productName = localizeText(p.name, lang);
-    const shortDesc = localizeText(p.shortDescription || p.description, lang);
+    const productName = cleanMd(localizeText(p.name, lang));
+    const shortDesc = cleanMd(localizeText(p.shortDescription || p.description, lang));
     const price = Number(p.price).toLocaleString('uz-UZ');
     const minQty = Number(p.itemsPerPackage) > 1 ? Number(p.itemsPerPackage) : 100;
     const packSum = (Number(p.price || 0) * minQty).toLocaleString('uz-UZ');
@@ -105,7 +131,7 @@ export async function sendProductCard(
 
     const caption =
         `🏷 *${productName}*\n\n` +
-        `${t(userId, 'product_price')} *${p.formattedPrice || price + ' UZS'}*\n` +
+        `${t(userId, 'product_price')} *${cleanMd(p.formattedPrice || price + ' UZS')}*\n` +
         `${t(userId, 'product_min_order')} *${minQty} ${t(userId, 'product_pcs')}* (${packSum} UZS)\n` +
         `${t(userId, 'product_status')} ${stockText}\n` +
         `${shortDesc ? `\n📝 ${shortDesc}` : ''}`;
@@ -192,10 +218,17 @@ export async function sendProductCard(
             });
         }
     } else {
-        await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {
-            caption,
-            parse_mode: 'Markdown',
-            reply_markup: kb,
-        });
+        try {
+            await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {
+                caption,
+                parse_mode: 'Markdown',
+                reply_markup: kb,
+            });
+        } catch {
+            await ctx.reply(caption, {
+                parse_mode: 'Markdown',
+                reply_markup: kb,
+            });
+        }
     }
 }
