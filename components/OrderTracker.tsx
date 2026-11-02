@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Package, Clock, Truck, CheckCircle, ArrowLeft, XCircle } from 'lucide-react';
+import { Search, Package, Clock, Truck, CheckCircle, ArrowLeft, XCircle, RotateCcw } from 'lucide-react';
 import { hasSupabaseCredentials } from '../lib/supabaseClient';
-import { Order } from '../types';
+import { Order, Product } from '../types';
 import { getLocalizedText } from '../lib/i18nUtils';
+import { useCart } from '../context/CartContext';
+import { useGlobalData } from '../context/GlobalContext';
+import { useToast } from '../context/ToastContext';
 
 interface OrderTrackerProps {
   onBack: () => void;
 }
 
 const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
+  const { addToCart } = useCart();
+  const { products } = useGlobalData();
+  const { showToast } = useToast();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [orderId, setOrderId] = useState('');
   const [loading, setLoading] = useState(false);
@@ -68,6 +74,47 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     await runSearch(phoneNumber, orderId);
+  };
+
+  const handleRepeatOrder = (order: Order) => {
+    const items = Array.isArray(order.items) ? order.items : [];
+    if (items.length === 0) {
+      showToast("Ushbu buyurtmada mahsulotlar ro'yxati topilmadi", 'error');
+      return;
+    }
+
+    let addedCount = 0;
+    items.forEach((item: any, idx: number) => {
+      const matched = products.find(
+        (p) =>
+          (item.id && Number(p.id) === Number(item.id)) ||
+          getLocalizedText(p.name, 'uz').toLowerCase() === getLocalizedText(item.name, 'uz').toLowerCase()
+      );
+      const qty = Math.max(1, Number(item.quantity) || 100);
+      const isLast = idx === items.length - 1;
+      if (matched) {
+        addToCart(matched, { quantity: qty, openSidebar: isLast });
+        addedCount++;
+      } else {
+        const fallbackProduct: Product = {
+          id: Number(item.id) || Date.now() + idx,
+          name: item.name || 'Mahsulot',
+          price: Number(item.price) || 0,
+          formattedPrice: `${Number(item.price || 0).toLocaleString('uz-UZ')} UZS`,
+          category: 'sovga-qutilari',
+          image: item.image || '/logo.jpg',
+          shortDescription: '',
+          specs: [],
+          itemsPerPackage: qty,
+        };
+        addToCart(fallbackProduct, { quantity: qty, openSidebar: isLast });
+        addedCount++;
+      }
+    });
+
+    if (addedCount > 0) {
+      showToast(`Buyurtmadagi ${addedCount} xil mahsulot savatchaga qo'shildi!`, 'success');
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -188,11 +235,23 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
                           </div>
                         ))}
 
-                      <div className="flex justify-between items-center pt-4 border-t border-white/5 mt-4">
-                        <span className="text-gray-400">Jami to'lov:</span>
-                        <span className="text-lg font-bold text-gold-400">
-                          {new Intl.NumberFormat('uz-UZ').format(order.total)} UZS
-                        </span>
+                      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 pt-4 border-t border-white/5 mt-4">
+                        <div>
+                          <span className="text-gray-400 text-sm mr-2">Jami to'lov:</span>
+                          <span className="text-lg font-bold text-gold-400">
+                            {new Intl.NumberFormat('uz-UZ').format(order.total)} UZS
+                          </span>
+                        </div>
+                        {Array.isArray(order.items) && order.items.length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRepeatOrder(order)}
+                            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-gold-400/15 border border-gold-400/30 text-gold-400 hover:bg-gold-400 hover:text-black transition-all"
+                          >
+                            <RotateCcw size={14} />
+                            <span>Shu buyurtmani takrorlash</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

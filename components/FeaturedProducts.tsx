@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 import { Product, Category } from '../types';
-import { Filter, X, Check, Search } from 'lucide-react';
+import { Filter, X, Check, Search, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getWholesaleUnitPrice } from '../context/CartContext';
 import { ProductSkeleton } from './Skeleton';
 import { getLocalizedText } from '../lib/i18nUtils';
 import { getCategoryDisplayName, getCategorySlug, getProductCategoryKey } from '../lib/categoryUtils';
+import { productSlug } from '../lib/slugify';
 
 interface FeaturedProductsProps {
     products: Product[];
@@ -67,6 +69,40 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
         return b.id - a.id; // default: newest
     });
 
+    const handleDownloadPriceList = () => {
+        if (!products || products.length === 0) return;
+        const headers = [
+            'ID',
+            lang === 'ru' ? 'Наименование товара' : 'Mahsulot nomi',
+            lang === 'ru' ? 'Категория' : 'Kategoriya',
+            lang === 'ru' ? 'Мин. упаковка (шт)' : 'Min. pachka (dona)',
+            lang === 'ru' ? 'Цена 100-499 шт (UZS)' : '100-499 dona narxi (UZS)',
+            lang === 'ru' ? 'Цена 500-999 шт -5% (UZS)' : '500-999 dona -5% (UZS)',
+            lang === 'ru' ? 'Цена 1000+ шт -10% VIP (UZS)' : '1000+ dona -10% VIP (UZS)',
+            lang === 'ru' ? 'Сумма за 1 упаковку (UZS)' : '1 pachka summasi (UZS)',
+            'URL',
+        ];
+        const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const rows = products.map((p) => {
+            const name = getLocalizedText(p.name, lang);
+            const cat = getCategoryDisplayName(p.category, categories, lang);
+            const minPack = p.itemsPerPackage && p.itemsPerPackage > 1 ? p.itemsPerPackage : 100;
+            const basePrice = Number(p.price || 0);
+            const price500 = getWholesaleUnitPrice(basePrice, 500);
+            const price1000 = getWholesaleUnitPrice(basePrice, 1000);
+            const packTotal = basePrice * minPack;
+            const url = `https://luxe-core.uz/${lang}/product/${productSlug(p, lang)}`;
+            return [p.id, name, cat, minPack, basePrice, price500, price1000, packTotal, url].map(esc).join(';');
+        });
+        const csv = '\uFEFF' + [headers.map(esc).join(';'), ...rows].join('\r\n');
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `LUXECORE_Optom_Prays_List_${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    };
+
     return (
         <section id="featured-products" className={`py-12 md:py-24 scroll-mt-20 transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-light-bg'}`}>
             <div className="container mx-auto px-4 md:px-6">
@@ -82,7 +118,15 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                         </p>
                     </div>
 
-                    <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                        <button
+                            type="button"
+                            onClick={handleDownloadPriceList}
+                            className="flex items-center gap-2 px-4 py-2.5 rounded-full text-xs md:text-sm font-bold bg-gold-400/15 border border-gold-400/30 text-gold-400 hover:bg-gold-400 hover:text-black transition-all shrink-0"
+                        >
+                            <Download size={15} />
+                            <span>{lang === 'ru' ? 'Прайс-лист (Excel)' : 'Prays-list (Excel)'}</span>
+                        </button>
                         {/* Search Input */}
                         <div className="relative flex-1 md:w-64">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
