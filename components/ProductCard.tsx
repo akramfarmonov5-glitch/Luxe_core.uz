@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, Heart } from 'lucide-react';
+import { Plus, Heart, Play } from 'lucide-react';
 import { Category, Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
@@ -82,6 +82,12 @@ const handleAddToCart = (e: React.MouseEvent) => {
           {product.is_premium && (
             <span className="px-2 py-0.5 bg-amber-500 text-black text-[10px] md:text-[11px] font-bold rounded-md uppercase tracking-wider shadow-lg">
               Premium
+            </span>
+          )}
+          {product.videoUrl && product.videoUrl.trim().length > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-600/95 text-white text-[10px] md:text-[11px] font-bold rounded-md tracking-wider shadow-lg">
+              <Play size={10} className="fill-white" />
+              <span>Video</span>
             </span>
           )}
         </div>

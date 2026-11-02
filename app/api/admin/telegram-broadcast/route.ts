@@ -95,13 +95,19 @@ async function sendProductPostToChannel(token: string, botUsername: string, prod
   const productSiteUrl = `${SITE_URL}/uz/product/${productSlug(product, 'uz')}`;
   const productBotUrl = `https://t.me/${botUsername}?start=product_${product.id}`;
 
-  const replyMarkup = {
-    inline_keyboard: [
-      [
-        { text: '🛒 Saytda xarid', url: productSiteUrl },
-        { text: '🤖 Botda xarid', url: productBotUrl },
-      ],
+  const inlineKeyboard: Array<Array<{ text: string; url: string }>> = [
+    [
+      { text: '🛒 Saytda xarid', url: productSiteUrl },
+      { text: '🤖 Botda xarid', url: productBotUrl },
     ],
+  ];
+
+  if (typeof product.videoUrl === 'string' && product.videoUrl.trim().startsWith('http')) {
+    inlineKeyboard.push([{ text: '▶️ Video obzorni ko‘rish (YouTube)', url: product.videoUrl.trim() }]);
+  }
+
+  const replyMarkup = {
+    inline_keyboard: inlineKeyboard,
   };
 
   const images: string[] = Array.isArray(product.images)
