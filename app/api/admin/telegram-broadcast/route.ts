@@ -256,7 +256,7 @@ export async function POST(req: NextRequest) {
       const textHtml =
         `🔔 <b>${escapeHtml(title)}</b>\n\n` +
         `${escapeHtml(body)}\n\n` +
-        `🛍 <a href="${escapeHtml(targetUrl)}">LUXECORE.UZ — Do'konga o'tish</a>`;
+        `🛍 <a href="${escapeHtml(targetUrl)}">LUXECORE (luxe-core.uz) — Do'konga o'tish</a>`;
 
       const replyMarkup = {
         inline_keyboard: [

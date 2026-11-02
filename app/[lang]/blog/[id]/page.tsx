@@ -67,16 +67,16 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const canonicalPath = `/${lang}/blog/${blogSlug(post as any, lang)}`;
     const languages: Record<string, string> = {};
     for (const altLang of SEO_LANGUAGES) {
-      languages[altLang] = `/${altLang}/blog/${blogSlug(post as any, altLang)}`;
+      languages[altLang] = `${SITE_URL}/${altLang}/blog/${blogSlug(post as any, altLang)}`;
     }
     languages['x-default'] = languages.uz;
 
     return {
-      title: `${seoTitle} | LUXECORE Blog`,
+      title: `${seoTitle} | LUXECORE (luxe-core.uz)`,
       description: seoDesc,
       keywords,
       alternates: {
-        canonical: canonicalPath,
+        canonical: `${SITE_URL}${canonicalPath}`,
         languages,
       },
       openGraph: {
@@ -84,7 +84,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         description: seoDesc,
         url: `${SITE_URL}${canonicalPath}`,
         type: 'article',
-        siteName: 'LUXECORE',
+        siteName: 'LUXECORE (luxe-core.uz)',
         images: post.image ? [{ url: post.image, alt: seoTitle }] : [],
         publishedTime: post.date,
       },
@@ -96,7 +96,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       },
     };
   } catch (error) {
-    return { title: 'Blog | LUXECORE' };
+    return { title: 'Blog | LUXECORE (luxe-core.uz)' };
   }
 }
 
@@ -112,10 +112,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ id: s
     image: post.image,
     datePublished: post.date,
     dateModified: post.date,
-    author: { '@type': 'Organization', name: 'LUXECORE' },
+    author: { '@type': 'Organization', name: 'LUXECORE (luxe-core.uz)', url: SITE_URL },
     publisher: {
       '@type': 'Organization',
-      name: 'LUXECORE',
+      name: 'LUXECORE (luxe-core.uz)',
+      url: SITE_URL,
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.jpg` },
     },
     description: (

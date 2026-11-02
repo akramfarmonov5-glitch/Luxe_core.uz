@@ -71,7 +71,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onBack }) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-black border border-white/20 rounded-xl pl-12 pr-4 py-3 text-white focus:border-gold-400 focus:outline-none"
-                placeholder="admin@luxecore.uz"
+                placeholder="admin@luxe-core.uz"
                 autoComplete="username"
               />
             </div>

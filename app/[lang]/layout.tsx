@@ -1,7 +1,7 @@
 import '../globals.css';
 import { Providers } from './Providers';
 import ClientLayout from './ClientLayout';
-import { SITE_URL } from '../../lib/siteUrl';
+import { SITE_URL, BRAND_ALTERNATE_NAMES } from '../../lib/siteUrl';
 import { fetchGlobalData } from '../../lib/globalData';
 
 const siteUrl = SITE_URL;
@@ -12,9 +12,15 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const l = lang || 'uz';
   const metadataMap: Record<string, any> = {
     uz: {
-      title: 'Sovg\'a qutilari, Paketlar, Qadoqlash, Bir martalik idishlar va Yangi Yil 2027 optom (ulgurji) — LUXECORE',
-      description: 'Optom sovg\'a qutilari, yangi yil uchun 2027 yil qutilari, to\'y va sarpo qutilari, kraft, Zip-Lock, BOPP paketlar, qadoqlash materiallari hamda bir martalik idishlar O\'rikzor omboridan ulgurji narxlarda. Toshkent va viloyatlarga tezkor yetkazib berish.',
+      title: 'Sovg\'a qutilari, Paketlar, Qadoqlash, Bir martalik idishlar va Yangi Yil 2027 optom (ulgurji) — LUXECORE (luxe-core.uz)',
+      description: 'LUXECORE (luxe-core.uz) — optom sovg\'a qutilari, yangi yil uchun 2027 yil qutilari, to\'y va sarpo qutilari, kraft, Zip-Lock, BOPP paketlar, qadoqlash materiallari hamda bir martalik idishlar O\'rikzor omboridan ulgurji narxlarda. Toshkent va viloyatlarga tezkor yetkazib berish.',
       keywords: [
+        'luxecore',
+        'luxecore uz',
+        'luxe-core.uz',
+        'luxe core toshkent',
+        'lux core optom',
+        'люкскор ташкент',
         'optom',
         'paketlar',
         'paketlar optom',
@@ -39,9 +45,16 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       ],
     },
     ru: {
-      title: 'Подарочные коробки, Пакеты, Упаковка, Одноразовая посуда и Новогодняя упаковка 2027 оптом — LUXECORE',
-      description: 'Оптом подарочные и свадебные коробки, новогодняя упаковка на 2027 год, крафт, Zip-Lock и БОПП пакеты, упаковочные материалы и одноразовая посуда со склада Урикзор в Ташкенте. Быстрая доставка по всему Узбекистану.',
+      title: 'Подарочные коробки, Пакеты, Упаковка, Одноразовая посуда и Новогодняя упаковка 2027 оптом — LUXECORE (luxe-core.uz)',
+      description: 'LUXECORE (luxe-core.uz / ЛюксКор) — оптом подарочные и свадебные коробки, новогодняя упаковка на 2027 год, крафт, Zip-Lock и БОПП пакеты, упаковочные материалы и одноразовая посуда со склада Урикзор в Ташкенте. Быстрая доставка по всему Узбекистану.',
       keywords: [
+        'luxecore',
+        'luxecore uz',
+        'luxe-core.uz',
+        'luxe core toshkent',
+        'lux core optom',
+        'люкскор ташкент',
+        'люкскор урикзор',
         'оптом',
         'пакеты оптом',
         'упаковка оптом',
@@ -59,9 +72,24 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       ],
     },
     en: {
-      title: 'Wholesale Gift Boxes, Packaging, Bags, Disposable Tableware & New Year 2027 — LUXECORE',
-      description: 'Wholesale gift boxes, New Year 2027 holiday packaging, wedding boxes, Kraft & Zip-Lock bags, packaging supplies and disposable tableware from Urikzor warehouse in Tashkent.',
-      keywords: ['wholesale packaging', 'gift boxes wholesale', 'kraft bags', 'zip lock bags', 'disposable tableware', 'New Year 2027 boxes', 'Tashkent', 'Uzbekistan'],
+      title: 'Wholesale Gift Boxes, Packaging, Bags, Disposable Tableware & New Year 2027 — LUXECORE (luxe-core.uz)',
+      description: 'LUXECORE (luxe-core.uz) — wholesale gift boxes, New Year 2027 holiday packaging, wedding boxes, Kraft & Zip-Lock bags, packaging supplies and disposable tableware from Urikzor warehouse in Tashkent.',
+      keywords: [
+        'luxecore',
+        'luxecore uz',
+        'luxe-core.uz',
+        'luxe core toshkent',
+        'lux core optom',
+        'люкскор ташкент',
+        'wholesale packaging',
+        'gift boxes wholesale',
+        'kraft bags',
+        'zip lock bags',
+        'disposable tableware',
+        'New Year 2027 boxes',
+        'Tashkent',
+        'Uzbekistan',
+      ],
     },
   };
   const metadata = metadataMap[l] || metadataMap.uz;
@@ -96,7 +124,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     openGraph: {
       type: 'website',
       url: `${siteUrl}/${l}`,
-      siteName: 'LUXECORE',
+      siteName: 'LUXECORE (luxe-core.uz)',
       title: metadata.title,
       description: metadata.description,
       images: [
@@ -104,7 +132,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
           url: logoUrl,
           width: 1024,
           height: 1024,
-          alt: 'LUXECORE logo',
+          alt: 'LUXECORE (luxe-core.uz) logo',
         },
       ],
     },
@@ -133,10 +161,11 @@ export default async function RootLayout({
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'LUXECORE',
+    name: 'LUXECORE (luxe-core.uz)',
+    alternateName: BRAND_ALTERNATE_NAMES,
     url: siteUrl,
     logo: logoUrl,
-    sameAs: ['https://t.me/luxecoreuz'],
+    sameAs: ['https://t.me/luxecoreuz', 'https://instagram.com/luxe_core_uz'],
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+998-99-644-84-44',

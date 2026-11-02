@@ -19,7 +19,8 @@ function renderInlineContent(text: string) {
     if (part.startsWith('[') && part.includes('](')) {
       const match = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
       if (match) {
-        const [, label, href] = match;
+        const [, label, rawHref] = match;
+        const href = rawHref.replace(/^https?:\/\/(www\.)?luxecore\.uz/i, 'https://luxe-core.uz');
         const isExternal = href.startsWith('http');
         if (isExternal) {
           return (
@@ -46,9 +47,21 @@ function renderInlineContent(text: string) {
       }
     }
     if (part.startsWith('**') && part.endsWith('**')) {
+      const inner = part.slice(2, -2);
+      if (inner.toUpperCase() === 'LUXECORE.UZ' || inner.toUpperCase() === 'LUXE-CORE.UZ') {
+        return (
+          <Link
+            key={i}
+            href="https://luxe-core.uz/uz"
+            className="text-gold-400 hover:text-gold-300 underline font-semibold transition-colors"
+          >
+            LUXECORE (luxe-core.uz)
+          </Link>
+        );
+      }
       return (
         <strong key={i} className="text-white font-semibold">
-          {part.slice(2, -2)}
+          {inner.replace(/LUXECORE\.UZ/g, 'LUXECORE (luxe-core.uz)')}
         </strong>
       );
     }
@@ -149,7 +162,9 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
             </div>
             <div className="flex items-center gap-2">
               <User size={16} />
-              <span>LUXECORE.UZ (O'rikzor Ombori)</span>
+              <Link href="https://luxe-core.uz/uz" className="hover:text-gold-400 transition-colors">
+                LUXECORE (luxe-core.uz) — O'rikzor Ombori
+              </Link>
             </div>
           </div>
         </div>
@@ -170,7 +185,7 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10 flex justify-between items-center">
-          <p className="text-gray-500 italic">O'qiganingiz uchun rahmat. B2B savdo va ulgurji narxlar uchun LUXECORE ga murojaat qiling.</p>
+          <p className="text-gray-500 italic">O'qiganingiz uchun rahmat. B2B savdo va ulgurji narxlar uchun LUXECORE (luxe-core.uz) ga murojaat qiling.</p>
           <button
             onClick={handleShare}
             className="flex items-center gap-2 text-gold-400 hover:text-gold-300 transition-colors"

@@ -47,18 +47,18 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       || `${productName}`;
     const productDesc = (
       activeLang === 'ru'
-        ? `${baseDesc} Оптовая цена: ${priceStr} (мин. заказ ${minQty} шт). Купить оптом со склада Урикзор в Ташкенте — LUXECORE.`
-        : `${baseDesc} Optom narxi: ${priceStr} (min. buyurtma ${minQty} dona). Toshkent O'rikzor omboridan ulgurji xarid — LUXECORE.`
+        ? `${baseDesc} Оптовая цена: ${priceStr} (мин. заказ ${minQty} шт). Купить оптом со склада Урикзор в Ташкенте — LUXECORE (luxe-core.uz).`
+        : `${baseDesc} Optom narxi: ${priceStr} (min. buyurtma ${minQty} dona). Toshkent O'rikzor omboridan ulgurji xarid — LUXECORE (luxe-core.uz).`
     ).substring(0, 165);
 
     const title =
       activeLang === 'ru'
-        ? `${productName} — купить оптом (${priceStr}) | LUXECORE Ташкент`
-        : `${productName} — optom ulgurji narxda (${priceStr}) | LUXECORE`;
+        ? `${productName} — купить оптом (${priceStr}) | LUXECORE (luxe-core.uz)`
+        : `${productName} — optom ulgurji narxda (${priceStr}) | LUXECORE (luxe-core.uz)`;
     const canonicalPath = `/${activeLang}/product/${productSlug(metadataProduct as any, activeLang)}`;
     const languages: Record<string, string> = {};
     for (const altLang of SEO_LANGUAGES) {
-      languages[altLang] = `/${altLang}/product/${productSlug(metadataProduct as any, altLang)}`;
+      languages[altLang] = `${SITE_URL}/${altLang}/product/${productSlug(metadataProduct as any, altLang)}`;
     }
     languages['x-default'] = languages.uz;
 
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       title,
       description: productDesc,
       alternates: {
-        canonical: canonicalPath,
+        canonical: `${SITE_URL}${canonicalPath}`,
         languages,
       },
       openGraph: {
@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         description: productDesc,
         url: `${SITE_URL}${canonicalPath}`,
         type: 'website',
-        siteName: 'LUXECORE',
+        siteName: 'LUXECORE (luxe-core.uz)',
         images: ogImages,
       },
       twitter: {

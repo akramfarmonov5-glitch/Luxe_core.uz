@@ -23,7 +23,7 @@ export const B2B_SEO_ARTICLES = [
     content: {
       uz: `Yangi Yil 2027 mavsumi yaqinlashishi bilan shirinlik ishlab chiqaruvchilar, qandolatchilik sexlari, maktab-bog'chalar ta'minotchilari va yirik korporativ kompaniyalar oldida bitta asosiy vazifa turadi: sifatli, mustahkam va bayramona sovg'a qutilarini eng arzon ulgurji narxda xarid qilish.
 
-Toshkentdagi **LUXECORE.UZ** B2B ulgurji platformasi O'rikzor ulgurji omboridan to'g'ridan-to'g'ri birinchi qo'l narxlarida yetkazib berishni yo'lga qo'ydi. Biz vositachilarsiz ishlaymiz, shu sababli siz bozor narxidan 15–25% arzonroqqa ega bo'lasiz.
+Toshkentdagi [LUXECORE (luxe-core.uz)](https://luxe-core.uz/uz) B2B ulgurji platformasi O'rikzor ulgurji omboridan to'g'ridan-to'g'ri birinchi qo'l narxlarida yetkazib berishni yo'lga qo'ydi. Biz vositachilarsiz ishlaymiz, shu sababli siz bozor narxidan 15–25% arzonroqqa ega bo'lasiz.
 
 ### 1. 3 Pog'onali Avtomatik Ulgurji Chegirma Tizimi
 
@@ -48,7 +48,7 @@ Katta korxonalar, ta'minot bo'limlari (snabjenetslar) va buxgalterlar uchun plat
 
 ### 4. 🖨 Rasmiy Yuk Xati (Накладная) — 100% Qonuniy va Shaffof
 
-Barcha yuridik shaxslar, MChJ va YaTT lar uchun omborimizdan chiqadigan har bir buyurtmaga to'liq rasmiy **YUK XATI (НАКЛАДНАЯ) — LUXECORE.UZ** ilova qilinadi. Unda tovar nomi, partiya raqami, aniq dona soni, muhr va mas'ul shaxs imzosi joylari mavjud. Buxgalteriya hisoboti uchun 100% tayyor hujjat.
+Barcha yuridik shaxslar, MChJ va YaTT lar uchun omborimizdan chiqadigan har bir buyurtmaga to'liq rasmiy **YUK XATI (НАКЛАДНАЯ) — LUXECORE (luxe-core.uz)** ilova qilinadi. Unda tovar nomi, partiya raqami, aniq dona soni, muhr va mas'ul shaxs imzosi joylari mavjud. Buxgalteriya hisoboti uchun 100% tayyor hujjat.
 
 ### 5. 🚚 2 Mln So'mdan Bepul Yetkazib Berish
 
@@ -66,7 +66,7 @@ Mavsumda narxlar ko'tarilmasdan oldin buyurtma bering:
 Hoziroq [LUXECORE Ulgurji Katalogiga](/uz/catalog) o'ting, Excel prays-listni yuklab oling va Yangi Yil 2027 partiyasini maksimal foyda bilan band qiling!`,
       ru: `С приближением новогоднего сезона 2027 кондитерские фабрики, частные цеха, поставщики школ и детских садов, а также корпоративные компании сталкиваются с главной задачей: купить качественные, прочные и презентабельные новогодние коробки для подарков по минимальной оптовой цене.
 
-B2B оптовая платформа **LUXECORE.UZ** обеспечивает прямые поставки со склада рынка Урикзор в Ташкенте по ценам первого поставщика без посредников и лишних переплат.
+B2B оптовая платформа [LUXECORE (luxe-core.uz)](https://luxe-core.uz/uz) обеспечивает прямые поставки со склада рынка Урикзор в Ташкенте по ценам первого поставщика без посредников и лишних переплат.
 
 ### 1. 3-Уровневая Автоматическая Система Оптовых Скидок
 
@@ -91,7 +91,7 @@ B2B оптовая платформа **LUXECORE.UZ** обеспечивает �
 
 ### 4. 🖨 Официальная Накладная со Штампом
 
-Для юридических лиц и индивидуальных предпринимателей на каждый заказ со склада распечатывается официальная **НАКЛАДНАЯ — LUXECORE.UZ** формата А4 со штампом, реквизитами и местом подписи. Полная бухгалтерская прозрачность гарантирована.
+Для юридических лиц и индивидуальных предпринимателей на каждый заказ со склада распечатывается официальная **НАКЛАДНАЯ — LUXECORE (luxe-core.uz)** формата А4 со штампом, реквизитами и местом подписи. Полная бухгалтерская прозрачность гарантирована.
 
 ### 5. 🚚 Бесплатная Доставка от 2 Млн Сум
 
@@ -143,7 +143,7 @@ B2B оптовая платформа **LUXECORE.UZ** обеспечивает �
     content: {
       uz: `Elektron tijorat rivojlanishi bilan Uzum Market, Wildberries va Instagram-do'konlar uchun qadoqlash sifati sotuv hajmi va mijozlar reytingini belgilovchi eng muhim omilga aylandi. Yirtilgan paket, yomon yopishgan klapan yoki tovar ko'rinmaydigan qadoq mijozlarning salbiy fikrlariga va tovar qaytarilishiga (vozvrat) sabab bo'ladi.
 
-Toshkentdagi **LUXECORE.UZ** B2B ulgurji ombori kiyim-kechak, kosmetika, aksessuarlar va savdo nuqtalari uchun sertifikatlangan Kraft, Zip-Lock va BOPP paketlarini to'g'ridan-to'g'ri O'rikzor narxlarida taqdim etadi.
+Toshkentdagi [LUXECORE (luxe-core.uz)](https://luxe-core.uz/uz) B2B ulgurji ombori kiyim-kechak, kosmetika, aksessuarlar va savdo nuqtalari uchun sertifikatlangan Kraft, Zip-Lock va BOPP paketlarini to'g'ridan-to'g'ri O'rikzor narxlarida taqdim etadi.
 
 ### 1. Marketpleyslar Uchun Eng Xaridorgir Qadoq Turlari
 
@@ -171,7 +171,7 @@ Bozorga borib vaqt sarflash shart emas. Saytimizda har bir mahsulot sahifasida a
 ### 4. 📥 Excel Prays-List va 🖨 Rasmiy Yuk Xati (Накладная)
 
 - [Katalog Sahifasida](/uz/catalog) barcha paket turlari va o'lchamlarini bitta **"📥 Prays-list (Excel)"** tugmasi orqali yuklab olib, o'z tannarxingizni rejalashtirishingiz mumkin.
-- Har bir buyurtmaga buxgalteriya hisoboti uchun muhrlangan rasmiy **YUK XATI (НАКЛАДНАЯ) — LUXECORE.UZ** beriladi.
+- Har bir buyurtmaga buxgalteriya hisoboti uchun muhrlangan rasmiy **YUK XATI (НАКЛАДНАЯ) — LUXECORE (luxe-core.uz)** beriladi.
 
 ### 5. 🚚 Toshkentda 2 Mln So'mdan Bepul Yetkazish
 
@@ -188,7 +188,7 @@ Bozorga borib vaqt sarflash shart emas. Saytimizda har bir mahsulot sahifasida a
 Hoziroq [Katalogga o'ting](/uz/catalog) va qadoqlash xarajatlaringizdan 10% tejab, mahsulotlaringiz sifatini yuqori darajaga ko'taring!`,
       ru: `С бурным развитием e-commerce в Узбекистане (Uzum Market, Wildberries, Zoodmall) качество упаковки напрямую влияет на процент выкупа товара и рейтинг продавца. Некачественный полиэтилен или слабый замок Zip-Lock приводят к повреждению товара при доставке и негативным отзывам.
 
-Оптовая база **LUXECORE.UZ** поставляет полный спектр упаковочных материалов со склада Урикзор по оптовым ценам напрямую от производителя.
+Оптовая база [LUXECORE (luxe-core.uz)](https://luxe-core.uz/uz) поставляет полный спектр упаковочных материалов со склада Урикзор по оптовым ценам напрямую от производителя.
 
 ### 1. Топовые Виды Упаковки для Маркетплейсов и Магазинов
 
@@ -216,7 +216,7 @@ Hoziroq [Katalogga o'ting](/uz/catalog) va qadoqlash xarajatlaringizdan 10% teja
 ### 4. 📥 Прайс-Лист в Excel и 🖨 Официальная Накладная
 
 - В шапке [Каталога Продукции](/ru/catalog) скачивайте актуальный **Excel прайс-лист** со всеми ценами и размерами в один клик.
-- На каждую отгрузку предоставляется официальная **НАКЛАДНАЯ — LUXECORE.UZ** со штампом для вашей бухгалтерии.
+- На каждую отгрузку предоставляется официальная **НАКЛАДНАЯ — LUXECORE (luxe-core.uz)** со штампом для вашей бухгалтерии.
 
 ### 5. 🚚 Бесплатная Доставка от 2 Млн Сум
 
@@ -268,7 +268,7 @@ Hoziroq [Katalogga o'ting](/uz/catalog) va qadoqlash xarajatlaringizdan 10% teja
     content: {
       uz: `Restoran, kafe, kofexona va tezkor ovqat yetkazib berish (fast-food delivery) xizmatlarining daromadliligi to'g'ridan-to'g'ri bir martalik idishlarning tannarxiga va sifatiga bog'liq. Taom yetib borguncha sovuq qolmasligi, souslar oqib ketmasligi va qog'oz stakan qo'lni kuydirmasligi mijozning sizga ikkinchi bor buyurtma berishini ta'minlaydi.
 
-**LUXECORE.UZ** O'rikzor ulgurji bozoridagi eng yirik ombordan umumiy ovqatlanish korxonalari (HoReCa) uchun sifatli bir martalik idish-tovoqlar va qadoqlarni ulgurji narxda taklif etadi.
+[LUXECORE (luxe-core.uz)](https://luxe-core.uz/uz) O'rikzor ulgurji bozoridagi eng yirik ombordan umumiy ovqatlanish korxonalari (HoReCa) uchun sifatli bir martalik idish-tovoqlar va qadoqlarni ulgurji narxda taklif etadi.
 
 ### 1. Kafe va Dostavka Uchun Zaruriy Asosiy Mahsulotlar
 
@@ -297,7 +297,7 @@ Oshxona xodimlari soni adashmasligi uchun barcha mahsulotlar qat'iy standartdagi
 ### 4. 📥 Excel Prays-List va 🖨 Rasmiy Yuk Xati (Накладная)
 
 - [Katalog Sahifasida](/uz/catalog) barcha HoReCa tovarlarining to'liq ro'yxati va ulgurji narxlarini **"📥 Prays-list (Excel)"** tugmasi orqali yuklab olish mumkin.
-- Barcha buyurtmalarga buxgalteriya hisoboti uchun muhr va imzo qo'yilgan rasmiy **YUK XATI (НАКЛАДНАЯ) — LUXECORE.UZ** ilova qilinadi.
+- Barcha buyurtmalarga buxgalteriya hisoboti uchun muhr va imzo qo'yilgan rasmiy **YUK XATI (НАКЛАДНАЯ) — LUXECORE (luxe-core.uz)** ilova qilinadi.
 
 ### 5. 🚚 Toshkentda 2 Mln So'mdan Bepul va 2 Soatda Yetkazish
 
@@ -313,7 +313,7 @@ Oshxona xodimlari soni adashmasligi uchun barcha mahsulotlar qat'iy standartdagi
 Hoziroq [LUXECORE Ulgurji Katalogiga](/uz/catalog) kiring va kafengiz uchun bir martalik idishlarni O'rikzor narxlarida xarid qiling!`,
       ru: `В ресторанном бизнесе, кофейнях и службах доставки еды качество одноразовой посуды играет ключевую роль: герметичность соусников, термостойкость крафт-стаканов и прочность ланч-боксов напрямую определяют лояльность клиентов.
 
-Оптовая платформа **LUXECORE.UZ** поставляет полный ассортимент одноразовой посуды и упаковки для HoReCa со склада рынка Урикзор в Ташкенте по прямым оптовым ценам.
+Оптовая платформа [LUXECORE (luxe-core.uz)](https://luxe-core.uz/uz) поставляет полный ассортимент одноразовой посуды и упаковки для HoReCa со склада рынка Урикзор в Ташкенте по прямым оптовым ценам.
 
 ### 1. Базовые Позиции для Кафе и Доставки Еды
 
@@ -339,7 +339,7 @@ Hoziroq [LUXECORE Ulgurji Katalogiga](/uz/catalog) kiring va kafengiz uchun bir 
 ### 4. 📥 Excel Прайс-Лист и 🖨 Официальная Накладная
 
 - Скачивайте полный прайс-лист в шапке [Каталога](/ru/catalog) кнопкой **"📥 Прайс-лист (Excel)"**.
-- К каждому заказу прилагается официальная **НАКЛАДНАЯ — LUXECORE.UZ** со штампом и реквизитами для бухгалтерии.
+- К каждому заказу прилагается официальная **НАКЛАДНАЯ — LUXECORE (luxe-core.uz)** со штампом и реквизитами для бухгалтерии.
 
 ### 5. 🚚 Бесплатная Доставка от 2 Млн Сум за 2 Часа
 
@@ -391,7 +391,7 @@ Hoziroq [LUXECORE Ulgurji Katalogiga](/uz/catalog) kiring va kafengiz uchun bir 
     content: {
       uz: `O'zbekistonda to'y marosimlari, fotiha, kelin-kuyov sarpolari va bayramona sovg'alar yuksak ehtirom bilan o'tkaziladi. Har bir to'y mavsumida sarpo qutilari, magnitli qulfli lyuks qutilar va zar hoshiyali milliy sovg'a qutilariga bo'lgan talab 200–300% gacha oshadi. Sovg'a do'konlari, gullar salonlari, kelinlik butiklari va qandolatchilar uchun bu eng katta daromad manbaidir.
 
-Toshkentdagi **LUXECORE.UZ** B2B ulgurji ombori O'rikzordan to'g'ridan-to'g'ri ishlab chiqaruvchi narxlarida eng sara sarpo va sovg'a qutilarini taqdim etadi.
+Toshkentdagi [LUXECORE (luxe-core.uz)](https://luxe-core.uz/uz) B2B ulgurji ombori O'rikzordan to'g'ridan-to'g'ri ishlab chiqaruvchi narxlarida eng sara sarpo va sovg'a qutilarini taqdim etadi.
 
 ### 1. Savdoda Eng Tez Sotiladigan Top-Modellar
 
@@ -418,7 +418,7 @@ Qattiq sovg'a qutilari tashish jarayonida shikastlanmasligi uchun zavodning maxs
 ### 4. 📥 Excel Prays-List va 🖨 Rasmiy Yuk Xati (Накладная)
 
 - [Katalog Sahifasidagi](/uz/catalog) **"📥 Prays-list (Excel)"** tugmasi orqali barcha qutilarning aniq o'lchamlari (sm), ichki balandligi va ulgurji narxlarini bir lahzada yuklab oling.
-- Barcha do'konlar va yuridik shaxslarga buxgalteriya hisoboti uchun muhrlangan rasmiy **YUK XATI (НАКЛАДНАЯ) — LUXECORE.UZ** beriladi.
+- Barcha do'konlar va yuridik shaxslarga buxgalteriya hisoboti uchun muhrlangan rasmiy **YUK XATI (НАКЛАДНАЯ) — LUXECORE (luxe-core.uz)** beriladi.
 
 ### 5. 🚚 Toshkentda 2 Mln So'mdan Bepul Yetkazish
 
@@ -435,7 +435,7 @@ Qattiq sovg'a qutilari tashish jarayonida shikastlanmasligi uchun zavodning maxs
 Hoziroq [LUXECORE Ulgurji Katalogiga](/uz/catalog) kiring, Excel narxnomani yuklab oling va to'y mavsumi uchun eng xaridorgir qutilarni eng arzon narxda zaxiralang!`,
       ru: `В Узбекистане свадебные церемонии, помолвка, обряды сарпо и вручение подарков занимают особое место. В разгар свадебного сезона спрос на жесткие подарочные коробки на магнитах, наборы для сарпо из 3 штук и традиционные коробки с золотым тиснением возрастает многократно.
 
-Оптовая база **LUXECORE.UZ** предлагает свадебные коробки для сарпо и подарочные Gift Box напрямую со склада рынка Урикзор в Ташкенте.
+Оптовая база [LUXECORE (luxe-core.uz)](https://luxe-core.uz/uz) предлагает свадебные коробки для сарпо и подарочные Gift Box напрямую со склада рынка Урикзор в Ташкенте.
 
 ### 1. Самые Ходовые Модели для Магазинов и Бутиков
 
@@ -462,7 +462,7 @@ Hoziroq [LUXECORE Ulgurji Katalogiga](/uz/catalog) kiring, Excel narxnomani yukl
 ### 4. 📥 Excel Прайс-Лист и 🖨 Официальная Накладная
 
 - В шапке [Каталога](/ru/catalog) скачивайте **Excel прайс-лист** со всеми размерами и фото в один клик.
-- Для юрлиц и ИП предоставляется официальная **НАКЛАДНАЯ — LUXECORE.UZ** со штампом.
+- Для юрлиц и ИП предоставляется официальная **НАКЛАДНАЯ — LUXECORE (luxe-core.uz)** со штампом.
 
 ### 5. 🚚 Бесплатная Доставка от 2 Млн Сум за 2 Часа
 

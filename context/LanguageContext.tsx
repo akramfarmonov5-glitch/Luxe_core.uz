@@ -36,7 +36,7 @@ const translations: Translations = {
     hero_chip_tracking: { uz: 'Buyurtmani kuzatish', ru: 'Отслеживание заказа', en: 'Order tracking' },
 
     // Footer
-    footer_desc: { uz: 'Sovg‘a qutilari, paketlar va qadoqlash mahsulotlari O‘rikzor omboridan to‘g‘ridan-to‘g‘ri ulgurji narxlarda.', ru: 'Подарочные коробки, пакеты и упаковочные материалы со склада Урикзор по оптовым ценам.', en: 'Gift boxes, packaging, and bags directly from warehouse at wholesale prices.' },
+    footer_desc: { uz: 'LUXECORE (luxe-core.uz) — Sovg‘a qutilari, paketlar, bir martalik idishlar va qadoqlash mahsulotlari O‘rikzor omboridan to‘g‘ridan-to‘g‘ri ulgurji narxlarda.', ru: 'LUXECORE (luxe-core.uz / ЛюксКор) — Подарочные коробки, пакеты, одноразовая посуда и упаковочные материалы со склада Урикзор по оптовым ценам.', en: 'LUXECORE (luxe-core.uz) — Gift boxes, packaging, disposable tableware and bags directly from Urikzor warehouse at wholesale prices.' },
     footer_categories: { uz: 'Kategoriyalar', ru: 'Категории', en: 'Categories' },
     footer_help: { uz: 'Yordam', ru: 'Помощь', en: 'Help' },
     footer_contact: { uz: 'Bog\'lanish', ru: 'Контакты', en: 'Contact Us' },

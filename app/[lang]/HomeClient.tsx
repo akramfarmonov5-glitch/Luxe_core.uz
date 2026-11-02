@@ -102,13 +102,13 @@ export default function HomePage({ featuredReviews = [] }: HomePageProps) {
         <div className={`p-6 md:p-8 rounded-2xl border ${isDark ? 'bg-white/[0.02] border-white/10 text-gray-300' : 'bg-white border-gray-200 text-gray-700'}`}>
           <h2 className={`text-lg md:text-2xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
             {lang === 'ru'
-              ? 'LUXECORE — Подарочные коробки, пакеты, упаковка, одноразовая посуда и новогодняя упаковка 2027 оптом в Ташкенте'
-              : 'LUXECORE — Sovg\'a qutilari, paketlar, qadoqlash materiallari, bir martalik idishlar va 2027 yil yangi yil uchun qutilar optom (ulgurji)'}
+              ? 'LUXECORE (luxe-core.uz) — Подарочные коробки, пакеты, упаковка, одноразовая посуда и новогодняя упаковка 2027 оптом в Ташкенте'
+              : 'LUXECORE (luxe-core.uz) — Sovg\'a qutilari, paketlar, qadoqlash materiallari, bir martalik idishlar va 2027 yil yangi yil uchun qutilar optom (ulgurji)'}
           </h2>
           <p className="text-xs md:text-sm leading-relaxed mb-4">
             {lang === 'ru'
-              ? 'Оптовый интернет-магазин LUXECORE (склад Урикзор, Ташкент) поставляет упаковочные материалы крупным и мелким оптом по всему Узбекистану. В нашем каталоге представлены: новогодняя упаковка на 2027 год (детские коробки для конфет и корпоративные наборы), свадебные коробки для сарпо, подарочные коробки на магните, крафт-пакеты с ручками, матовые и прозрачные Zip-Lock пакеты для маркетплейсов Uzum и Wildberries, БОПП пакеты, а также одноразовая посуда, стаканы и ланч-боксы для кафе и доставки.'
-              : 'LUXECORE ulgurji do\'koni (Toshkent, O\'rikzor ombori) O\'zbekiston bo\'ylab tadbirkorlar, do\'konlar, marketpleys sotuvchilari va restoranlar uchun barcha turdagi qadoqlash mahsulotlarini birinchi qo\'l optom narxlarda yetkazib beradi. Katalogimizda: 2027 yil yangi yil uchun bolalar shirinlik qutilari va korporativ qadoqlar, to\'y va kelin-kuyov sarpo qutilari, magnitli premium sovg\'a qutilari, burama tutqichli kraft paketlar, Uzum va Wildberries uchun Zip-Lock paketlar, yopishqoq BOPP paketlar hamda kafe-restoranlar uchun bir martalik idishlar (odnorazoviy idishlar, stakanlar, konteynerlar) mavjud.'}
+              ? 'Оптовый интернет-магазин LUXECORE (luxe-core.uz / LuxeCore / ЛюксКор Ташкент, склад Урикзор) поставляет упаковочные материалы крупным и мелким оптом по всему Узбекистану. В нашем каталоге представлены: новогодняя упаковка на 2027 год (детские коробки для конфет и корпоративные наборы), свадебные коробки для сарпо, подарочные коробки на магните, крафт-пакеты с ручками, матовые и прозрачные Zip-Lock пакеты для маркетплейсов Uzum и Wildberries, БОПП пакеты, а также одноразовая посуда, стаканы и ланч-боксы для кафе и доставки.'
+              : 'LUXECORE (luxe-core.uz / LuxeCore / Luxe Core Toshkent, O\'rikzor ombori) ulgurji do\'koni O\'zbekiston bo\'ylab tadbirkorlar, do\'konlar, marketpleys sotuvchilari va restoranlar uchun barcha turdagi qadoqlash mahsulotlarini birinchi qo\'l optom narxlarda yetkazib beradi. Katalogimizda: 2027 yil yangi yil uchun bolalar shirinlik qutilari va korporativ qadoqlar, to\'y va kelin-kuyov sarpo qutilari, magnitli premium sovg\'a qutilari, burama tutqichli kraft paketlar, Uzum va Wildberries uchun Zip-Lock paketlar, yopishqoq BOPP paketlar hamda kafe-restoranlar uchun bir martalik idishlar (odnorazoviy idishlar, stakanlar, konteynerlar) mavjud.'}
           </p>
           <div className="flex flex-wrap gap-2 pt-2">
             {seoTags.map((tag, idx) => (

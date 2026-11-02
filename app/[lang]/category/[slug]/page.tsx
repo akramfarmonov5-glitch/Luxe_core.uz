@@ -44,16 +44,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       : slug;
     const description = (
       category ? getLocalizedText(category.description, activeLang) : ''
-    ) || `${categoryName} - LUXECORE premium kolleksiyasi. Eksklyuziv mahsulotlarni buyurtma qiling.`;
+    ) || `${categoryName} — LUXECORE (luxe-core.uz) ulgurji (optom) katalogi. O'rikzor omboridan tezkor yetkazib berish.`;
 
-    const title = `${categoryName} | LUXECORE`;
+    const title = `${categoryName} — optom | LUXECORE (luxe-core.uz)`;
     const canonicalSlug = category ? getCategorySlug(category, activeLang) : slug;
     const canonicalPath = `/${activeLang}/category/${canonicalSlug}`;
 
     const languages: Record<string, string> = {};
     for (const altLang of SEO_LANGUAGES) {
       const altSlug = category ? getCategorySlug(category, altLang) : slug;
-      languages[altLang] = `/${altLang}/category/${altSlug}`;
+      languages[altLang] = `${SITE_URL}/${altLang}/category/${altSlug}`;
     }
     languages['x-default'] = languages.uz;
 
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title,
       description: description.substring(0, 160),
       alternates: {
-        canonical: canonicalPath,
+        canonical: `${SITE_URL}${canonicalPath}`,
         languages,
       },
       openGraph: {
@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         description,
         url: `${SITE_URL}${canonicalPath}`,
         type: 'website',
-        siteName: 'LUXECORE',
+        siteName: 'LUXECORE (luxe-core.uz)',
         images: ogImage ? [{ url: ogImage, alt: categoryName }] : [],
       },
       twitter: {

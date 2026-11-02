@@ -31,7 +31,8 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
 
           <div className="space-y-4">
             <h3 className={`text-2xl font-bold tracking-wider ${isDark ? 'text-white' : 'text-light-text'}`}>
-              LUXE<span className="text-gold-400">CORE</span>
+              LUXE<span className="text-gold-400">CORE</span>{' '}
+              <span className="text-xs font-normal text-gray-500">(luxe-core.uz)</span>
             </h3>
             <p className={`text-sm leading-relaxed ${isDark ? 'text-gray-500' : 'text-light-muted'}`}>
               {t('footer_desc')}
@@ -97,7 +98,7 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
                 <Facebook size={16} />
               </a>
-              <a href="mailto:support@luxecore.uz" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
+              <a href="mailto:support@luxe-core.uz" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
                 <Mail size={16} />
               </a>
             </div>
@@ -105,7 +106,7 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
         </div>
 
         <div className={`border-t pt-8 flex flex-col md:flex-row justify-between items-center text-xs ${isDark ? 'border-white/5 text-gray-600' : 'border-light-border text-light-muted'}`}>
-          <p>&copy; 2026 LUXECORE. {t('all_rights_reserved')}.</p>
+          <p>&copy; 2026 LUXECORE (luxe-core.uz). {t('all_rights_reserved')}.</p>
           <div className="flex gap-6 mt-4 md:mt-0 items-center">
             <Link href={`/${lang}/privacy`} className="hover:text-gold-400 transition-colors">{helpLabels.privacy}</Link>
             <Link href={`/${lang}/terms`} className="hover:text-gold-400 transition-colors">{helpLabels.terms}</Link>

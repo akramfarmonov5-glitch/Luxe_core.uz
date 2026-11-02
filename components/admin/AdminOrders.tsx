@@ -178,7 +178,7 @@ const AdminOrders: React.FC = () => {
         </div>
         <div class="header">
           <div>
-            <div class="brand">LUXECORE.UZ</div>
+            <div class="brand">LUXECORE (luxe-core.uz)</div>
             <div class="sub">Ulgurji Sovg'a Qutilari va Qadoqlash Materiallari (O'rikzor ombori)</div>
             <div class="sub">Sayt: https://luxe-core.uz | Telegram: @luxecoreuz</div>
           </div>
