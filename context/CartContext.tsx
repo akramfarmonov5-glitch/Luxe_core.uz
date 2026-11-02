@@ -8,7 +8,7 @@ import { getLocalizedText } from '../lib/i18nUtils';
 interface CartContextType {
   cart: CartItem[];
   isCartOpen: boolean;
-  addToCart: (product: Product, options?: { openSidebar?: boolean }) => void;
+  addToCart: (product: Product, options?: { openSidebar?: boolean; quantity?: number }) => void;
   removeFromCart: (productId: number) => void;
   updateQuantity: (productId: number, quantity: number) => void;
   toggleCart: () => void;
@@ -41,8 +41,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem('luxecore_cart', JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product: Product, options?: { openSidebar?: boolean }) => {
-    const qtyToAdd = product.itemsPerPackage || 1;
+  const addToCart = (product: Product, options?: { openSidebar?: boolean; quantity?: number }) => {
+    const qtyToAdd = options?.quantity && options.quantity > 0 ? options.quantity : (product.itemsPerPackage || 1);
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id);
       if (existingItem) {

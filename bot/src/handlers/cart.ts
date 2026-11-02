@@ -42,7 +42,9 @@ export async function handleAddToCart(ctx: Context) {
         const data = ctx.callbackQuery?.data;
         if (!data) return;
 
-        const productId = parseInt(data.replace('addcart:', ''));
+        const parts = data.replace('addcart:', '').split(':');
+        const productId = parseInt(parts[0]);
+        const mult = Math.max(1, parseInt(parts[1] || '1') || 1);
         if (!userId || isNaN(productId)) return;
 
         const { data: product } = await supabase
@@ -55,11 +57,12 @@ export async function handleAddToCart(ctx: Context) {
 
         const productName = localizeText(product.name, getLang(userId));
         const step = Number(product.itemsPerPackage) > 1 ? Number(product.itemsPerPackage) : 100;
+        const addQty = step * mult;
         const cart = getUserCart(userId);
         const existing = cart.find(i => i.productId === productId);
 
         if (existing) {
-            existing.quantity += step;
+            existing.quantity += addQty;
             existing.name = productName;
             existing.itemsPerPackage = step;
         } else {
@@ -67,7 +70,7 @@ export async function handleAddToCart(ctx: Context) {
                 productId: product.id,
                 name: productName,
                 price: product.price,
-                quantity: step,
+                quantity: addQty,
                 image: product.image,
                 itemsPerPackage: step,
             });
@@ -79,7 +82,7 @@ export async function handleAddToCart(ctx: Context) {
         await ensureUser(userId, ctx.from?.first_name);
 
         await ctx.reply(
-            `🛒 *${productName}* (+${step} ${t(userId, 'product_pcs')}) ${t(userId, 'cart_added')}\n\n` +
+            `🛒 *${productName}* (+${addQty} ${t(userId, 'product_pcs')}) ${t(userId, 'cart_added')}\n\n` +
             `Savatda: ${cart.length} xil, ${cart.reduce((s, i) => s + i.quantity, 0)} ${t(userId, 'product_pcs')}`,
             {
                 parse_mode: 'Markdown',

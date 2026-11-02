@@ -41,6 +41,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
   const [isPlaying, setIsPlaying] = useState(false);
   const [isQuickBuyOpen, setIsQuickBuyOpen] = useState(false);
 
+  const packSize = product.itemsPerPackage && product.itemsPerPackage > 1 ? product.itemsPerPackage : 100;
+  const [selectedQty, setSelectedQty] = useState<number>(packSize);
+
   const isLiked = isInWishlist(product.id);
   const productCategoryKey = getProductCategoryKey(product.category, categories);
 
@@ -54,6 +57,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
     window.scrollTo(0, 0);
     setActiveImage(product.image);
     setIsPlaying(false);
+    setSelectedQty(product.itemsPerPackage && product.itemsPerPackage > 1 ? product.itemsPerPackage : 100);
 
     // Track Facebook Pixel ViewContent
     fpixel.trackViewContent({
@@ -91,8 +95,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
   }, [product, lang, categories]);
 
   const handleAddToCart = () => {
-    addToCart(product);
-    showToast(`${getLocalizedText(product.name, lang)} ${t('added_to_cart_desc')}`, 'success');
+    addToCart(product, { quantity: selectedQty });
+    showToast(`${getLocalizedText(product.name, lang)} (+${selectedQty} ${t('stock_in')}) ${t('added_to_cart_desc')}`, 'success');
   };
 
   const handleToggleWishlist = () => {
@@ -105,7 +109,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
   };
 
   const handleBuyNow = () => {
-    addToCart(product);
+    addToCart(product, { quantity: selectedQty });
     onCheckout();
   };
 
@@ -313,6 +317,64 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   </div>
                 );
               })()}
+              <div className={`mb-4 p-3 rounded-xl border ${isDark ? 'bg-white/[0.03] border-white/10' : 'bg-gray-50 border-gray-200'}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-xs font-bold uppercase tracking-wider ${isDark ? 'text-gold-400' : 'text-amber-800'}`}>
+                    📦 {lang === 'ru' ? 'Выберите количество (упаковками):' : 'Miqdorni tanlang (pachkalab):'}
+                  </span>
+                  <span className={`text-xs font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                    {Math.round(selectedQty / packSize)} {lang === 'ru' ? 'уп.' : 'pachka'} ({selectedQty} {t('stock_in')}) ={' '}
+                    <span className="text-gold-400">{(Number(product.price || 0) * selectedQty).toLocaleString('uz-UZ')} UZS</span>
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-1.5 mb-2">
+                  {[1, 2, 5, 10].map((mult) => {
+                    const preset = packSize * mult;
+                    const active = selectedQty === preset;
+                    return (
+                      <button
+                        key={mult}
+                        type="button"
+                        onClick={() => setSelectedQty(preset)}
+                        className={`py-2 px-1 text-xs font-bold rounded-lg transition-all border ${
+                          active
+                            ? 'bg-gold-400 text-black border-gold-400 shadow-sm'
+                            : isDark
+                            ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
+                            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-100'
+                        }`}
+                      >
+                        {mult}x ({preset} {t('stock_in')})
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedQty((prev) => Math.max(packSize, prev - packSize))}
+                    className={`px-3 py-1.5 rounded-lg border font-bold text-sm transition-colors ${isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-300 bg-white text-gray-800 hover:bg-gray-100'}`}
+                  >
+                    −{packSize}
+                  </button>
+                  <input
+                    type="number"
+                    min={packSize}
+                    step={packSize}
+                    value={selectedQty}
+                    onChange={(e) => setSelectedQty(Math.max(packSize, Number(e.target.value) || packSize))}
+                    className={`flex-1 text-center rounded-lg border py-1.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-gold-400/50 ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setSelectedQty((prev) => prev + packSize)}
+                    className={`px-3 py-1.5 rounded-lg border font-bold text-sm transition-colors ${isDark ? 'border-white/10 bg-white/5 text-white hover:bg-white/10' : 'border-gray-300 bg-white text-gray-800 hover:bg-gray-100'}`}
+                  >
+                    +{packSize}
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3 md:gap-4 mb-3">
                 <button
                   onClick={handleAddToCart}
@@ -496,7 +558,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
         isOpen={isQuickBuyOpen}
         onClose={() => setIsQuickBuyOpen(false)}
         product={product}
-        quantity={product.itemsPerPackage || 100}
+        quantity={selectedQty}
       />
       {product.stock !== 0 && (
         <div className={`fixed inset-x-0 bottom-0 z-40 border-t px-4 py-3 md:hidden ${

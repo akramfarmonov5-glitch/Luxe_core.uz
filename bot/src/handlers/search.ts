@@ -67,10 +67,14 @@ export async function handleSearchQuery(ctx: Context) {
                 `${t(userId, 'product_status')} ${stockText}`;
 
             const productUrl = getProductUrl(config.SITE_URL, p.id, userId);
+            const unitLabel = t(userId, 'product_pcs');
             const kb = new InlineKeyboard()
                 .webApp(t(userId, 'btn_buy_on_site'), productUrl)
                 .row()
-                .text(t(userId, 'btn_add_cart'), `addcart:${p.id}`)
+                .text(`🛒 +1x (${minQty} ${unitLabel})`, `addcart:${p.id}:1`)
+                .text(`📦 +5x (${minQty * 5})`, `addcart:${p.id}:5`)
+                .text(`📦 +10x (${minQty * 10})`, `addcart:${p.id}:10`)
+                .row()
                 .url(t(userId, 'btn_view_site'), productUrl);
 
             try {

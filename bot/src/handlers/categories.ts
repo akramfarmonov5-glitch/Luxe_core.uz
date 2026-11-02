@@ -122,10 +122,14 @@ export async function sendProductCard(
     const productUrl = getProductUrl(config.SITE_URL, p.id, userId);
     kb.webApp(t(userId, 'btn_buy_on_site'), productUrl).row();
 
-    // Secondary actions: Add to bot cart & open in external browser
-    kb.text(t(userId, 'btn_add_cart'), `addcart:${p.id}`);
-    kb.url(t(userId, 'btn_view_site'), productUrl);
-    kb.row();
+    // Quick wholesale pack buttons (1x, 5x, 10x)
+    const unitLabel = t(userId, 'product_pcs');
+    kb.text(`🛒 +1x (${minQty} ${unitLabel})`, `addcart:${p.id}:1`)
+      .text(`📦 +5x (${minQty * 5})`, `addcart:${p.id}:5`)
+      .text(`📦 +10x (${minQty * 10})`, `addcart:${p.id}:10`)
+      .row();
+
+    kb.url(t(userId, 'btn_view_site'), productUrl).row();
 
     // If browsing a category, allow opening the whole category on the website
     if (prefix.startsWith('catpage:')) {
