@@ -51,13 +51,21 @@ export async function POST(req: NextRequest) {
       }, { status: 501 });
     }
 
-    const admin = await import('firebase-admin');
-    
-    if (admin.apps.length === 0) {
+    const firebaseModule = await import('firebase-admin');
+    // firebase-admin 14 (ESM) da `apps`, `credential`, `messaging` default eksport
+    // ostida keladi — interop uchun ikkala shaklni ham qo'llab-quvvatlaymiz.
+    const admin: any = (firebaseModule as any).default ?? firebaseModule;
+    const credentialFactory: any = admin.credential ?? (firebaseModule as any).credential;
+    const messagingFactory: any = admin.messaging ?? (firebaseModule as any).messaging;
+    const existingApps: any[] = typeof admin.getApps === 'function'
+      ? admin.getApps()
+      : (admin.apps ?? []);
+
+    if (!Array.isArray(existingApps) || existingApps.length === 0) {
       try {
         const serviceAccount = JSON.parse(serviceAccountStr);
         admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount)
+          credential: credentialFactory.cert(serviceAccount)
         });
       } catch (parseErr: any) {
         console.error("Failed to parse or initialize Firebase Admin SDK:", parseErr);
@@ -83,7 +91,7 @@ export async function POST(req: NextRequest) {
       }
     };
 
-    const response = await admin.messaging().sendEachForMulticast(messagePayload);
+    const response = await messagingFactory().sendEachForMulticast(messagePayload);
     
     // 4. Identify and delete expired tokens dynamically
     const expiredTokens: string[] = [];

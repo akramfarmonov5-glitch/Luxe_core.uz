@@ -1,5 +1,5 @@
 
-const env = import.meta.env || {};
+const env: Record<string, string | undefined> = (import.meta as any).env || {};
 export const FB_PIXEL_ID = env.VITE_FACEBOOK_PIXEL_ID;
 
 

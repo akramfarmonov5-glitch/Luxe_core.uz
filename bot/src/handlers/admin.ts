@@ -83,11 +83,18 @@ async function restoreOrderStockIfNeeded(orderId: string) {
     try {
         const { data: order } = await supabase
             .from('orders')
-            .select('status, items')
+            .select('status, items, stock_reserved')
             .eq('id', orderId)
             .single();
 
         if (!order || order.status === 'Bekor qilindi' || !Array.isArray(order.items)) {
+            return;
+        }
+
+        // Qoldiq FAQAT haqiqatan yechilgan buyurtmalar uchun qaytariladi
+        // (`stock_reserved = true` — `create_order_with_stock` RPC qo'yadi).
+        // Aks holda eski buyurtmalarda qoldiq ikki marta oshib ketardi.
+        if (order.stock_reserved !== true) {
             return;
         }
 
@@ -109,6 +116,12 @@ async function restoreOrderStockIfNeeded(orderId: string) {
                     .eq('id', productId);
             }
         }
+
+        // Ikki marta qaytarilmasligi uchun bayroqni tushiramiz.
+        await supabase
+            .from('orders')
+            .update({ stock_reserved: false })
+            .eq('id', orderId);
     } catch (err) {
         console.error('Restore stock error:', err);
     }

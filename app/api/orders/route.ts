@@ -122,7 +122,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const { error } = await supabase.from('orders').insert({
+    const orderPayload = {
       id: orderId,
       customerName,
       phone,
@@ -135,10 +135,13 @@ export async function POST(req: NextRequest) {
       shipping_address: address || null,
       city: city || null,
       telegram_user_id: resolvedTelegramUserId,
-    });
+    };
 
-    if (error) {
-      throw error;
+    // Ombor qoldig'i shu yerda atomar yechiladi (RPC).
+    // Migratsiya qo'llanmagan bo'lsa — eski insert'ga qaytadi.
+    const insertError = await insertOrderWithStockReservation(supabase, orderPayload, items);
+    if (insertError) {
+      throw insertError;
     }
 
     if (source !== 'telegram-bot') {
@@ -163,12 +166,45 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('Order creation API error:', error);
-    const message = error?.message || 'Buyurtma yaratishda xatolik yuz berdi';
+    const rawMessage = error?.message || 'Buyurtma yaratishda xatolik yuz berdi';
+    const message = rawMessage.includes('INSUFFICIENT_STOCK')
+      ? 'Tanlangan mahsulot uchun omborda yetarli qoldiq yo‘q. Iltimos, sonini kamaytiring.'
+      : rawMessage;
     return NextResponse.json(
       { error: message },
-      { status: isClientOrderError(message) ? 400 : 500 },
+      { status: isClientOrderError(rawMessage) ? 400 : 500 },
     );
   }
+}
+
+async function insertOrderWithStockReservation(
+  supabase: NonNullable<ReturnType<typeof getServiceSupabaseClient>>,
+  order: Record<string, unknown>,
+  items: Array<{ id: number; quantity: number }>,
+): Promise<{ message: string } | null> {
+  const { error: stockError } = await supabase.rpc('create_order_with_stock', {
+    p_order: order,
+    p_items: items.map((item) => ({ id: item.id, quantity: item.quantity })),
+  });
+
+  if (!stockError) {
+    return null;
+  }
+
+  // Migratsiya hali qo'llanmagan bo'lsa (funksiya topilmadi) — eski insert bilan
+  // davom etamiz, shunda deploy va migratsiya tartibi muhim bo'lib qolmaydi.
+  const functionMissing =
+    stockError.code === 'PGRST202' ||
+    stockError.code === '42883' ||
+    /could not find the function|function .* does not exist/i.test(stockError.message || '');
+
+  if (functionMissing) {
+    console.warn("create_order_with_stock RPC topilmadi — oddiy insert ishlatildi. Migratsiyani qo'llang.");
+    const { error: insertError } = await supabase.from('orders').insert(order as never);
+    return insertError ? { message: insertError.message } : null;
+  }
+
+  return { message: stockError.message };
 }
 
 async function sendTelegramNotification({
@@ -317,5 +353,10 @@ function isClientOrderError(message: string) {
     'At least one item is required',
     'One or more products were not found',
     'Product lookup failed',
-  ].includes(message) || message.includes('uchun yetarli stock mavjud emas');
+  ].includes(message)
+    || message.includes('uchun yetarli stock mavjud emas')
+    || message.includes('INSUFFICIENT_STOCK')
+    || message.includes('ORDER_ITEMS_INVALID')
+    || message.includes('ORDER_PAYLOAD_INVALID')
+    || message.includes('ITEM_INVALID');
 }

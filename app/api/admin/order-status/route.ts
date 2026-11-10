@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     const { data: existingOrder, error: fetchErr } = await supabase
       .from('orders')
-      .select('id, status, items, telegram_user_id, phone, total')
+      .select('*')
       .eq('id', orderId)
       .single();
 
@@ -39,8 +39,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Buyurtma topilmadi' }, { status: 404 });
     }
 
-    // Restore stock if transitioning to 'Bekor qilindi'
-    if (status === 'Bekor qilindi' && existingOrder.status !== 'Bekor qilindi') {
+    // Qoldiqni FAQAT haqiqatan yechilgan buyurtmalar uchun qaytaramiz
+    // (`stock_reserved = true`, `create_order_with_stock` RPC qo'yadi).
+    // Aks holda eski buyurtmalarda qoldiq ikki marta oshib ketardi.
+    const shouldRestoreStock =
+      status === 'Bekor qilindi' &&
+      existingOrder.status !== 'Bekor qilindi' &&
+      existingOrder.stock_reserved === true;
+
+    if (shouldRestoreStock) {
       const items = Array.isArray(existingOrder.items) ? existingOrder.items : [];
       for (const item of items) {
         const productId = Number(item?.id ?? item?.productId);
@@ -63,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     const { error: updateErr } = await supabase
       .from('orders')
-      .update({ status })
+      .update(shouldRestoreStock ? { status, stock_reserved: false } : { status })
       .eq('id', orderId);
 
     if (updateErr) {

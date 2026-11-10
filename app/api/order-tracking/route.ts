@@ -3,8 +3,26 @@ import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 import { normalizePhone } from '../../../lib/checkout.server';
 
+const MAX_ORDERS_FULL = 3;
+const MAX_ORDERS_LIMITED = 3;
+
+// `ilike` da `%` va `_` — wildcard. Foydalanuvchi kiritgan qiymat ular bilan
+// tozalanmasa, `%` yuborib telefon raqamiga tegishli BARCHA buyurtmalarni
+// tanlab olish mumkin edi.
+function escapeLikePattern(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => `\\${char}`);
+}
+
+function sanitizeOrderId(value: unknown): string {
+  return String(value || '')
+    .trim()
+    .replace(/^#+/, '')
+    .replace(/[^A-Za-z0-9-]/g, '')
+    .slice(0, 40);
+}
+
 export async function POST(req: NextRequest) {
-  const rateLimit = checkRateLimit(`order-tracking:${getClientIp(req)}`, 15, 60 * 1000);
+  const rateLimit = checkRateLimit(`order-tracking:${getClientIp(req)}`, 10, 60 * 1000);
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
   }
@@ -17,11 +35,11 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { phone, orderId } = await req.json();
-    const rawPhone = String(phone || '').trim();
-    const normalizedPhone = normalizePhone(phone);
+    const body = await req.json().catch(() => ({}));
+    const rawPhone = String(body?.phone || '').trim();
+    const normalizedPhone = normalizePhone(rawPhone);
     const digits = rawPhone.replace(/\D/g, '').slice(-9);
-    const normalizedOrderId = String(orderId || '').trim().replace(/^#/, '');
+    const normalizedOrderId = sanitizeOrderId(body?.orderId);
 
     if (digits.length < 9) {
       return NextResponse.json({ error: 'Valid phone is required' }, { status: 400 });
@@ -40,24 +58,51 @@ export async function POST(req: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (normalizedOrderId) {
-      query = query.ilike('id', `%${normalizedOrderId}%`);
+      query = query.ilike('id', `%${escapeLikePattern(normalizedOrderId)}%`);
     }
 
-    const { data, error } = await query.limit(20);
+    const limit = normalizedOrderId ? MAX_ORDERS_FULL : MAX_ORDERS_LIMITED;
+    const { data, error } = await query.limit(limit);
 
     if (error) {
       throw error;
     }
 
-    const orders = (data || []).map((order) => ({
-      ...order,
-      total: Number(order.total || 0),
-      items: Array.isArray(order.items) ? order.items : [],
-    }));
+    const hasSecondFactor = normalizedOrderId.length >= 6;
 
-    return NextResponse.json({ orders });
+    const orders = (data || []).map((order) => {
+      const base = {
+        id: order.id,
+        total: Number(order.total || 0),
+        status: order.status,
+        date: order.date,
+        paymentMethod: order.paymentMethod,
+        items: Array.isArray(order.items) ? order.items : [],
+        created_at: order.created_at,
+      };
+
+      // Ikkinchi omil (buyurtma ID) tasdiqlanmagan bo'lsa, shaxsiy
+      // ma'lumotlar (ism, telefon) qaytarilmaydi.
+      if (!hasSecondFactor) {
+        return { ...base, customerName: null, phone: null };
+      }
+
+      return {
+        ...base,
+        customerName: order.customerName,
+        phone: order.phone,
+      };
+    });
+
+    return NextResponse.json({
+      orders,
+      limited: !hasSecondFactor,
+      ...(hasSecondFactor ? {} : {
+        hint: 'To‘liq ma’lumot uchun telefon raqam bilan birga buyurtma ID sini kiriting.',
+      }),
+    });
   } catch (error: any) {
     console.error('Order tracking API error:', error);
-    return NextResponse.json({ error: error?.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -120,8 +120,5 @@ export interface Review {
   created_at: string;
 }
 
-declare global {
-  interface ImportMeta {
-    env: any;
-  }
-}
+// Eslatma: `ImportMeta.env` ni bu yerda qayta e'lon qilmaymiz —
+// Next.js 16 o'zining tipini beradi va ikki xil deklaratsiya konflikt beradi.

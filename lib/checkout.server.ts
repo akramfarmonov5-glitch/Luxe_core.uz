@@ -20,12 +20,6 @@ export function getWholesaleUnitPrice(basePrice: number, quantity: number): numb
   return cleanBase;
 }
 
-const FALLBACK_PROMO_RULES: Record<string, number> = {
-  LUXE2026: 0.1,
-  PAKET2026: 0.1,
-  ADMIN: 0.5,
-};
-
 export type CheckoutItemInput = {
   id: number;
   quantity: number;
@@ -187,8 +181,11 @@ export async function calculateCheckoutPricing(
   };
 }
 
+// Promo-kodlar FAQAT `promo_codes` jadvalidan olinadi.
+// Ilgari kodda qotib qolgan zaxira qoidalar (ADMIN = -50%) bor edi —
+// ular har qanday xaridorga 50% chegirma berardi, shuning uchun olib tashlandi.
 async function resolvePromoRate(promoCode?: string | null) {
-  const normalizedPromo = promoCode?.trim().toUpperCase() || '';
+  const normalizedPromo = promoCode?.trim().toUpperCase().slice(0, 64) || '';
   if (!normalizedPromo) {
     return {
       normalizedPromo,
@@ -198,50 +195,44 @@ async function resolvePromoRate(promoCode?: string | null) {
   }
 
   const supabase = getServiceSupabaseClient() || getPublicSupabaseClient();
-  if (supabase) {
-    const { data, error } = await supabase
-      .from('promo_codes')
-      .select('discount_percent, active, expires_at')
-      .eq('code', normalizedPromo)
-      .maybeSingle();
-
-    if (!error && data) {
-      if (!data.active) {
-        return { normalizedPromo, promoRate: undefined, promoStatus: 'invalid' as const };
-      }
-
-      if (data.expires_at && new Date(data.expires_at) < new Date()) {
-        return { normalizedPromo, promoRate: undefined, promoStatus: 'expired' as const };
-      }
-
-      const discountPercent = Number(data.discount_percent);
-      if (Number.isFinite(discountPercent) && discountPercent > 0) {
-        return {
-          normalizedPromo,
-          promoRate: discountPercent / 100,
-          promoStatus: 'valid' as const,
-        };
-      }
-    }
-
-    if (!error && !data && !FALLBACK_PROMO_RULES[normalizedPromo]) {
-      return { normalizedPromo, promoRate: undefined, promoStatus: 'invalid' as const };
-    }
+  if (!supabase) {
+    // Baza sozlanmagan muhitda promo-kodlar qo'llanmaydi (fail-closed).
+    return { normalizedPromo, promoRate: undefined, promoStatus: 'invalid' as const };
   }
 
-  const fallbackPromoRate = FALLBACK_PROMO_RULES[normalizedPromo];
-  if (fallbackPromoRate) {
-    return {
-      normalizedPromo,
-      promoRate: fallbackPromoRate,
-      promoStatus: 'valid' as const,
-    };
+  const { data, error } = await supabase
+    .from('promo_codes')
+    .select('discount_percent, active, expires_at')
+    .eq('code', normalizedPromo)
+    .maybeSingle();
+
+  if (error) {
+    console.warn('Promo code lookup failed:', error.message);
+    return { normalizedPromo, promoRate: undefined, promoStatus: 'invalid' as const };
+  }
+
+  if (!data) {
+    return { normalizedPromo, promoRate: undefined, promoStatus: 'invalid' as const };
+  }
+
+  if (!data.active) {
+    return { normalizedPromo, promoRate: undefined, promoStatus: 'invalid' as const };
+  }
+
+  if (data.expires_at && new Date(data.expires_at) < new Date()) {
+    return { normalizedPromo, promoRate: undefined, promoStatus: 'expired' as const };
+  }
+
+  const discountPercent = Number(data.discount_percent);
+  // 0 dan katta va 100 dan oshmaydigan chegirma — aks holda rad etamiz.
+  if (!Number.isFinite(discountPercent) || discountPercent <= 0 || discountPercent >= 100) {
+    return { normalizedPromo, promoRate: undefined, promoStatus: 'invalid' as const };
   }
 
   return {
     normalizedPromo,
-    promoRate: undefined,
-    promoStatus: 'invalid' as const,
+    promoRate: discountPercent / 100,
+    promoStatus: 'valid' as const,
   };
 }
 
