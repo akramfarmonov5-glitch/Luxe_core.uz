@@ -1,0 +1,1946 @@
+[
+  {
+    "name": "{\"uz\":\"Yangi yil 2027 sovg‘a paketi - \\\"Qishki ertak va archa\\\" (o‘rta)\",\"ru\":\"Новогодний подарочный пакет 2027 - \\\"Зимняя сказка и елка\\\" (средний)\",\"en\":\"New Year 2027 Gift Bag - \\\"Winter Tale & Tree\\\" (Medium)\"}",
+    "slug": "{\"uz\":\"yangi-yil-2027-sovga-paketi-qishki-ertak-va-archa-orta\",\"ru\":\"yangi-yil-2027-sovga-paketi-qishki-ertak-va-archa-orta\",\"en\":\"yangi-yil-2027-sovga-paketi-qishki-ertak-va-archa-orta\"}",
+    "price": 1800,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-1.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-1.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-31.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/480480d2-5466-4c58-baaf-76db74f10637-600.webp"
+    ],
+    "description": "{\"uz\":\"Bayramona dizayndagi \\\"Qishki ertak va archa\\\" nomli o‘lchamdagi yangi yil 2027 sovg‘a paketi. Yaqinlaringiz va hamkasblaringiz uchun sovg‘alarni chiroyli qadoqlashga juda mos keladi. Ulgurji va chakana savdo uchun qulay. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодний подарочный пакет 2027 - \\\"Зимняя сказка и елка\\\" (средний) оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year 2027 Gift Bag - \\\"Winter Tale & Tree\\\" (Medium) wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": true,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil 2027 sovg‘a paketi - \\\"Qorbobo va bolalar\\\" (28.5x21.5x8 sm)\",\"ru\":\"Новогодний подарочный пакет 2027 - \\\"Дед Мороз и дети\\\" (28.5x21.5x8 sm)\",\"en\":\"New Year 2027 Gift Bag - \\\"Santa & Kids\\\" (28.5x21.5x8 sm)\"}",
+    "slug": "{\"uz\":\"yangi-yil-2027-sovga-paketi-qorbobo-va-bolalar-28-5x21-5x8-sm\",\"ru\":\"yangi-yil-2027-sovga-paketi-qorbobo-va-bolalar-28-5x21-5x8-sm\",\"en\":\"yangi-yil-2027-sovga-paketi-qorbobo-va-bolalar-28-5x21-5x8-sm\"}",
+    "price": 1800,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-2.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-2.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-32.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/480480d2-5466-4c58-baaf-76db74f10637.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"O'lchami 28.5x21.5x8 sm bo'lgan bayramona dizayndagi \\\"Qorbobo va bolalar\\\" Yangi yil 2027 sovg‘a paketi. Sovg'alarni joylash uchun qulay va chiroyli tanlov. Ulgurji va chakana savdo uchun. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодний подарочный пакет 2027 - \\\"Дед Мороз и дети\\\" (28.5x21.5x8 sm) оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year 2027 Gift Bag - \\\"Santa & Kids\\\" (28.5x21.5x8 sm) wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": true,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (karton paket) \\\"Qorbobo\\\", 28.5x21.5x8 sm\",\"ru\":\"Новогодняя подарочная коробка (картонный пакет) \\\"Дед Мороз\\\", 28.5x21.5x8 sm\",\"en\":\"Holiday Cardboard Gift Bag \\\"Santa\\\", 28.5x21.5x8 sm\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-karton-paket-qorbobo-28-5x21-5x8-sm\",\"ru\":\"yangi-yil-sovga-qutisi-karton-paket-qorbobo-28-5x21-5x8-sm\",\"en\":\"yangi-yil-sovga-qutisi-karton-paket-qorbobo-28-5x21-5x8-sm\"}",
+    "price": 1800,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-3.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-3.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-33.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/6bcb9aef-81f3-4296-8629-24e7ffe5365a.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun yorqin va sifatli sovg'a qutisi (karton paket). Shirinliklar, bolalar sovg'alari va korporativ tuhfalarni qadoqlash uchun ajoyib tanlov.   Afzalliklari va xususiyatlari:O'lchami: Bo'yi — 28.5 sm, eni — 21.5 sm, tubi (chuqurligi) — 8 sm.   Qulay shakl: Yuqori qismida tayyor kesilgan tutqichi va qulf vazifasini bajaruvchi qopqog'i bor (qo'shimcha skotch yoki yelim shart emas).   Material: Mustahkam, sifatli qalin karton (sovg'a og'irligini bemalol ko'taradi).Dizayn: Qorbobo va bolajonlar tasvirlangan bayramona yorqin bosma, ustida \\\"С Новым Годом\\\" yozuvi mavjud.   Qadoqda: 100 dona (optom narxda). Bog'cha, maktab, tashkilotlar va do'konlar uchun juda qulay. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя подарочная коробка (картонный пакет) \\\"Дед Мороз\\\", 28.5x21.5x8 sm оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"Holiday Cardboard Gift Bag \\\"Santa\\\", 28.5x21.5x8 sm wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": true,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (karton karobka) \\\"Qorbobo va Qorbola\\\"\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз и снеговик\\\"\",\"en\":\"New Year Candy Box (Carton) \\\"Santa & Snowman\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-qorbola\",\"ru\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-qorbola\",\"en\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-qorbola\"}",
+    "price": 2400,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-4.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-4.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-34.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/3705e8dd-dda2-4905-89ea-f165c3289c99.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/c446bb38-9a82-47f0-a2ed-8cb1d7997dd9.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun \\\"sandiqcha\\\" (sunduchok) shaklidagi yorqin va mustahkam karton sovg'a qutisi. Bolalar shirinliklari, konfetlar va bayramona sovg'alarni qadoqlash uchun eng ommabop va qulay variant.   Afzalliklari va xususiyatlari:Ikki tomonlama yorqin dizayn: Qutining bir tomonida bezatilgan archa, bug'u, qishki uycha va sovg'alar qopi, ikkinchi tomonida esa quvnoq qorbolalar (снеговики) tasvirlangan. Yon tomonida \\\"С Новым Годом\\\" tabrik yozuvi mavjud.   Qulay konstruksiya: Yuqori qismida qo'lda ko'tarib yurish uchun qulay kesilgan tutqichi bor. Yelim va skotchsiz tez hamda oson yig'iladi.   Material: Yuqori sifatli qalin karton — shaklini yaxshi ushlaydi va shirinliklar og'irligiga chidamli.\\r\\nUlgurji xarid: Bog'chalar, maktablar, korporativ mijozlar va do'konlar uchun ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз и снеговик\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Candy Box (Carton) \\\"Santa & Snowman\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": true,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (karton karobka) \\\"Qorbobo va Uycha\\\"\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз и домик\\\"\",\"en\":\"New Year Candy Box (Carton) \\\"Santa & Cottage\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-uycha\",\"ru\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-uycha\",\"en\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-uycha\"}",
+    "price": 2500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-5.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-5.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-35.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/9d28ca54-5d95-4b44-b338-a89c6260e0ca.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/e36e812b-d27d-4c30-b274-3b4550605565.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun ertaknamo yog'och uycha ko'rinishidagi yorqin va mustahkam karton sovg'a qutisi (sunduchok). Bolalar shirinliklari, konfetlar va bayram sovg'alarini qadoqlash uchun ajoyib tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Ikki tomonlama bayramona dizayn: Bir tomonida sovg'a ulashayotgan Qorbobo va qizaloq, ikkinchi tomonida esa bezatilgan Yangi yil archasi hamda kuchukchali bolakay tasvirlangan. Tom qismida chiroyli chiroqlar (girlyanda) va mo'ri rasmi bor.\\r\\n• Ikki tilda tabrik: Qutining yuqori qismida \\\"Yangi yilingiz bilan!\\\" va \\\"С Новым Годом!\\\" yozuvlari mavjud.\\r\\n• Qulay konstruksiya: Yuqori qismida qo'lda ushlash uchun qulay kesilgan tutqichi bor. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Sifatli qalin karton — shaklini yaxshi ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'cha, maktab, tashkilotlar va do'konlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз и домик\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Candy Box (Carton) \\\"Santa & Cottage\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": true,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (karton karobka) \\\"Masha va Ayiq\\\"\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Маша и медведь\\\"\",\"en\":\"New Year Candy Box (Carton) \\\"Masha & The Bear\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-karton-karobka-masha-va-ayiq\",\"ru\":\"yangi-yil-sovga-qutisi-karton-karobka-masha-va-ayiq\",\"en\":\"yangi-yil-sovga-qutisi-karton-karobka-masha-va-ayiq\"}",
+    "price": 1800,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-6.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-6.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-36.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/73d6e19b-3770-4b28-8c3f-1241ad3ea6b5.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d979040f-b48c-44b0-b1ed-a6e1ad4d18e8.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun bolajonlarning sevimli \\\"Masha va Ayiq\\\" (Маша и Медведь) multfilmi qahramonlari tasvirlangan yorqin va sifatli karton sovg'a qutisi. Bog'cha va maktab bolalari uchun shirinliklar, konfetlar hamda bayram sovg'alarini qadoqlashda eng xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Ikki tomonlama sevimli dizayn: Qutining bir tomonida Qorqiz kiyimidagi Masha, Ayiq va bezatilgan Yangi yil archasi, ikkinchi tomonida esa Masha, quyonchalar, olmaxonlar va sovg'alar tasvirlangan. Ustida yorqin \\\"С Новым Годом!\\\" tabrik yozuvi bor.\\r\\n• Qulay shakl: Yuqori qismida bolalar qo'lda ko'tarib yurishi uchun qulay kesilgan tutqichi mavjud. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Mustahkam, yaltiroq (glyanseviy) qalin karton — shaklini yaxshi ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va ulgurji savdogarlar uchun eng arzon optom narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Маша и медведь\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Candy Box (Carton) \\\"Masha & The Bear\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": true,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (derazali uycha) \\\"Qishki uycha\\\"\",\"ru\":\"Новогодняя коробка с окошком «Домик» \\\"Зимний домик\\\"\",\"en\":\"New Year Window House Box \\\"Winter House\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-derazali-uycha-qishki-uycha\",\"ru\":\"yangi-yil-sovga-qutisi-derazali-uycha-qishki-uycha\",\"en\":\"yangi-yil-sovga-qutisi-derazali-uycha-qishki-uycha\"}",
+    "price": 3000,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-7.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-7.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-37.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/ad6af1b4-180a-449d-be50-1e3be0c9d792.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun shaffof derazali va mo'rili ertaknamo uycha ko'rinishidagi original karton sovg'a qutisi. Bolalar shirinliklari, konfetlar va Yangi yil sovg'alarini chiroyli qadoqlash uchun eng xaridorgir va noodatiy tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Shaffof derazacha: Uycha oldidagi deraza orqali quti ichidagi shirinliklar va sovg'alar ko'rinib turadi — bu sovg'ani yanada jozibador qiladi.\\r\\n• Ertaknamo 3D dizayn: Quti haqiqiy qorli uycha shaklida bo'lib, tom qismida muzqaymoq ushlagan oq ayiqcha, pastki qismida esa quvnoq qorbola, pingvin va \\\"С Новым Годом\\\" tabrik yozuvi tasvirlangan.\\r\\n• Qulay tutqich: Uycha mo'risi (trubasi) qo'lda ko'tarib yurish uchun qulay va mustahkam tutqich vazifasini bajaradi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi, yelim va skotchsiz oson yig'iladi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va korporativ mijozlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с окошком «Домик» \\\"Зимний домик\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Window House Box \\\"Winter House\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": true,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (derazali karobka) \\\"Qishki o'yinlar\\\"\",\"ru\":\"Новогодняя коробка с окошком \\\"Зимние забавы\\\"\",\"en\":\"New Year Clear Window Box \\\"Winter Games\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-derazali-karobka-qishki-oyinlar\",\"ru\":\"yangi-yil-sovga-qutisi-derazali-karobka-qishki-oyinlar\",\"en\":\"yangi-yil-sovga-qutisi-derazali-karobka-qishki-oyinlar\"}",
+    "price": 3500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-8.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-8.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-38.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/5cb4dea9-5772-40d5-acec-cc76c3849a67.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun shaffof derazali va tutqichli yorqin karton sovg'a qutisi (sunduchok). Bolalar shirinliklari, konfetlar va bayram sovg'alarini chiroyli qadoqlash uchun eng xaridorgir va qulay tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Shaffof derazacha: Qutining old qismida maxsus shaffof darcha mavjud bo'lib, uning ichidagi shirinliklar va sovg'alar tashqaridan chiroyli ko'rinib turadi.\\r\\n• Milliy bayramona dizayn: Qutida qorda chana, vatrushka va chang'i uchayotgan quvnoq bolajonlar, bayram mushaklari hamda \\\"Yangi yilingiz bilan!\\\" tabrik yozuvi tasvirlangan. Yon tomonida Qorbobo rasmi bor.\\r\\n• Qulay konstruksiya: Yuqori qismida qo'lda ko'tarib yurish uchun mustahkam kesilgan tutqichi mavjud. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini yaxshi ushlaydi va shirinliklar og'irligiga chidamli.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va korporativ mijozlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с окошком \\\"Зимние забавы\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Clear Window Box \\\"Winter Games\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": true,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (sandiqcha-karobka) \\\"Sehrli oqshom va Qorbola\\\"\",\"ru\":\"Новогодняя коробка «Сундучок» \\\"Волшебная ночь и снеговик\\\"\",\"en\":\"New Year Treasure Chest Box \\\"Magical Night & Snowman\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-sandiqcha-karobka-sehrli-oqshom-va-qorbola\",\"ru\":\"yangi-yil-sovga-qutisi-sandiqcha-karobka-sehrli-oqshom-va-qorbola\",\"en\":\"yangi-yil-sovga-qutisi-sandiqcha-karobka-sehrli-oqshom-va-qorbola\"}",
+    "price": 3200,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-9.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-9.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-39.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/76085dee-683a-4eaa-829a-19c227853182.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun nafis sandiqcha (larets) ko'rinishidagi yorqin va mustahkam karton sovg'a qutisi. Bolalar shirinliklari, konfetlar va korporativ bayram sovg'alarini chiroyli qadoqlash uchun juda qulay va xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Ertaknamo qishki dizayn: Qutida moviy qishki tun, to'lin oy fonida bug'ularda uchayotgan Qorbobo, sovg'a ushlagan quvnoq Qorbola va qorli uychalar tasvirlangan. Ustida chiroyli \\\"Счастливого Нового Года!\\\" tabrik yozuvi mavjud.\\r\\n• Ishonchli va chiroyli qulf: Yuqori qismida naqshinkor kesilgan qopqoq-qulfi hamda qo'lda ko'tarib yurish uchun qulay yumaloq tutqichi bor. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка «Сундучок» \\\"Волшебная ночь и снеговик\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Treasure Chest Box \\\"Magical Night & Snowman\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (sandiqcha-karobka) \\\"Mikki va Minni\\\"\",\"ru\":\"Новогодняя коробка «Сундучок» \\\"Микки и Минни Маус\\\"\",\"en\":\"New Year Treasure Chest Box \\\"Mickey & Minnie\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-sandiqcha-karobka-mikki-va-minni\",\"ru\":\"yangi-yil-sovga-qutisi-sandiqcha-karobka-mikki-va-minni\",\"en\":\"yangi-yil-sovga-qutisi-sandiqcha-karobka-mikki-va-minni\"}",
+    "price": 3200,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-10.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-10.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-4.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/74e5c9d2-9f8a-46db-89bc-685b1373dd79.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun bolajonlarning sevimli multfilm qahramonlari — Mikki va Minni Maus tasvirlangan yorqin qizil rangli karton sovg'a qutisi (sandiqcha). Bog'cha va maktab bolalari uchun shirinliklar, konfetlar hamda bayram sovg'alarini qadoqlashda eng xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Yorqin bayramona dizayn: Qizil sahna pardalari va oltin qo'ng'iroqchalar fonida Yangi yil qalpog'ini kiygan Mikki va Minni Maus hamda shirinliklar gulchambari tasvirlangan.\\r\\n• O'zbek tilida tabrik: Qutining yumaloq tutqich qismida yorqin harflar bilan \\\"YANGI YILINGIZ BILAN!\\\" tabrik yozuvi mavjud.\\r\\n• Ishonchli qulf va tutqich: Yuqori qismida naqshinkor qopqoq-qulfi va qo'lda ko'tarib yurish uchun qulay tutqichi bor. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка «Сундучок» \\\"Микки и Минни Маус\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Treasure Chest Box \\\"Mickey & Minnie\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (derazali karobka) \\\"Qorbobo va Oltin naqsh\\\"\",\"ru\":\"Новогодняя коробка с окошком \\\"Дед Мороз и золотой орнамент\\\"\",\"en\":\"New Year Clear Window Box \\\"Santa & Gold Ornament\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-derazali-karobka-qorbobo-va-oltin-naqsh\",\"ru\":\"yangi-yil-sovga-qutisi-derazali-karobka-qorbobo-va-oltin-naqsh\",\"en\":\"yangi-yil-sovga-qutisi-derazali-karobka-qorbobo-va-oltin-naqsh\"}",
+    "price": 7500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-11.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-11.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-41.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/856f97a5-503e-43eb-aa2f-bc1cef382246.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun shaffof derazali, qizil va oltin rang uyg'unligidagi klassik karton sovg'a qutisi (sunduchok). Bolalar shirinliklari, konfetlar hamda korporativ bayram sovg'alarini chiroyli qadoqlash uchun eng xaridorgir va universal tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Shaffof derazacha: Qutining old qismida chiroyli hoshiyali shaffof darcha mavjud bo'lib, ichidagi shirinliklar va sovg'a to'plami tashqaridan ko'rinib turadi.\\r\\n• Boy klassik dizayn: Qizil-tilla fonda zarhal naqshlar, sehrli hassa ushlagan Qorbobo, archa shoxlari, bayram shamlari va \\\"Счастливого Нового Года!\\\" tabrik yozuvi tasvirlangan.\\r\\n• Qulay konstruksiya: Yuqori qismida naqshlar bilan bezatilgan mustahkam kesilgan tutqichi bor. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va korporativ mijozlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с окошком \\\"Дед Мороз и золотой орнамент\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Clear Window Box \\\"Santa & Gold Ornament\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": true
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (milliy dizayn) \\\"Yangi yilingiz bilan!\\\"\",\"ru\":\"Новогодняя коробка с национальным узором \\\"С Новым Годом!\\\"\",\"en\":\"Traditional Gold Ornament Gift Box \\\"Happy New Year!\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-milliy-dizayn-yangi-yilingiz-bilan\",\"ru\":\"yangi-yil-sovga-qutisi-milliy-dizayn-yangi-yilingiz-bilan\",\"en\":\"yangi-yil-sovga-qutisi-milliy-dizayn-yangi-yilingiz-bilan\"}",
+    "price": 2500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-12.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-12.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-42.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/aee78ea6-aac2-4a28-a230-a93188c2d7ce.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun o'zbek milliy naqshlari (xonatlas, adras va sharqona bezaklar) uyg'unligida ishlangan betakror va mustahkam karton sovg'a qutisi. Bolalar shirinliklari, konfetlar hamda korporativ bayram sovg'alarini chiroyli qadoqlash uchun eng xaridorgir va original tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Milliy va bayramona dizayn: Qutida o'zbek milliy matolari (atlas va adras) naqshlari, sharqona bezakli archa o'yinchoqlari, quvnoq bolakay, sovg'alar hamda \\\"Yangi yilingiz bilan!\\\" tabrik yozuvi aks ettirilgan.\\r\\n• Yon tomonda shaffof derazacha: Qutining yon qismida archa shaklidagi maxsus shaffof darcha mavjud bo'lib, uning ichidagi shirinliklar ko'rinib turadi.\\r\\n• Qulay shakl: Yuqori qismida qo'lda ko'tarib yurish uchun qulay kesilgan tutqichi bor. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, tashkilotlar va do'konlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с национальным узором \\\"С Новым Годом!\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"Traditional Gold Ornament Gift Box \\\"Happy New Year!\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (karton karobka) \\\"Qorbobo va Archa\\\"\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз и новогодняя елка\\\"\",\"en\":\"New Year Candy Box (Carton) \\\"Santa & Tree\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-archa\",\"ru\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-archa\",\"en\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-archa\"}",
+    "price": 2500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-13.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-13.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-43.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/4086c100-bd1c-48fd-9f45-f3dd427b42dd.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun klassik va yorqin dizayndagi tutqichli karton sovg'a qutisi. Bolalar shirinliklari, konfetlar hamda korporativ bayram sovg'alarini chiroyli qadoqlash uchun eng xaridorgir va universal tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Klassik bayramona dizayn: Qutida sovg'alarga to'la qop va bayram maktubini ushlab turgan mehribon Qorbobo, o'yinchoqlar bilan bezatilgan Yangi yil archasi hamda chiroyli \\\"С Новым Годом!\\\" tabrik yozuvi tasvirlangan. Yon tomonlari bayram shamlari rasmi bilan boyitilgan.\\r\\n• Qulay konstruksiya: Yuqori qismida qo'lda ko'tarib yurish uchun qulay kesilgan tutqichi va yon tomonlarida ishonchli qulflari bor. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз и новогодняя елка\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Candy Box (Carton) \\\"Santa & Tree\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (karton karobka) \\\"Qorbobo chanada\\\"\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз на санях\\\"\",\"en\":\"New Year Candy Box (Carton) \\\"Santa on Sleigh\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-chanada\",\"ru\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-chanada\",\"en\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-chanada\"}",
+    "price": 2500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-14.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-14.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-44.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/f6177eb8-9491-44e6-8810-add2485f9c50.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/107535e7-79d3-42c5-945b-8b44eca35f4c.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun uchta oq ot qo'shilgan chanada sovg'alar bilan yeldek uchib kelayotgan Qorbobo tasvirlangan yorqin karton sovg'a qutisi. Bolalar shirinliklari, konfetlar va bayram sovg'alarini chiroyli qadoqlash uchun eng xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• O'zbek tilida tabrik va ertaknamo dizayn: Qutida qorli archalar, uch otli chanadagi Qorbobo hamda \\\"Yangi yilingiz bilan!\\\" tabrik yozuvi tasvirlangan. Yon tomonlari bayram shamlari rasmi bilan bezatilgan.\\r\\n• Qulay konstruksiya: Yuqori qismida qo'lda ko'tarib yurish uchun qulay kesilgan tutqichi va yon tomonlarida ishonchli qulflari bor. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз на санях\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Candy Box (Carton) \\\"Santa on Sleigh\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (karton karobka) \\\"Quvnoq sichqonchalar\\\"\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Веселые мышата\\\"\",\"en\":\"New Year Candy Box (Carton) \\\"Merry Mice\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-karton-karobka-quvnoq-sichqonchalar\",\"ru\":\"yangi-yil-sovga-qutisi-karton-karobka-quvnoq-sichqonchalar\",\"en\":\"yangi-yil-sovga-qutisi-karton-karobka-quvnoq-sichqonchalar\"}",
+    "price": 1800,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-15.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-15.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-45.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/b8994b8c-8f4b-47ae-9e5f-d7b55f9a12fa.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/486a0d00-34cb-48a3-8ae3-26274d4385c2.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun yoqimtoy va quvnoq sichqonchalar hamda rang-barang sovg'alar tasvirlangan yorqin karton sovg'a qutisi. Bog'cha va maktab bolalari uchun shirinliklar, konfetlar va Yangi yil sovg'alarini chiroyli qadoqlashda ajoyib tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Yoqimli bolajonlar dizayni: Qutida archa shoxlari, katta qizil shar o'yinchog'i, rang-barang sovg'a qutilari ichidagi yoqimtoy sichqonchalar hamda zarhal \\\"С Новым Годом!\\\" tabrik yozuvi aks ettirilgan.\\r\\n• Qulay konstruksiya: Yuqori qismida naqshinkor hoshiyali va qo'lda ko'tarib yurish uchun qulay kesilgan tutqichi bor. Yelim va skotchsiz tez hamda oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va ulgurji xaridorlar uchun eng arzon optom narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Веселые мышата\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Candy Box (Carton) \\\"Merry Mice\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (karton karobka) \\\"Qorbobo va Qorqiz\\\"\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз и Снегурочка\\\"\",\"en\":\"New Year Candy Box (Carton) \\\"Santa & Snow Maiden\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-qorqiz\",\"ru\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-qorqiz\",\"en\":\"yangi-yil-sovga-qutisi-karton-karobka-qorbobo-va-qorqiz\"}",
+    "price": 5500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-16.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-16.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-46.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/b898bbd1-143e-46c5-9fdb-038001ed1933.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/c23b48eb-0e65-42d0-8d7c-0ec770c561ca.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun klassik ertaknamo uslubda bezatilgan yorqin qizil va oltin naqshli karton sovg'a qutisi (sunduchok). Bolalar shirinliklari, konfetlar va korporativ bayram sovg'alarini chiroyli qadoqlash uchun eng xaridorgir va universal tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Ikki tomonlama boy dizayn: Qutining bir tomonida qorli o'rmondagi Qorbobo va Qorqiz, ikkinchi tomonida esa Yangi yil archasini bezatayotgan bolajonlar hamda sovg'alar tasvirlangan. Yuqori qismida zarhal naqshlar ichida \\\"С Новым Годом!\\\" tabrik yozuvi mavjud.\\r\\n• Qulay va baland shakl: Baland \\\"sunduchok\\\" konstruksiyasi ko'proq shirinlik sig'dirish imkonini beradi. Tepasida mustahkam kesilgan tutqichi bor, yelim va skotchsiz oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va sovg'a og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка для конфет (картон) \\\"Дед Мороз и Снегурочка\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Candy Box (Carton) \\\"Santa & Snow Maiden\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": true
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil qopqoqli sovg'a qutisi (kub-karobka) \\\"Baxt ostonada\\\"\",\"ru\":\"Новогодняя коробка куб с крышкой \\\"Счастье на пороге\\\"\",\"en\":\"New Year Cube Box with Lid \\\"Joy on the Threshold\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-qopqoqli-sovga-qutisi-kub-karobka-baxt-ostonada\",\"ru\":\"yangi-yil-qopqoqli-sovga-qutisi-kub-karobka-baxt-ostonada\",\"en\":\"yangi-yil-qopqoqli-sovga-qutisi-kub-karobka-baxt-ostonada\"}",
+    "price": 15000,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-17.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-17.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-47.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/f185e336-b81c-45c1-87c2-8d7472572e51.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami va qishki tantanalar uchun alohida qopqoqli, nafis dizayndagi kvadrat (kub) sovg'a qutisi. Korporativ sovg'alar, shirinlik to'plamlari, kosmetika, parfyumeriya, krujka va suvenirlarni zamonaviy hamda chiroyli qadoqlash uchun eng xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Zamonaviy va nafis dizayn: Qopqoq qismida sham yoqilgan bayram fonusi, qishki gullar hamda \\\"Счастье на пороге, все мечты сбудутся!\\\" (Baxt ostonada, barcha orzular ushaladi!) tilaklari, pastki qismida esa qo'ng'iroqchalar, apelsin bo'laklari va archa shoxlari tasvirlangan.\\r\\n• Qulay shakl (qopqoq-tub): Klassik kvadrat quti va ustidan yopiladigan alohida qopqoqdan iborat. Har qanday yoshdagi insonlar — ham kattalar, ham bolalar uchun sovg'a berishga mos keladi.\\r\\n• Material: Yuqori sifatli qalin va mustahkam karton — shaklini a'lo darajada ushlaydi va sovg'ani shikastlanishdan himoya qiladi.\\r\\n• Ulgurji xarid: Sovg'a do'konlari, korporativ mijozlar, tashkilotlar va ulgurji savdogarlar uchun eng arzon optom narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка куб с крышкой \\\"Счастье на пороге\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Cube Box with Lid \\\"Joy on the Threshold\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 50,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": true
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (qasr-karobka) \\\"Qorbobo qasri\\\"\",\"ru\":\"Новогодняя коробка «Замок» \\\"Дворец Деда Мороза\\\"\",\"en\":\"New Year Castle Box \\\"Santa Castle\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-qasr-karobka-qorbobo-qasri\",\"ru\":\"yangi-yil-sovga-qutisi-qasr-karobka-qorbobo-qasri\",\"en\":\"yangi-yil-sovga-qutisi-qasr-karobka-qorbobo-qasri\"}",
+    "price": 2500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-18.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-18.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-48.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/ed1a6109-1122-4783-a217-f61542cb4e05.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun ertaknamo qasr (minora) ko'rinishidagi baland va yorqin karton sovg'a qutisi. Bog'cha va maktab bolalari uchun shirinliklar, konfetlar hamda bayram sovg'alarini chiroyli qadoqlashda juda ko'rkam va xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Ertaknamo qasr dizayni: Qutining pastki qismida saroy ustunlari oldida sehrli hassa ushlagan Qorbobo hamda sovg'alar va quyonchaga to'la qop, yuqori tom qismida esa balkondagi quyoncha va \\\"С Новым Годом!\\\" tabrik lentasi tasvirlangan.\\r\\n• Baland va qulay shakl: Uchburchak tomli baland konstruksiya sovg'ani hajmli va salobatli ko'rsatadi. Tepasida qo'lda ko'tarib yurish uchun qulay kesilgan tutqichi bor, yelim va skotchsiz oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка «Замок» \\\"Дворец Деда Мороза\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Castle Box \\\"Santa Castle\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (uycha-karobka) \\\"Vinni Pux va do'stlari\\\"\",\"ru\":\"Новогодняя коробка «Избушка» \\\"Винни Пух и друзья\\\"\",\"en\":\"New Year Cottage Gift Box \\\"Winnie the Pooh & Friends\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-uycha-karobka-vinni-pux-va-dostlari\",\"ru\":\"yangi-yil-sovga-qutisi-uycha-karobka-vinni-pux-va-dostlari\",\"en\":\"yangi-yil-sovga-qutisi-uycha-karobka-vinni-pux-va-dostlari\"}",
+    "price": 2500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-19.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-19.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-49.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/630c2a5c-1bf4-462d-9528-168eae5973a4.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun bolajonlarning sevimli \\\"Vinni Pux va uning do'stlari\\\" multfilmi qahramonlari tasvirlangan ertaknamo qasr (uycha) ko'rinishidagi yorqin karton sovg'a qutisi. Bog'cha va maktab bolalari uchun shirinliklar, konfetlar hamda bayram sovg'alarini chiroyli qadoqlashda eng xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Sevimli qahramonlar dizayni: Qorli g'ishtin saroy va archa gulchambari fonida Yangi yil qalpog'ini kiygan Vinni Pux (qo'lida asal ko'zachasi bilan), quvnoq Yo'lbarscha (Tigra), Xo'tikcha Ia, Kenguru Rux hamda bayram sovg'alari tasvirlangan.\\r\\n• Noodatiy va baland shakl: Gumbaz tomli saroy konstruksiyasi sovg'ani hajmli va chiroyli ko'rsatadi. Tepasida qo'lda ko'tarib yurish uchun qulay tutqichi bor, yelim va skotchsiz oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка «Избушка» \\\"Винни Пух и друзья\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Cottage Gift Box \\\"Winnie the Pooh & Friends\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (tutqichli karobka) \\\"Masha va Ayiq va Uycha\\\"\",\"ru\":\"Новогодняя коробка с ручкой \\\"Маша и медведь с домиком\\\"\",\"en\":\"New Year Handle Candy Box \\\"Masha & The Bear va Uycha\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-masha-va-ayiq-va-uycha\",\"ru\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-masha-va-ayiq-va-uycha\",\"en\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-masha-va-ayiq-va-uycha\"}",
+    "price": 2500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-20.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-20.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-5.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/b1aeb5c9-fd81-447d-981e-7a8ceb901e04.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/1510979c-0a38-4d8c-b1ac-0fc5459a3c1e.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun o'ymakor yog'och tutqichli va ikki tildagi tabriklar bilan bezatilgan yorqin karton sovg'a qutisi (sunduchok). Bolalar shirinliklari, konfetlar va Yangi yil sovg'alarini chiroyli qadoqlash uchun eng xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n• Ikki tomonlama qiziqarli dizayn: Bir tomonida o'zbek tilida \\\"Yangi yilingiz bilan!\\\", bayram bayroqchalari, quvnoq bolakay va sovg'a ochayotgan kuchukcha; ikkinchi tomonida esa rus tilida \\\"С НОВЫМ ГОДОМ!\\\", qorli tom ostidagi uycha va sevimli multfilm qahramonlari — Masha va Ayiq tasvirlangan.\\r\\n• O'ymakor tutqich: Qutining yuqori qismidagi tutqich sharqona yog'och o'ymakorligi uslubida naqshinkor bezatilgan bo'lib, qo'lda ko'tarib yurish uchun juda qulay va mustahkam. Yelim va skotchsiz oson yig'iladi.\\r\\n• Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n• Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с ручкой \\\"Маша и медведь с домиком\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Handle Candy Box \\\"Masha & The Bear va Uycha\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (tutqichli karobka) \\\"Yangi yil archasi\\\"\",\"ru\":\"Новогодняя коробка с ручкой \\\"Новогодняя елочка\\\"\",\"en\":\"New Year Handle Candy Box \\\"Holiday Tree\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-yangi-yil-archasi\",\"ru\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-yangi-yil-archasi\",\"en\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-yangi-yil-archasi\"}",
+    "price": 1800,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-21.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-21.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-50.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/987c29f9-b610-4cf4-9511-0940f3b7b794.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun yorqin qizil rangdagi, sumkacha shaklida ishlangan tutqichli karton sovg'a qutisi. Bog'cha va maktab bolalari, shuningdek korporativ mijozlar uchun shirinliklar, konfetlar va bayram sovg'alarini chiroyli qadoqlashda juda qulay hamda xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n- Bayramona klassik dizayn: Qizil fonda bayram mushaklari, archa shoxlari va tilla qo'ng'iroqchalar, pastki qismida sovg'alarga to'la go'zal Yangi yil archasi hamda markazda yirik «С Новым годом!» tabrik yozuvi tasvirlangan.\\r\\n- Qulay sumkacha shakli: Yuqori qismida qo'lda ko'tarib yurish uchun oval tutqichi va ishonchli yopiladigan yarim oy shaklidagi qopqoq-klapani mavjud. Yelim va skotchsiz tez yig'iladi.\\r\\n- Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini yaxshi ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n- Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с ручкой \\\"Новогодняя елочка\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Handle Candy Box \\\"Holiday Tree\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (tutqichli karobka) \\\"Bolalar va Qorbola\\\"\",\"ru\":\"Новогодняя коробка с ручкой \\\"Дети и снеговик\\\"\",\"en\":\"New Year Handle Candy Box \\\"Kids & Snowman\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-bolalar-va-qorbola\",\"ru\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-bolalar-va-qorbola\",\"en\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-bolalar-va-qorbola\"}",
+    "price": 1800,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-22.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-22.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-51.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/af477b54-b973-4268-a4fc-29410f3ad7f9.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun qishki ertak uslubida ishlangan, tutqichli uycha-sandiqcha shaklidagi yorqin karton sovg'a qutisi. Bog'cha va maktab bolalari uchun shirinliklar, konfetlar hamda bayram sovg'alarini chiroyli qadoqlashda juda ko'rkam va xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n- Samimiy qishki dizayn: Qutining old qismida qor bilan qoplangan shinam uycha va ko'cha chiroqlari fonida quвноq bolajonlar Qorbola yasayotgani, yuqori tutqich qismida esa qizil fonda oltin rangli Yangi yil bezaklari tasvirlangan.\\r\\n- Qulay uycha-sandiqcha shakli: Tepasida qo'lda ko'tarib yurish uchun qulay kesilgan tutqichi mavjud, yelim va skotchsiz oson hamda tez yig'iladi.\\r\\n- Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n- Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с ручкой \\\"Дети и снеговик\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Handle Candy Box \\\"Kids & Snowman\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (tutqichli karobka) \\\"Quvnoq pingvincha\\\"\",\"ru\":\"Новогодняя коробка с ручкой \\\"Веселый пингвин\\\"\",\"en\":\"New Year Handle Candy Box \\\"Cheerful Penguin\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-quvnoq-pingvincha\",\"ru\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-quvnoq-pingvincha\",\"en\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-quvnoq-pingvincha\"}",
+    "price": 3500,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-23.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-23.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-52.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/28d5d16e-989f-4d4d-a466-fd9126dff005.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun yorqin malina-qizil rangda ishlangan, yoqimtoy pingvincha tasvirli tutqichli karton sovg'a qutisi. Bog'cha va maktab bolalari uchun shirinliklar, konfetlar hamda bayram sovg'alarini chiroyli qadoqlashda juda quvnoq va xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n- Yoqimtoy bolalarbop dizayn: Qor parchalari bilan bezatilgan yorqin fonda issiq qalpoq va sharf kiyib, rangli bayram konfetlarini (ledenes) ushlab turgan shirin pingvincha, yirik «С Новым Годом!» tabrik yozuvi hamda tepa qismida Qorbola va kichik pingvin tasvirlangan.\\r\\n- Qulay uycha-sandiqcha shakli: Tepasida qo'lda ko'tarib yurish uchun qulay kesilgan tutqichi mavjud, yelim va skotchsiz oson hamda tez yig'iladi.\\r\\n- Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n- Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с ручкой \\\"Веселый пингвин\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Handle Candy Box \\\"Cheerful Penguin\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  },
+  {
+    "name": "{\"uz\":\"Yangi yil sovg'a qutisi (tutqichli karobka) \\\"Qorbobo va o'rmon hayvonlari\\\"\",\"ru\":\"Новогодняя коробка с ручкой \\\"Дед Мороз и лесные звери\\\"\",\"en\":\"New Year Handle Candy Box \\\"Santa & Woodland Animals\\\"\"}",
+    "slug": "{\"uz\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-qorbobo-va-ormon-hayvonlari\",\"ru\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-qorbobo-va-ormon-hayvonlari\",\"en\":\"yangi-yil-sovga-qutisi-tutqichli-karobka-qorbobo-va-ormon-hayvonlari\"}",
+    "price": 1800,
+    "category": "yangi-yil-2027",
+    "categoryId": 24,
+    "image": "/products/yangi-yil/yangi-yil-karobkalar-optom-24.png",
+    "images": [
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-24.png",
+      "/products/yangi-yil/yangi-yil-karobkalar-optom-53.png",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/27a7e520-36c5-487d-958a-23dc6e6cdf7f.webp",
+      "https://pub-b8343d3293a0400ab1ff285dacadb658.r2.dev/products/d9257b19-10b2-49df-bfc5-377a8b5cd578-600.webp"
+    ],
+    "description": "{\"uz\":\"Yangi 2027-yil bayrami uchun klassik ertak uslubida ishlangan, tutqichli sumkacha shaklidagi yorqin karton sovg'a qutisi. Bog'cha va maktab bolalari uchun shirinliklar, konfetlar hamda bayram sovg'alarini chiroyli qadoqlashda juda ko'rkam va xaridorgir tanlov.\\r\\n\\r\\nAfzalliklari va xususiyatlari:\\r\\n- Ertaknamo qishki dizayn: Qor parchalari bilan bezatilgan ko'k fonda sovg'alarga to'la qop va archa bilan kelayotgan mehribon Qorbobo hamda uning sodiq do'stlari — quyoncha, olmaxon, kuchukcha va ayiqcha tasvirlangan.\\r\\n- Noodatiy va qulay shakl: Yon tomonlari nafis egilgan hajmli konstruksiya hamda tilla naqshli tepa qismidagi kesilgan tutqich qutiga o'zgacha chiroy beradi. Yelim va skotchsiz oson yig'iladi.\\r\\n- Material: Yuqori sifatli yaltiroq (glyanseviy) qalin karton — shaklini a'lo darajada ushlaydi va shirinliklar og'irligini bemalol ko'taradi.\\r\\n- Ulgurji xarid: Bog'chalar, maktablar, do'konlar va tashkilotlar uchun eng arzon ulgurji (optom) narxlarda sotiladi. Toshkent O'rikzor omboridan 100 donadan boshlab ulgurji narxda yetkazib beriladi. 500+ donadan -5%, 1000+ donadan -10% VIP chegirma mavjud.\",\"ru\":\"Новогодняя коробка с ручкой \\\"Дед Мороз и лесные звери\\\" оптом со склада Урикзор в Ташкенте. Прочный картон, яркая праздничная полиграфия. Скидки от 500 шт (-5%), от 1000 шт (-10% VIP). Доставка за 2 часа по Ташкенту.\",\"en\":\"New Year Handle Candy Box \\\"Santa & Woodland Animals\\\" wholesale from Tashkent Urikzor warehouse. Sturdy cardboard, premium holiday printing. Bulk discounts up to 10%, fast delivery.\"}",
+    "stock": 30000,
+    "itemsPerPackage": 100,
+    "specifications": [
+      {
+        "label": {
+          "uz": "Material",
+          "ru": "Материал",
+          "en": "Material"
+        },
+        "value": {
+          "uz": "Qalin xrom-karton (300 g/m²)",
+          "ru": "Плотный хром-эрзац картон (300 г/м²)",
+          "en": "Rigid chromo board (300 gsm)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Sig'imi",
+          "ru": "Вместимость",
+          "en": "Capacity"
+        },
+        "value": {
+          "uz": "1 – 1.5 kg shirinlik va sovg'alar",
+          "ru": "1 – 1.5 кг сладостей и подарков",
+          "en": "1 - 1.5 kg candies and gifts"
+        }
+      },
+      {
+        "label": {
+          "uz": "Min. buyurtma",
+          "ru": "Мин. заказ",
+          "en": "Min. Order"
+        },
+        "value": {
+          "uz": "100 dona (1 pachka)",
+          "ru": "100 шт (1 пачка)",
+          "en": "100 pcs (1 pack)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Ulgurji chegirma",
+          "ru": "Оптовая скидка",
+          "en": "Wholesale Discount"
+        },
+        "value": {
+          "uz": "500+ (-5%), 1000+ (-10% VIP)",
+          "ru": "500+ (-5%), 1000+ (-10% VIP)",
+          "en": "500+ (-5%), 1000+ (-10% VIP)"
+        }
+      },
+      {
+        "label": {
+          "uz": "Yetkazib berish",
+          "ru": "Доставка",
+          "en": "Delivery"
+        },
+        "value": {
+          "uz": "Toshkentda 2 soatda, viloyatga 1 kunda",
+          "ru": "По Ташкенту за 2 часа, в области за 1 день",
+          "en": "Tashkent in 2 hrs, regions in 1 day"
+        }
+      }
+    ],
+    "is_bestseller": false,
+    "is_premium": false
+  }
+]
