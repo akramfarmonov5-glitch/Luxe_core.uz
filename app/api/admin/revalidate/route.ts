@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
 
     revalidateTag('global-data', 'max');
     revalidatePath('/', 'layout');
+    revalidatePath('/catalog.xml');
+    revalidatePath('/sitemap.xml');
 
     return NextResponse.json({ revalidated: true, timestamp: Date.now() });
   } catch (err: any) {

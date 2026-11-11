@@ -90,8 +90,8 @@ export async function GET() {
     return new NextResponse(sitemap, {
       status: 200,
       headers: {
-        'Content-Type': 'application/xml',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
       },
     });
   } catch (err) {

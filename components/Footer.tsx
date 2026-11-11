@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Instagram, Mail, Lock, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { Mail, Lock, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { Instagram } from './BrandIcons';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useGlobalData } from '../context/GlobalContext';

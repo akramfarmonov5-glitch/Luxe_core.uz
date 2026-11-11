@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingBag, Search, User, Menu, X, ChevronRight, Instagram, Send, Facebook, Youtube, Twitter, Heart, Sun, Moon, Phone } from 'lucide-react';
+import { ShoppingBag, Search, User, Menu, X, ChevronRight, Send, Heart, Sun, Moon, Phone } from 'lucide-react';
+import { Instagram, Facebook, Youtube, Twitter } from './BrandIcons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';

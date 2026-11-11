@@ -52,8 +52,8 @@ export async function GET() {
     return `
     <item>
       <g:id>${product.id}</g:id>
-      <g:title><![CDATA[${getLocalizedText(product.name, 'uz')}]]></g:title>
-      <g:description><![CDATA[${getLocalizedText(product.shortDescription || product.description || product.name, 'uz')}]]></g:description>
+      <g:title><![CDATA[${escapeCdata(getLocalizedText(product.name, 'uz'))}]]></g:title>
+      <g:description><![CDATA[${escapeCdata(getLocalizedText(product.shortDescription || product.description || product.name, 'uz'))}]]></g:description>
       <g:link>${BASE_URL}/uz/product/${productSlug(product, 'uz')}</g:link>
       <g:image_link>${escapeXml(imageLink)}</g:image_link>
       <g:brand>LUXECORE (luxe-core.uz)</g:brand>
@@ -79,10 +79,14 @@ export async function GET() {
   return new NextResponse(xmlFeed, {
     status: 200,
     headers: {
-      'Content-Type': 'text/xml',
-      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300',
     },
   });
+}
+
+function escapeCdata(value: string): string {
+  return String(value || '').replace(/\]\]>/g, ']]]]><![CDATA[>');
 }
 
 /**

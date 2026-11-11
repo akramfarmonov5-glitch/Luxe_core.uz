@@ -10,7 +10,6 @@ import {
   PlusCircle,
   MinusCircle,
   Image as ImageIcon,
-  Youtube,
   Sparkles,
   Box,
   Globe,
@@ -20,6 +19,7 @@ import {
   Loader2,
   Package,
 } from 'lucide-react';
+import { Youtube } from '../BrandIcons';
 import { Product, Category } from '../../types';
 import { supabase } from '../../lib/supabaseClient';
 import { useToast } from '../../context/ToastContext';
