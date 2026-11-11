@@ -46,9 +46,10 @@ const AdminNavigation: React.FC<AdminNavigationProps> = ({ navigationSettings, s
     };
 
     const updateSocialLink = (index: number, field: keyof SocialLink, value: string) => {
-        const newItems = [...formData.socialLinks];
-        // @ts-ignore
-        newItems[index] = { ...newItems[index], [field]: value };
+        // `@ts-ignore` o'rniga xavfsiz map (computed key bilan tip saqlanadi).
+        const newItems = formData.socialLinks.map((link, i) =>
+            i === index ? { ...link, [field]: value } : link
+        );
         setFormData(prev => ({ ...prev, socialLinks: newItems }));
     };
 
