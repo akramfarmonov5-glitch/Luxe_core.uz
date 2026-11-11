@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createHash } from 'node:crypto';
-import { getAuthenticatedUserId } from '@/lib/checkout.server';
+import { createHash, randomUUID } from 'node:crypto';
+import { getAuthenticatedUserId, getServiceSupabaseClient } from '@/lib/checkout.server';
 import { isAdminUser } from '@/lib/admin';
 
 export const runtime = 'nodejs';
@@ -14,7 +14,65 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/avif',
   'image/gif',
 ]);
+const EXT_BY_MIME: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/avif': 'avif',
+  'image/gif': 'gif',
+};
 const UPLOAD_FOLDER = 'luxecore';
+const STORAGE_BUCKET = 'products';
+
+type ServiceSupabaseClient = NonNullable<ReturnType<typeof getServiceSupabaseClient>>;
+
+async function uploadToSupabaseStorage(supabase: ServiceSupabaseClient, file: File) {
+  const ext = EXT_BY_MIME[file.type] || 'bin';
+  const objectPath = `uploads/${Date.now()}-${randomUUID().slice(0, 8)}.${ext}`;
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const uploadOptions = {
+    contentType: file.type,
+    cacheControl: '31536000',
+    upsert: false,
+  };
+
+  let { error: uploadError } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(objectPath, buffer, uploadOptions);
+
+  if (uploadError && /bucket not found/i.test(uploadError.message)) {
+    const { error: bucketError } = await supabase.storage.createBucket(STORAGE_BUCKET, {
+      public: true,
+      fileSizeLimit: MAX_FILE_SIZE,
+      allowedMimeTypes: Array.from(ALLOWED_MIME_TYPES),
+    });
+
+    if (bucketError && !/already exists/i.test(bucketError.message)) {
+      return NextResponse.json(
+        { error: `Storage bucket yaratishda xatolik: ${bucketError.message}` },
+        { status: 502 },
+      );
+    }
+
+    ({ error: uploadError } = await supabase.storage
+      .from(STORAGE_BUCKET)
+      .upload(objectPath, buffer, uploadOptions));
+  }
+
+  if (uploadError) {
+    return NextResponse.json(
+      { error: `Storage ga yuklashda xatolik: ${uploadError.message}` },
+      { status: 502 },
+    );
+  }
+
+  const { data: publicData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(objectPath);
+  if (!publicData?.publicUrl) {
+    return NextResponse.json({ error: 'Rasmning public URL manzili olinmadi' }, { status: 502 });
+  }
+
+  return NextResponse.json({ url: publicData.publicUrl, storage: 'supabase' });
+}
 
 function getCloudinaryConfig() {
   const cloudName =
@@ -45,9 +103,11 @@ export async function POST(req: NextRequest) {
   }
 
   const cloudinary = getCloudinaryConfig();
-  if (!cloudinary) {
+  const supabase = cloudinary ? null : getServiceSupabaseClient();
+
+  if (!cloudinary && !supabase) {
     return NextResponse.json(
-      { error: 'Cloudinary server kalitlari sozlanmagan (CLOUDINARY_API_KEY / API_SECRET)' },
+      { error: 'Rasm yuklash xizmati sozlanmagan (Cloudinary yoki Supabase Storage kalitlari kerak)' },
       { status: 503 },
     );
   }
@@ -74,6 +134,13 @@ export async function POST(req: NextRequest) {
 
     if (file.size <= 0 || file.size > MAX_FILE_SIZE) {
       return NextResponse.json({ error: 'Rasm hajmi 10MB dan oshmasligi kerak' }, { status: 400 });
+    }
+
+    if (!cloudinary) {
+      if (!supabase) {
+        return NextResponse.json({ error: 'Storage xizmati mavjud emas' }, { status: 503 });
+      }
+      return await uploadToSupabaseStorage(supabase, file);
     }
 
     const timestamp = Math.floor(Date.now() / 1000);
@@ -111,8 +178,9 @@ export async function POST(req: NextRequest) {
     const optimizedUrl = data.secure_url.replace('/upload/', '/upload/q_auto,f_auto,w_1200/');
 
     return NextResponse.json({ url: optimizedUrl });
-  } catch (error: any) {
-    console.error('API Admin Upload Error:', error?.message || error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('API Admin Upload Error:', message);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

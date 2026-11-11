@@ -24,19 +24,70 @@ const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
         setPreview(currentImage || null);
     }, [currentImage]);
 
+    const compressImageIfNeeded = async (file: File): Promise<File> => {
+        const MAX_SERVERLESS_SAFE_BYTES = 3.5 * 1024 * 1024;
+        if (file.type === 'image/gif' || file.size <= MAX_SERVERLESS_SAFE_BYTES) {
+            return file;
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+        try {
+            const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+                const image = new Image();
+                image.onload = () => resolve(image);
+                image.onerror = () => reject(new Error('Rasmni o\'qib bo\'lmadi'));
+                image.src = objectUrl;
+            });
+
+            const maxDimension = 1600;
+            const scale = Math.min(1, maxDimension / Math.max(img.width, img.height));
+            const targetWidth = Math.max(1, Math.round(img.width * scale));
+            const targetHeight = Math.max(1, Math.round(img.height * scale));
+
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return file;
+
+            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+            const toBlobAsync = (mime: string, quality: number) =>
+                new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, mime, quality));
+
+            let blob = await toBlobAsync('image/webp', 0.86);
+            if (!blob || blob.type !== 'image/webp') {
+                blob = await toBlobAsync('image/jpeg', 0.86);
+            }
+
+            if (!blob || blob.size >= file.size) {
+                return file;
+            }
+
+            const baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
+            const ext = blob.type === 'image/webp' ? 'webp' : 'jpg';
+            return new File([blob], `${baseName}.${ext}`, { type: blob.type });
+        } finally {
+            URL.revokeObjectURL(objectUrl);
+        }
+    };
+
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
+        const inputEl = e.target;
+        const file = inputEl.files?.[0];
         if (!file) return;
 
         // Validate file type
         if (!file.type.startsWith('image/')) {
             setError('Faqat rasm fayllari qabul qilinadi');
+            inputEl.value = '';
             return;
         }
 
         // Validate file size (max 10MB)
         if (file.size > 10 * 1024 * 1024) {
             setError('Rasm 10MB dan kichik bo\'lishi kerak');
+            inputEl.value = '';
             return;
         }
 
@@ -44,23 +95,25 @@ const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
         setIsUploading(true);
 
         try {
-            // Yuklash endi server orqali (imzolangan) amalga oshiriladi.
-            // Avval brauzerdan `unsigned_preset` bilan yuklanardi — bu istalgan
-            // odamga Cloudinary akkauntiga fayl yuklash imkonini berardi.
             const { data: sessionData } = await supabase.auth.getSession();
             const accessToken = sessionData.session?.access_token;
             if (!accessToken) {
                 throw new Error('Sessiya topilmadi. Qaytadan login qiling.');
             }
 
+            const uploadFile = await compressImageIfNeeded(file).catch(() => file);
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', uploadFile);
 
             const response = await fetch('/api/admin/upload', {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${accessToken}` },
                 body: formData,
             });
+
+            if (response.status === 413) {
+                throw new Error('Rasm hajmi server limitidan (4.5MB) oshdi. Kichikroq rasm yuklang.');
+            }
 
             const data = await response.json().catch(() => ({}));
 
@@ -70,10 +123,12 @@ const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
 
             setPreview(data.url);
             onUpload(data.url);
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const message = err instanceof Error && err.message ? err.message : 'qayta urinib ko\'ring';
             console.error('Upload error:', err);
-            setError(`Fayl yuklashda xatolik (${err.message || 'qayta urinib ko\'ring'}). 'Havola (URL)' bo'limi orqali rasm linkini kiritishingiz mumkin.`);
+            setError(`Fayl yuklashda xatolik (${message}). 'Havola (URL)' bo'limi orqali rasm linkini kiritishingiz mumkin.`);
         } finally {
+            inputEl.value = '';
             setIsUploading(false);
         }
     };
