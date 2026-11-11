@@ -345,9 +345,11 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Ustun nomi sxemaga mos bo'lishi shart: `promo_codes.active`
+      // (avval `is_active` yozilardi va upsert "column does not exist" bilan yiqilardi).
       const { data, error } = await supabase
         .from('promo_codes')
-        .upsert({ code, discount_percent: discountPercent, is_active: true }, { onConflict: 'code' })
+        .upsert({ code, discount_percent: discountPercent, active: true }, { onConflict: 'code' })
         .select()
         .single();
 

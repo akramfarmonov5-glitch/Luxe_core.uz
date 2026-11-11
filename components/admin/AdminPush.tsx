@@ -6,7 +6,8 @@ import { useToast } from '../../context/ToastContext';
 interface PromoItem {
   code: string;
   discount_percent: number;
-  is_active: boolean;
+  // Sxemadagi haqiqiy ustun nomi — `promo_codes.active`
+  active: boolean;
 }
 
 const AdminPush: React.FC = () => {

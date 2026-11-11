@@ -1,4 +1,5 @@
 import '../globals.css';
+import Script from 'next/script';
 import { Providers } from './Providers';
 import ClientLayout from './ClientLayout';
 import { SITE_URL, BRAND_ALTERNATE_NAMES } from '../../lib/siteUrl';
@@ -158,6 +159,9 @@ export default async function RootLayout({
 }) {
   const { lang } = await params;
   const initialData = await fetchGlobalData().catch(() => null);
+  // GA4: `lib/analytics.ts` dagi barcha ecommerce eventlari faqat shu skript
+  // yuklanganda ishlaydi. Env berilmasa — skript umuman chiqmaydi.
+  const gaMeasurementId = process.env.NEXT_PUBLIC_GA_ID;
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
@@ -191,6 +195,20 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        {gaMeasurementId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaMeasurementId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${gaMeasurementId}');`}
+            </Script>
+          </>
+        )}
         <Providers initialData={initialData}>
           <ClientLayout lang={lang}>
             {children}

@@ -4,18 +4,11 @@ import { Product, CartItem } from '../types';
 import { trackAddToCart } from '../lib/fpixel';
 import { trackAddToCart as trackGaAddToCart } from '../lib/analytics';
 import { getLocalizedText } from '../lib/i18nUtils';
+import { getWholesaleUnitPrice } from '../lib/pricing';
 
-export function getWholesaleUnitPrice(basePrice: number, quantity: number): number {
-  const cleanBase = Number(basePrice || 0);
-  if (cleanBase <= 0) return 0;
-  if (quantity >= 1000) {
-    return Math.max(50, Math.round((cleanBase * 0.9) / 50) * 50);
-  }
-  if (quantity >= 500) {
-    return Math.max(50, Math.round((cleanBase * 0.95) / 50) * 50);
-  }
-  return cleanBase;
-}
+// Savat ham, server ham bitta narx funksiyasini ishlatadi (`lib/pricing.ts`).
+// Eski importlar buzilmasligi uchun bu yerdan qayta eksport qilinadi.
+export { getWholesaleUnitPrice };
 
 interface CartContextType {
   cart: CartItem[];

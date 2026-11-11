@@ -1,6 +1,13 @@
 
-const env: Record<string, string | undefined> = (import.meta as any).env || {};
-export const FB_PIXEL_ID = env.VITE_FACEBOOK_PIXEL_ID;
+/**
+ * Meta (Facebook) Pixel ID.
+ *
+ * Eslatma: avval bu qiymat Vite uslubidagi `import.meta.env.VITE_...` dan
+ * o'qilardi — Next.js'da u doim `undefined` bo'lgani uchun pixel umuman
+ * yuklanmasdi va barcha `track*` chaqiruvlari jim o'tib ketardi.
+ */
+export const FB_PIXEL_ID: string | undefined =
+  process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || undefined;
 
 
 

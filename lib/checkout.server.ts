@@ -2,23 +2,15 @@ import { randomUUID } from 'node:crypto';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { MOCK_PRODUCTS } from '../constants';
 import { getLocalizedText } from './i18nUtils';
+import { getWholesaleUnitPrice } from './pricing';
 import type { Product } from '../types';
 
 export const MIN_ORDER_AMOUNT = 200_000;
 export const FREE_DELIVERY_THRESHOLD = 2_000_000;
 export const DELIVERY_FEE = 40_000;
 
-export function getWholesaleUnitPrice(basePrice: number, quantity: number): number {
-  const cleanBase = Number(basePrice || 0);
-  if (cleanBase <= 0) return 0;
-  if (quantity >= 1000) {
-    return Math.max(50, Math.round((cleanBase * 0.9) / 50) * 50);
-  }
-  if (quantity >= 500) {
-    return Math.max(50, Math.round((cleanBase * 0.95) / 50) * 50);
-  }
-  return cleanBase;
-}
+// Narx hisobi `lib/pricing.ts` da — savat bilan bir xil manba.
+export { getWholesaleUnitPrice };
 
 export type CheckoutItemInput = {
   id: number;
