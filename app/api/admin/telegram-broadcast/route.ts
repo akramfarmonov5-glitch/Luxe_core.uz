@@ -3,6 +3,7 @@ import { getAuthenticatedUserId, getServiceSupabaseClient } from '@/lib/checkout
 import { isAdminUser } from '@/lib/admin';
 import { getLocalizedText } from '@/lib/i18nUtils';
 import { productSlug } from '@/lib/slugify';
+import { getErrorMessage } from '@/lib/errors';
 
 const CHANNEL_ID = process.env.TELEGRAM_CHANNEL_ID || process.env.CHANNEL_ID || '@luxecoreuz';
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://luxe-core.uz').replace(/\/+$/, '');
@@ -54,8 +55,8 @@ async function postTelegramMessage(
         return;
       }
       lastError = new Error(data?.description || `Telegram ${endpoint} error on ${chatId}`);
-    } catch (err: any) {
-      lastError = err;
+    } catch (err: unknown) {
+      lastError = new Error(getErrorMessage(err));
     }
   }
 
@@ -171,8 +172,8 @@ export async function GET(req: NextRequest) {
       promos: promos || [],
       deviceCount: deviceCount || 0,
     });
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || 'Internal error' }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: getErrorMessage(err, 'Internal error') }, { status: 500 });
   }
 }
 
@@ -370,8 +371,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Noto\'g\'ri mode' }, { status: 400 });
-  } catch (err: any) {
-    console.error('Telegram broadcast API error:', err);
-    return NextResponse.json({ error: err?.message || 'Server xatoligi' }, { status: 500 });
+  } catch (err: unknown) {
+    const message = getErrorMessage(err);
+    console.error('Telegram broadcast API error:', message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

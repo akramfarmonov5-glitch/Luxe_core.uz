@@ -15,10 +15,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ products, categories = 
   const [orders, setOrders] = useState<Order[]>([]);
   const [totalSales, setTotalSales] = useState(0);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     const { data: ordersData } = await supabase.from('orders').select('*');
     if (ordersData) {
@@ -27,6 +23,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ products, categories = 
       setTotalSales(total);
     }
   };
+
+  // `fetchData` e'londan keyin chaqiriladi (react-hooks/immutability).
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const processSalesData = () => {
       const last7Days = Array.from({length: 7}, (_, i) => {

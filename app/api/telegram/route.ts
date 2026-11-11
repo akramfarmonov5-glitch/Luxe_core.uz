@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
+import { getErrorMessage } from '../../../lib/errors';
 
 export async function POST(req: NextRequest) {
   const rateLimit = await checkRateLimit(`telegram:${getClientIp(req)}`, 5, 60 * 1000);
@@ -42,8 +43,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to send Telegram message', error);
-    return NextResponse.json({ error: error?.message || 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(error, 'Internal Server Error') }, { status: 500 });
   }
 }

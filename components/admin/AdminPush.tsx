@@ -33,10 +33,6 @@ const AdminPush: React.FC = () => {
   const [isLoadingCount, setIsLoadingCount] = useState(false);
   const [isSending, setIsSending] = useState(false);
 
-  useEffect(() => {
-    fetchStatsAndPromos();
-  }, []);
-
   const fetchStatsAndPromos = async () => {
     setIsLoadingCount(true);
     try {
@@ -60,6 +56,11 @@ const AdminPush: React.FC = () => {
       setIsLoadingCount(false);
     }
   };
+
+  // `fetchStatsAndPromos` e'londan keyin chaqiriladi (react-hooks/immutability).
+  useEffect(() => {
+    fetchStatsAndPromos();
+  }, []);
 
   const handleAddPromo = async (e: React.FormEvent) => {
     e.preventDefault();

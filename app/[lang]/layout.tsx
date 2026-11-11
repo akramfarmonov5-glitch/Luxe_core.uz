@@ -209,7 +209,7 @@ gtag('config', '${gaMeasurementId}');`}
             </Script>
           </>
         )}
-        <Providers initialData={initialData}>
+        <Providers initialData={initialData} lang={lang || 'uz'}>
           <ClientLayout lang={lang}>
             {children}
           </ClientLayout>

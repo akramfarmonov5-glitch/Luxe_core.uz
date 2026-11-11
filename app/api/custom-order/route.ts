@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
+import { getErrorMessage } from '../../../lib/errors';
 
 function escapeHtml(value: string): string {
   return value
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'Server xatosi' }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: getErrorMessage(error, 'Server xatosi') }, { status: 500 });
   }
 }

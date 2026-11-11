@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 import { normalizePhone } from '../../../lib/checkout.server';
 import { hasSecondFactor, maskOrderId } from '../../../lib/orderMask';
+import { getErrorMessage } from '../../../lib/errors';
 
 const MAX_ORDERS_FULL = 3;
 const MAX_ORDERS_LIMITED = 3;
@@ -109,8 +110,8 @@ export async function POST(req: NextRequest) {
         hint: 'To‘liq ma’lumot uchun telefon raqam bilan birga buyurtma ID sini kiriting.',
       }),
     });
-  } catch (error: any) {
-    console.error('Order tracking API error:', error);
+  } catch (error: unknown) {
+    console.error('Order tracking API error:', getErrorMessage(error));
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -28,3 +28,10 @@ tsconfig.tsbuildinfo
 .claude/
 .env*.local
 .agent_chat_history.json
+
+# Testlar / E2E
+test-results
+playwright-report
+blob-report
+playwright/.cache
+lint.json

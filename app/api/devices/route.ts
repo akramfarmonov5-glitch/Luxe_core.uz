@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { formatPhoneNumber } from '@/lib/phoneUtils';
 import { checkRateLimit, getClientIp } from '@/lib/rateLimit';
+import { getErrorMessage } from '@/lib/errors';
 
 // Use server-side Supabase client with Service Role Key to bypass RLS policies.
 // Klient lazy yaratiladi — env sozlanmagan bo'lsa build vaqtida yiqilmaydi.
@@ -103,8 +104,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('API Devices Error:', error?.message || error);
+  } catch (error: unknown) {
+    console.error('API Devices Error:', getErrorMessage(error));
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

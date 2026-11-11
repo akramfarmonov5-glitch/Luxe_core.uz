@@ -5,6 +5,7 @@ import {
   normalizeCheckoutItems,
 } from '../../../../lib/checkout.server';
 import { checkRateLimit, getClientIp } from '../../../../lib/rateLimit';
+import { getErrorMessage } from '../../../../lib/errors';
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,7 +36,10 @@ export async function POST(req: NextRequest) {
     const pricing = await calculateCheckoutPricing(normalizedItems, products, promoCode);
 
     return NextResponse.json(pricing);
-  } catch (error: any) {
-    return NextResponse.json({ error: error?.message || 'Narxni hisoblashda xatolik yuz berdi' }, { status: 400 });
+  } catch (error: unknown) {
+    return NextResponse.json(
+      { error: getErrorMessage(error, 'Narxni hisoblashda xatolik yuz berdi') },
+      { status: 400 },
+    );
   }
 }

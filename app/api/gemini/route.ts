@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
+import { getErrorMessage } from '../../../lib/errors';
 
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
 const TTS_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-2.5-flash-preview-tts';
@@ -110,8 +111,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ text, audioBase64 });
-  } catch (error: any) {
-    console.error("Gemini API Error:", error?.message || error);
-    return NextResponse.json({ error: error?.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    console.error('Gemini API Error:', getErrorMessage(error));
+    return NextResponse.json({ error: getErrorMessage(error, 'Internal Server Error') }, { status: 500 });
   }
 }

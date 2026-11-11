@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUserId, getServiceSupabaseClient } from '@/lib/checkout.server';
 import { isAdminUser } from '@/lib/admin';
+import { getErrorMessage, isMissingRpcError } from '@/lib/errors';
 
 const STATUS_MESSAGES: Record<string, string> = {
   "To'landi": "✅ Buyurtmangiz tasdiqlandi va qabul qilindi! Tez orada yetkazib beramiz.",
@@ -106,18 +107,11 @@ export async function POST(req: NextRequest) {
       success: true,
       notifiedTelegram,
     });
-  } catch (err: any) {
-      console.error('Order status API error:', err);
-      return NextResponse.json({ error: err?.message || 'Server xatoligi' }, { status: 500 });
-    }
+  } catch (err: unknown) {
+    const message = getErrorMessage(err);
+    console.error('Order status API error:', message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
-  
-  function isMissingRpc(error: { code?: string; message?: string }) {
-    return (
-      error.code === 'PGRST202' ||
-      error.code === '42883' ||
-      /could not find the function|function .* does not exist/i.test(error.message || '')
-    );
   }
   
   /**
@@ -133,8 +127,8 @@ export async function POST(req: NextRequest) {
   
     if (!error) return;
   
-    if (!isMissingRpc(error)) {
-      console.warn('restore_order_stock RPC xatosi:', error.message);
+    if (!isMissingRpcError(error)) {
+      console.warn('restore_order_stock RPC xatosi:', getErrorMessage(error));
       return;
     }
   
@@ -142,8 +136,9 @@ export async function POST(req: NextRequest) {
   
     const items = Array.isArray(rawItems) ? rawItems : [];
     for (const item of items) {
-      const productId = Number((item as any)?.id ?? (item as any)?.productId);
-      const qty = Number((item as any)?.quantity);
+      const record = (item ?? {}) as { id?: unknown; productId?: unknown; quantity?: unknown };
+      const productId = Number(record.id ?? record.productId);
+      const qty = Number(record.quantity);
       if (!productId || !(qty > 0)) continue;
   
       const { data: prod } = await supabase

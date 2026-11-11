@@ -1,5 +1,6 @@
 import { slugify } from './slugify';
 import { getLocalizedText } from './i18nUtils';
+import type { DbProduct, DbCategory } from './dbTypes';
 import type { Product, Category } from '../types';
 
 /**
@@ -11,7 +12,7 @@ import type { Product, Category } from '../types';
  * faqat shu faylni ishlatadi.
  */
 
-export function mapProducts(rows: any[]): Product[] {
+export function mapProducts(rows: DbProduct[]): Product[] {
   return rows.map((p) => ({
     ...p,
     formattedPrice: new Intl.NumberFormat('uz-UZ').format(Number(p.price)) + ' UZS',
@@ -21,7 +22,7 @@ export function mapProducts(rows: any[]): Product[] {
   })) as Product[];
 }
 
-export function mapCategories(rows: any[]): Category[] {
+export function mapCategories(rows: DbCategory[]): Category[] {
   return rows.map((c) => ({
     ...c,
     slug: c.slug || slugify(getLocalizedText(c.name, 'uz')),

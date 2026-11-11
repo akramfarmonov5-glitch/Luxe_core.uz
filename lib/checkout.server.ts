@@ -19,6 +19,15 @@ export type CheckoutItemInput = {
 
 export type PromoStatus = 'none' | 'valid' | 'invalid' | 'expired';
 
+export type PromoResolution = {
+  normalizedPromo: string;
+  promoRate?: number;
+  promoStatus: PromoStatus;
+};
+
+/** Promo-kodni tekshiruvchi funksiya (testda inject qilinadi). */
+export type PromoResolver = (promoCode?: string | null) => Promise<PromoResolution>;
+
 export type CheckoutPricing = {
   subtotal: number;
   discountAmount: number;
@@ -76,8 +85,9 @@ export function normalizeCheckoutItems(rawItems: unknown): CheckoutItemInput[] {
   const quantitiesById = new Map<number, number>();
 
   rawItems.forEach((item) => {
-    const id = Number((item as any)?.id);
-    const quantity = Number((item as any)?.quantity);
+    const record = (item ?? {}) as { id?: unknown; quantity?: unknown };
+    const id = Number(record.id);
+    const quantity = Number(record.quantity);
 
     if (!Number.isInteger(id) || id <= 0) {
       throw new Error('Invalid product id');
@@ -138,6 +148,7 @@ export async function calculateCheckoutPricing(
   items: CheckoutItemInput[],
   products: Product[],
   promoCode?: string | null,
+  promoResolver: PromoResolver = resolvePromoRate,
 ): Promise<CheckoutPricing> {
   const productsById = new Map(products.map((product) => [product.id, product]));
 
@@ -155,7 +166,7 @@ export async function calculateCheckoutPricing(
     return sum + unitPrice * item.quantity;
   }, 0);
 
-  const { normalizedPromo, promoRate, promoStatus } = await resolvePromoRate(promoCode);
+  const { normalizedPromo, promoRate, promoStatus } = await promoResolver(promoCode);
   const discountAmount = promoRate ? Math.round(subtotal * promoRate) : 0;
   const discountedSubtotal = Math.max(0, subtotal - discountAmount);
   const deliveryFee = discountedSubtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
@@ -176,7 +187,7 @@ export async function calculateCheckoutPricing(
 // Promo-kodlar FAQAT `promo_codes` jadvalidan olinadi.
 // Ilgari kodda qotib qolgan zaxira qoidalar (ADMIN = -50%) bor edi —
 // ular har qanday xaridorga 50% chegirma berardi, shuning uchun olib tashlandi.
-async function resolvePromoRate(promoCode?: string | null) {
+export async function resolvePromoRate(promoCode?: string | null): Promise<PromoResolution> {
   const normalizedPromo = promoCode?.trim().toUpperCase().slice(0, 64) || '';
   if (!normalizedPromo) {
     return {

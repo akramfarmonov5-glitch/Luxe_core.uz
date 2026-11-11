@@ -2,6 +2,24 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedUserId } from '@/lib/checkout.server';
 import { isAdminUser } from '@/lib/admin';
 import { getServiceSupabaseClient } from '@/lib/checkout.server';
+import { getErrorMessage } from '@/lib/errors';
+
+/** firebase-admin 14 ESM interop uchun minimal tip. */
+type FirebaseMessaging = {
+  sendEachForMulticast: (payload: unknown) => Promise<{
+    successCount: number;
+    failureCount: number;
+    responses: Array<{ success: boolean; error?: { code?: string } }>;
+  }>;
+};
+
+type FirebaseAdminModule = {
+  initializeApp: (options: { credential: unknown }) => unknown;
+  credential: { cert: (serviceAccount: unknown) => unknown };
+  messaging: () => FirebaseMessaging;
+  getApps?: () => unknown[];
+  apps?: unknown[];
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,23 +72,22 @@ export async function POST(req: NextRequest) {
     const firebaseModule = await import('firebase-admin');
     // firebase-admin 14 (ESM) da `apps`, `credential`, `messaging` default eksport
     // ostida keladi — interop uchun ikkala shaklni ham qo'llab-quvvatlaymiz.
-    const admin: any = (firebaseModule as any).default ?? firebaseModule;
-    const credentialFactory: any = admin.credential ?? (firebaseModule as any).credential;
-    const messagingFactory: any = admin.messaging ?? (firebaseModule as any).messaging;
-    const existingApps: any[] = typeof admin.getApps === 'function'
+    const admin = ((firebaseModule as unknown as { default?: FirebaseAdminModule }).default ??
+      firebaseModule) as unknown as FirebaseAdminModule;
+    const existingApps = typeof admin.getApps === 'function'
       ? admin.getApps()
       : (admin.apps ?? []);
 
     if (!Array.isArray(existingApps) || existingApps.length === 0) {
       try {
-        const serviceAccount = JSON.parse(serviceAccountStr);
+        const serviceAccount: unknown = JSON.parse(serviceAccountStr);
         admin.initializeApp({
-          credential: credentialFactory.cert(serviceAccount)
+          credential: admin.credential.cert(serviceAccount)
         });
-      } catch (parseErr: any) {
-        console.error("Failed to parse or initialize Firebase Admin SDK:", parseErr);
-        return NextResponse.json({ 
-          error: `Failed to initialize Firebase Admin SDK: ${parseErr.message}` 
+      } catch (parseErr: unknown) {
+        console.error('Failed to parse or initialize Firebase Admin SDK:', getErrorMessage(parseErr));
+        return NextResponse.json({
+          error: `Failed to initialize Firebase Admin SDK: ${getErrorMessage(parseErr)}`
         }, { status: 500 });
       }
     }
@@ -91,7 +108,7 @@ export async function POST(req: NextRequest) {
       }
     };
 
-    const response = await messagingFactory().sendEachForMulticast(messagePayload);
+    const response = await admin.messaging().sendEachForMulticast(messagePayload);
     
     // 4. Identify and delete expired tokens dynamically
     const expiredTokens: string[] = [];
@@ -122,8 +139,8 @@ export async function POST(req: NextRequest) {
       cleanedUpCount: expiredTokens.length
     });
 
-  } catch (error: any) {
-    console.error('API Admin Push Error:', error?.message || error);
-    return NextResponse.json({ error: error?.message || 'Internal Server Error' }, { status: 500 });
+  } catch (error: unknown) {
+    console.error('API Admin Push Error:', getErrorMessage(error));
+    return NextResponse.json({ error: getErrorMessage(error, 'Internal Server Error') }, { status: 500 });
   }
 }

@@ -12,10 +12,6 @@ const AdminOrders: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  React.useEffect(() => {
-    fetchOrders();
-  }, []);
-
   const fetchOrders = async () => {
     try {
       // Admin panelda barcha buyurtmalarni cheksiz yuklamaymiz —
@@ -37,6 +33,11 @@ const AdminOrders: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // `fetchOrders` e'londan keyin chaqiriladi (react-hooks/immutability).
+  React.useEffect(() => {
+    fetchOrders();
+  }, []);
 
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {

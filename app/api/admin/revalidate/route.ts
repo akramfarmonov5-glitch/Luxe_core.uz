@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { getAuthenticatedUserId } from '@/lib/checkout.server';
 import { isAdminUser } from '@/lib/admin';
+import { getErrorMessage } from '@/lib/errors';
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
     revalidatePath('/sitemap.xml');
 
     return NextResponse.json({ revalidated: true, timestamp: Date.now() });
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || 'Revalidation error' }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: getErrorMessage(err, 'Revalidation error') }, { status: 500 });
   }
 }

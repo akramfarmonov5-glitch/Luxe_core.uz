@@ -11,6 +11,7 @@ import {
   toOrderItems,
 } from '../../../lib/checkout.server';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
+import { getErrorMessage } from '../../../lib/errors';
 
 type OrderSource = 'checkout' | 'quick-buy' | 'telegram-bot';
 type PaymentMethod = 'paynet' | 'cash' | 'card';
@@ -164,9 +165,9 @@ export async function POST(req: NextRequest) {
       items: orderItems,
       paymentMethod: toStoredPaymentMethod(paymentMethod),
     });
-  } catch (error: any) {
-    console.error('Order creation API error:', error);
-    const rawMessage = error?.message || 'Buyurtma yaratishda xatolik yuz berdi';
+  } catch (error: unknown) {
+    const rawMessage = getErrorMessage(error, 'Buyurtma yaratishda xatolik yuz berdi');
+    console.error('Order creation API error:', rawMessage);
     const message = rawMessage.includes('INSUFFICIENT_STOCK')
       ? 'Tanlangan mahsulot uchun omborda yetarli qoldiq yo‘q. Iltimos, sonini kamaytiring.'
       : rawMessage;

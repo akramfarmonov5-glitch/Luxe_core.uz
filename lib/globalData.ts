@@ -2,6 +2,11 @@ import { unstable_cache } from 'next/cache';
 import { supabase, hasSupabaseCredentials } from './supabaseClient';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, DEFAULT_HERO_CONTENT, DEFAULT_NAVIGATION, DEFAULT_BLOG_POSTS } from '../constants';
 import { mapProducts, mapCategories } from './dataMappers';
+import type {
+  DbBlogPost,
+  DbHeroContent,
+  DbNavigationSettings,
+} from './dbTypes';
 import type { Product, Category, HeroContent, NavigationSettings, BlogPost } from '../types';
 
 export interface GlobalData {
@@ -48,7 +53,7 @@ async function fetchGlobalDataUncached(): Promise<GlobalData> {
 
   let heroContent: HeroContent = DEFAULT_HERO_CONTENT;
   if (heroRes.status === 'fulfilled' && heroRes.value.data) {
-    const heroData: any = heroRes.value.data;
+    const heroData = heroRes.value.data as DbHeroContent;
     heroContent = {
       badge: heroData.badge || DEFAULT_HERO_CONTENT.badge,
       title: heroData.title || DEFAULT_HERO_CONTENT.title,
@@ -60,7 +65,7 @@ async function fetchGlobalDataUncached(): Promise<GlobalData> {
 
   let blogPosts: BlogPost[] = [];
   if (blogRes.status === 'fulfilled' && blogRes.value.data && blogRes.value.data.length > 0) {
-    blogPosts = blogRes.value.data.map((post: any) => ({
+    blogPosts = (blogRes.value.data as DbBlogPost[]).map((post) => ({
       ...post,
       seo: post.seo || {
         title: post.seo_title || post.title,
@@ -74,10 +79,10 @@ async function fetchGlobalDataUncached(): Promise<GlobalData> {
 
   let navigationSettings: NavigationSettings = DEFAULT_NAVIGATION;
   if (navRes.status === 'fulfilled' && navRes.value.data) {
-    const navData: any = navRes.value.data;
+    const navData = navRes.value.data as DbNavigationSettings;
     navigationSettings = {
-      menuItems: navData.menuItems || navData.menu_items || [],
-      socialLinks: navData.socialLinks || navData.social_links || [],
+      menuItems: (navData.menuItems ?? navData.menu_items ?? []) as NavigationSettings['menuItems'],
+      socialLinks: (navData.socialLinks ?? navData.social_links ?? []) as NavigationSettings['socialLinks'],
     };
   }
 

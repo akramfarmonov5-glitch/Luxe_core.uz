@@ -24,11 +24,8 @@ const projectRules = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-unused-vars': 'warn',
     'react-hooks/set-state-in-effect': 'warn',
-    // `useEffect(() => { fetchX(); }, [])` ko'rinishidagi admin komponentlar
-    // `const` funksiyani e'londan oldin chaqiradi. React Compiler yoqilmagan
-    // (runtime uchun xavfsiz), shuning uchun hozircha `warn` — keyingi
-    // refaktorda effektlar funksiya e'lonidan keyinga ko'chiriladi.
-    'react-hooks/immutability': 'warn',
+    // Effektlar funksiya e'lonidan keyinga ko'chirildi — bu qoida endi `error`.
+    'react-hooks/immutability': 'error',
   },
 };
 

@@ -32,7 +32,7 @@ export function slugify(text: string): string {
 /**
  * Mahsulot uchun unique SEO slug yaratish (id bilan)
  */
-export function productSlug(product: { id: number; name: any; slug?: any }, lang = 'uz'): string {
+export function productSlug(product: { id: number; name: unknown; slug?: unknown }, lang = 'uz'): string {
   const localizedSlug = getLocalizedText(product.slug, lang) || getLocalizedText(product.slug, 'uz');
   const localizedName = getLocalizedText(product.name, lang) || getLocalizedText(product.name, 'uz');
   const rawBase = slugify(localizedSlug || localizedName) || 'mahsulot';
@@ -53,7 +53,7 @@ export function getIdFromSlug(slug: string): number | null {
 /**
  * Blog post uchun SEO slug yaratish
  */
-export function blogSlug(post: { id: number; title: any; slug?: any }, lang = 'uz'): string {
+export function blogSlug(post: { id: number; title: unknown; slug?: unknown }, lang = 'uz'): string {
   const localizedSlug = getLocalizedText(post.slug, lang) || getLocalizedText(post.slug, 'uz');
   const localizedTitle = getLocalizedText(post.title, lang) || getLocalizedText(post.title, 'uz');
   const rawBase = slugify(localizedSlug || localizedTitle) || 'maqola';

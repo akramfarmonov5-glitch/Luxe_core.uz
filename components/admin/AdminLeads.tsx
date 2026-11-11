@@ -21,10 +21,6 @@ const AdminLeads: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetchAllCustomers();
-  }, []);
-
   const fetchAllCustomers = async () => {
     setLoading(true);
 
@@ -61,6 +57,11 @@ const AdminLeads: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // `fetchAllCustomers` e'londan keyin chaqiriladi (react-hooks/immutability).
+  useEffect(() => {
+    fetchAllCustomers();
+  }, []);
 
   const deleteLead = async (id: string) => {
     try {

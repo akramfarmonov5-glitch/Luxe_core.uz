@@ -297,14 +297,15 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const LanguageProvider: React.FC<{ children: ReactNode; initialLang?: SeoLanguage }> = ({ children, initialLang }) => {
     const router = useRouter();
     const pathname = usePathname() || '/';
 
-    // Til manbai — faqat URL prefiksi (`/uz`, `/ru`, `/en`) yoki default `uz`.
-    // SSR va klientda bir xil qiymat olinadi, shuning uchun hydration
-    // mos kelmay qolish muammosi yo'q.
-    const [lang, setLangState] = useState<Language>(() => getLanguageFromPath(pathname));
+    // Til manbai — server layout'dan kelgan `initialLang` (SSR bilan bir xil),
+    // aks holda URL prefiksi (`/uz`, `/ru`, `/en`) yoki default `uz`.
+    const [lang, setLangState] = useState<Language>(
+        () => initialLang ?? getLanguageFromPath(pathname),
+    );
 
     const setLang = (newLang: Language) => {
         setLangState(newLang);

@@ -1,3 +1,5 @@
+import { getErrorMessage } from './errors';
+
 type RateLimitEntry = {
   count: number;
   resetAt: number;
@@ -108,8 +110,8 @@ async function checkWithRedis(
       remaining: Math.max(0, limit - count),
       resetAt: Date.now() + windowMs,
     };
-  } catch (error: any) {
-    console.warn('Rate limit Redis bilan aloqa yo`q:', error?.message || error);
+  } catch (error: unknown) {
+    console.warn('Rate limit Redis bilan aloqa yo`q:', getErrorMessage(error));
     return null;
   }
 }

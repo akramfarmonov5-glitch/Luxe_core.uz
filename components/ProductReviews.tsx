@@ -29,10 +29,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   const [hoveredRating, setHoveredRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchReviews();
-  }, [productId]);
-
   const fetchReviews = async () => {
     setLoading(true);
     try {
@@ -50,6 +46,13 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
       setLoading(false);
     }
   };
+
+  // `fetchReviews` e'lon qilingandan KEYIN chaqiriladi
+  // (react-hooks/immutability: TDZ/kompilyator xatosi bo'lmasligi uchun).
+  useEffect(() => {
+    fetchReviews();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
