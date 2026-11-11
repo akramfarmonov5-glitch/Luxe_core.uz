@@ -110,16 +110,16 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     },
     icons: {
       icon: [
-        { url: '/favicon.ico', sizes: 'any' },
-        { url: '/favicon-16x16.png?v=20260430', type: 'image/png', sizes: '16x16' },
-        { url: '/favicon-32x32.png?v=20260430', type: 'image/png', sizes: '32x32' },
-        { url: '/favicon-48x48.png?v=20260430', type: 'image/png', sizes: '48x48' },
-        { url: '/favicon.png?v=20260430', type: 'image/png', sizes: '32x32' },
+        { url: '/favicon.ico?v=20261112', sizes: 'any' },
+        { url: '/favicon-16x16.png?v=20261112', type: 'image/png', sizes: '16x16' },
+        { url: '/favicon-32x32.png?v=20261112', type: 'image/png', sizes: '32x32' },
+        { url: '/favicon-48x48.png?v=20261112', type: 'image/png', sizes: '48x48' },
+        { url: '/favicon.png?v=20261112', type: 'image/png', sizes: '32x32' },
       ],
       apple: [
-        { url: '/apple-touch-icon.png?v=20260430', sizes: '180x180', type: 'image/png' },
+        { url: '/apple-touch-icon.png?v=20261112', sizes: '180x180', type: 'image/png' },
       ],
-      shortcut: ['/favicon.ico'],
+      shortcut: ['/favicon.ico?v=20261112'],
     },
     manifest: '/manifest.webmanifest',
     openGraph: {
@@ -183,11 +183,11 @@ export default async function RootLayout({
     <html lang={lang || 'uz'} suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#0B1F1A" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=20260430" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=20260430" />
-        <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png?v=20260430" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20260430" />
+        <link rel="icon" href="/favicon.ico?v=20261112" sizes="any" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=20261112" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=20261112" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png?v=20261112" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20261112" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <script
           type="application/ld+json"

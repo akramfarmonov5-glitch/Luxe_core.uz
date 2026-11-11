@@ -99,8 +99,8 @@ const InstallPWA: React.FC = () => {
           </button>
 
           <div className="flex gap-4 md:gap-5 items-start">
-            <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl shrink-0 overflow-hidden bg-white flex items-center justify-center p-2 shadow-inner border border-gray-100">
-              <Image src="/logo.jpg" alt="LUXECORE App" width={80} height={80} className="w-full h-full object-contain" />
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl shrink-0 overflow-hidden bg-black flex items-center justify-center p-0.5 shadow-inner border border-gold-500/30">
+              <Image src="/logo.jpg" alt="LUXECORE App" width={80} height={80} className="w-full h-full object-contain rounded-2xl" />
             </div>
             
             <div className="flex-1">

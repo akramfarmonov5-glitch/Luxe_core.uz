@@ -8,14 +8,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Eo_circle_amber_letter-l.svg",
+      "src": "/pwa-192x192.png?v=20261112",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Eo_circle_amber_letter-l.svg",
+      "src": "/pwa-512x512.png?v=20261112",
       "sizes": "512x512",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
