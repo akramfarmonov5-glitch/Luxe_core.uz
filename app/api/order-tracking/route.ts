@@ -22,7 +22,7 @@ function sanitizeOrderId(value: unknown): string {
 }
 
 export async function POST(req: NextRequest) {
-  const rateLimit = checkRateLimit(`order-tracking:${getClientIp(req)}`, 10, 60 * 1000);
+  const rateLimit = await checkRateLimit(`order-tracking:${getClientIp(req)}`, 10, 60 * 1000);
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
   }

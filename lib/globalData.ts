@@ -1,8 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { supabase, hasSupabaseCredentials } from './supabaseClient';
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, DEFAULT_HERO_CONTENT, DEFAULT_NAVIGATION, DEFAULT_BLOG_POSTS } from '../constants';
-import { slugify } from './slugify';
-import { getLocalizedText } from './i18nUtils';
+import { mapProducts, mapCategories } from './dataMappers';
 import type { Product, Category, HeroContent, NavigationSettings, BlogPost } from '../types';
 
 export interface GlobalData {
@@ -13,22 +12,10 @@ export interface GlobalData {
   blogPosts: BlogPost[];
 }
 
-export function mapProducts(rows: any[]): Product[] {
-  return rows.map((p) => ({
-    ...p,
-    formattedPrice: new Intl.NumberFormat('uz-UZ').format(Number(p.price)) + ' UZS',
-    shortDescription: p.description || '',
-    specs: p.specifications || [],
-    videoUrl: p.videoUrl || '',
-  })) as Product[];
-}
-
-export function mapCategories(rows: any[]): Category[] {
-  return rows.map((c) => ({
-    ...c,
-    slug: c.slug || slugify(getLocalizedText(c.name, 'uz')),
-  })) as Category[];
-}
+// Sof mapperlar `lib/dataMappers.ts` da — ularni klient komponentlar ham
+// xavfsiz import qilishi mumkin (bu fayl `next/cache` ga bog'liq).
+// Eski import yo'llari buzilmasligi uchun qayta eksport qilamiz.
+export { mapProducts, mapCategories };
 
 // Mock data faqat Supabase sozlanmagan (lokal dev) muhitda ishlatiladi.
 // Credentials mavjud bo'lsa — baza bo'sh bo'lsa ham bo'sh ro'yxat qaytadi.

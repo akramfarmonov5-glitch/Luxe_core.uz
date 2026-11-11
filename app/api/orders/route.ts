@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     const rateLimitKey = source === 'telegram-bot'
       ? `orders:telegram:${telegramUserId}`
       : `orders:${getClientIp(req)}`;
-    const rateLimit = checkRateLimit(rateLimitKey, source === 'telegram-bot' ? 20 : 12, 5 * 60 * 1000);
+    const rateLimit = await checkRateLimit(rateLimitKey, source === 'telegram-bot' ? 20 : 12, 5 * 60 * 1000);
     if (!rateLimit.allowed) {
       return NextResponse.json({ error: 'Juda ko‘p buyurtma urinishlari. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
     }

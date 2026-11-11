@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Category } from '../types';
@@ -45,20 +46,32 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategor
             </>
           ) : (
             <>
-              {categories.map((category, index) => (
-            <motion.button
+              {categories.map((category, index) => {
+                const catHref = `/${lang}/category/${getCategorySlug(category, lang)}`;
+                const isPng = category.image?.toLowerCase().endsWith('.png');
+                return (
+            <motion.div
               key={category.id}
-              type="button"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
-              onClick={() => onSelectCategory(getCategorySlug(category))}
               className={`group relative rounded-2xl md:rounded-3xl overflow-hidden cursor-pointer border border-white/5 text-left ${
+                isPng ? 'bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900' : ''
+              } ${
                 // 1-element (index 0) 2x2 joy egallaydi. 3 ustunli gridda bu 2/3 qismni oladi.
                 index === 0 ? 'col-span-2 row-span-2' : 'col-span-1'
                 }`}
             >
+              <Link
+                href={catHref}
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+                  e.preventDefault();
+                  onSelectCategory(getCategorySlug(category));
+                }}
+                className="block w-full h-full relative"
+              >
               {/* Image Background */}
               <div className="absolute inset-0">
                 <Image
@@ -66,7 +79,7 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategor
                   alt={getLocalizedText(category.name, lang)}
                   fill
                   sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  className={`${isPng ? 'object-contain p-4 md:p-6' : 'object-cover'} transition-transform duration-700 group-hover:scale-110`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
               </div>
@@ -94,8 +107,10 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ categories, onSelectCategor
                   </div>
                 </div>
               </div>
-            </motion.button>
-          ))}
+              </Link>
+            </motion.div>
+                );
+              })}
             </>
           )}
         </div>

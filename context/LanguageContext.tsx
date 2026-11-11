@@ -44,7 +44,7 @@ const translations: Translations = {
 
     // Product Detail
     tech_specs: { uz: 'Texnik Xususiyatlar', ru: 'Технические Характеристики', en: 'Technical Specs' },
-    related_products: { uz: 'O\'xshash Mahsulotlar', ru: 'Похожие Tovarlar', en: 'Related Products' },
+    related_products: { uz: 'O\'xshash Mahsulotlar', ru: 'Похожие товары', en: 'Related Products' },
     description_label: { uz: 'Tavsif', ru: 'Описание', en: 'Description' },
     video_review: { uz: 'VIDEO SHARH', ru: 'ВИДЕО ОБЗОР', en: 'VIDEO REVIEW' },
 

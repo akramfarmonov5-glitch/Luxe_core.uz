@@ -147,7 +147,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                 <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-12 gap-4">
                     <div className="space-y-2 w-full md:w-auto">
                         <h2 className={`text-2xl md:text-4xl font-bold ${isDark ? 'text-white' : 'text-light-text'}`}>
-                            {t('premium_collection').split(' ')[0]} <span className="text-gold-400">{t('premium_collection').split(' ')[1]}</span>
+                            {t('premium_collection').split(' ')[0]} <span className="text-gold-400">{t('premium_collection').split(' ').slice(1).join(' ')}</span>
                         </h2>
                         <p className={`text-sm md:text-base max-w-md ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
                             {t('collection_desc')}
@@ -239,6 +239,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                     {t('sort_by')}
                                 </h3>
                                 <select 
+                                    aria-label={t('sort_by')}
                                     value={sortOrder}
                                     onChange={(e) => setSortOrder(e.target.value)}
                                     className={`w-full border rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-gold-400 transition-colors cursor-pointer ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
@@ -257,6 +258,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                 <div className="flex items-center gap-2">
                                     <input 
                                         type="number" 
+                                        min={0}
                                         placeholder={t('min_price')}
                                         value={minPrice}
                                         onChange={(e) => setMinPrice(e.target.value)}
@@ -265,6 +267,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                     <span className="text-gray-400">-</span>
                                     <input 
                                         type="number" 
+                                        min={0}
                                         placeholder={t('max_price')}
                                         value={maxPrice}
                                         onChange={(e) => setMaxPrice(e.target.value)}
@@ -356,7 +359,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                         >
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-light-text'}`}>{t('filter')}</h3>
-                                <button onClick={() => setIsFilterOpen(false)} className={isDark ? 'text-gray-400 hover:text-white' : 'text-light-muted hover:text-light-text'}>
+                                <button type="button" aria-label="Close filters" onClick={() => setIsFilterOpen(false)} className={isDark ? 'text-gray-400 hover:text-white' : 'text-light-muted hover:text-light-text'}>
                                     <X size={24} />
                                 </button>
                             </div>
@@ -388,6 +391,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                 <div>
                                     <h4 className={`text-sm font-bold mb-3 uppercase tracking-wider ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>{t('sort_by')}</h4>
                                     <select 
+                                        aria-label={t('sort_by')}
                                         value={sortOrder}
                                         onChange={(e) => setSortOrder(e.target.value)}
                                         className={`w-full border rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-gold-400 transition-colors ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-light-border text-light-text'}`}
@@ -404,6 +408,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                     <div className="flex items-center gap-2">
                                         <input 
                                             type="number" 
+                                            min={0}
                                             placeholder={t('min_price')}
                                             value={minPrice}
                                             onChange={(e) => setMinPrice(e.target.value)}
@@ -412,6 +417,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                         <span className="text-gray-400">-</span>
                                         <input 
                                             type="number" 
+                                            min={0}
                                             placeholder={t('max_price')}
                                             value={maxPrice}
                                             onChange={(e) => setMaxPrice(e.target.value)}
@@ -459,6 +465,7 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({ products, categorie
                                 </div>
                                 <button
                                     type="button"
+                                    aria-label="Close modal"
                                     onClick={() => setIsCustomLogoOpen(false)}
                                     className="text-gray-400 hover:text-white"
                                 >

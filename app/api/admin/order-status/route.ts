@@ -48,24 +48,7 @@ export async function POST(req: NextRequest) {
       existingOrder.stock_reserved === true;
 
     if (shouldRestoreStock) {
-      const items = Array.isArray(existingOrder.items) ? existingOrder.items : [];
-      for (const item of items) {
-        const productId = Number(item?.id ?? item?.productId);
-        const qty = Number(item?.quantity);
-        if (productId && qty > 0) {
-          const { data: prod } = await supabase
-            .from('products')
-            .select('stock')
-            .eq('id', productId)
-            .single();
-          if (prod && typeof prod.stock === 'number') {
-            await supabase
-              .from('products')
-              .update({ stock: prod.stock + qty })
-              .eq('id', productId);
-          }
-        }
-      }
+      await restoreOrderStock(supabase, orderId, existingOrder.items);
     }
 
     const { error: updateErr } = await supabase
@@ -124,7 +107,59 @@ export async function POST(req: NextRequest) {
       notifiedTelegram,
     });
   } catch (err: any) {
-    console.error('Order status API error:', err);
-    return NextResponse.json({ error: err?.message || 'Server xatoligi' }, { status: 500 });
+      console.error('Order status API error:', err);
+      return NextResponse.json({ error: err?.message || 'Server xatoligi' }, { status: 500 });
+    }
   }
-}
+  
+  function isMissingRpc(error: { code?: string; message?: string }) {
+    return (
+      error.code === 'PGRST202' ||
+      error.code === '42883' ||
+      /could not find the function|function .* does not exist/i.test(error.message || '')
+    );
+  }
+  
+  /**
+   * Qoldiqni qaytarish: avval atomar RPC (`restore_order_stock`), funksiya hali
+   * qo'llanmagan bo'lsa — eski usulga fallback.
+   */
+  async function restoreOrderStock(
+    supabase: NonNullable<ReturnType<typeof getServiceSupabaseClient>>,
+    orderId: string,
+    rawItems: unknown,
+  ): Promise<void> {
+    const { error } = await supabase.rpc('restore_order_stock', { p_order_id: orderId });
+  
+    if (!error) return;
+  
+    if (!isMissingRpc(error)) {
+      console.warn('restore_order_stock RPC xatosi:', error.message);
+      return;
+    }
+  
+    console.warn('restore_order_stock RPC topilmadi — eski usulga fallback. Migratsiyani qo`llang.');
+  
+    const items = Array.isArray(rawItems) ? rawItems : [];
+    for (const item of items) {
+      const productId = Number((item as any)?.id ?? (item as any)?.productId);
+      const qty = Number((item as any)?.quantity);
+      if (!productId || !(qty > 0)) continue;
+  
+      const { data: prod } = await supabase
+        .from('products')
+        .select('stock')
+        .eq('id', productId)
+        .single();
+  
+      if (prod && typeof prod.stock === 'number') {
+        await supabase
+          .from('products')
+          .update({ stock: prod.stock + qty })
+          .eq('id', productId);
+      }
+    }
+  
+    // Ikki marta qaytarilmasligi uchun bayroqni tushiramiz.
+    await supabase.from('orders').update({ stock_reserved: false }).eq('id', orderId);
+  }

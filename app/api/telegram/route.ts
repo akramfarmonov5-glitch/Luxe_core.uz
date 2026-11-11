@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 
 export async function POST(req: NextRequest) {
-  const rateLimit = checkRateLimit(`telegram:${getClientIp(req)}`, 5, 60 * 1000);
+  const rateLimit = await checkRateLimit(`telegram:${getClientIp(req)}`, 5, 60 * 1000);
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
   }

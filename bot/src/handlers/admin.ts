@@ -98,6 +98,24 @@ async function restoreOrderStockIfNeeded(orderId: string) {
             return;
         }
 
+        // Atomar qaytarish: `restore_order_stock` bayroqni va qoldiqlarni bitta
+        // tranzaksiyada yangilaydi (migratsiya qo'llangan bo'lsa).
+        const { error: rpcError } = await supabase.rpc('restore_order_stock', { p_order_id: orderId });
+        if (!rpcError) {
+            return;
+        }
+
+        const functionMissing =
+            rpcError.code === 'PGRST202' ||
+            rpcError.code === '42883' ||
+            /could not find the function|function .* does not exist/i.test(rpcError.message || '');
+
+        if (!functionMissing) {
+            console.warn('restore_order_stock RPC xatosi:', rpcError.message);
+            return;
+        }
+
+        // Fallback: eski usul (RPC hali qo'llanmagan).
         for (const item of order.items) {
             const productId = Number(item.id ?? item.productId);
             const qty = Number(item.quantity);

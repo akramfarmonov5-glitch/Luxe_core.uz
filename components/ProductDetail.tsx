@@ -106,9 +106,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     if (!isLiked) {
-      showToast(`${getLocalizedText(product.name, lang)} ${t('product.wishlist_added')}`, 'success');
+      showToast(`${getLocalizedText(product.name, lang)} ${t('added_to_wishlist_desc')}`, 'success');
     } else {
-      showToast(`${getLocalizedText(product.name, lang)} ${t('product.wishlist_removed')}`, 'info');
+      showToast(`${getLocalizedText(product.name, lang)} ${t('removed_from_wishlist_desc')}`, 'info');
     }
   };
 
@@ -309,7 +309,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   <button
                     type="button"
                     onClick={handleToggleWishlist}
-                    aria-label={isLiked ? t('product.wishlist_removed') || 'Remove from wishlist' : t('product.wishlist_added') || 'Add to wishlist'}
+                    aria-label={isLiked ? t('removed_from_wishlist_desc') : t('added_to_wishlist_desc')}
                     className={`p-3 rounded-xl border transition-all ${isLiked ? 'bg-gold-400 border-gold-400 text-black' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/30'}`}
                   >
                     <Heart size={22} className={isLiked ? 'fill-black' : ''} />

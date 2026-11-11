@@ -2,8 +2,10 @@ import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, CheckCircle2, ShieldCheck, CreditCard, Truck, Send, Wallet, Banknote, X, Smartphone, ExternalLink, Ticket, Loader2 } from 'lucide-react';
-import { useCart } from '../context/CartContext';
+import { useCart, getWholesaleUnitPrice } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useGlobalData } from '../context/GlobalContext';
+import { getCategoryDisplayName } from '../lib/categoryUtils';
 import * as fpixel from '../lib/fpixel';
 import { trackBeginCheckout, trackPurchase as trackGaPurchase } from '../lib/analytics';
 import { useToast } from '../context/ToastContext';
@@ -23,6 +25,7 @@ const DELIVERY_FEE = 40_000;
 const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const { cart, cartTotal, clearCart } = useCart();
   const { session } = useAuth();
+  const { categories } = useGlobalData();
   const { showToast } = useToast();
   const { isDark } = useTheme();
   const { lang, t } = useLanguage();
@@ -73,8 +76,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
   const remainingForFreeDelivery = Math.max(0, FREE_DELIVERY_THRESHOLD - discountedSubtotal);
 
   const PAYNET_URL = "https://app.paynet.uz/?m=49156&i=4805742d-d76c-4b39-8c02-8ddf1c450f33&branchId=&actTypeId=144";
-  const PAYNET_QR_IMAGE = "/images/paynet-qr.jpg";
-  const QR_FALLBACK = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(PAYNET_URL)}&color=000000&bgcolor=ffffff`;
+  const PAYNET_QR_IMAGE = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(PAYNET_URL)}&color=000000&bgcolor=ffffff`;
 
   useEffect(() => {
     if (!hasTrackedCheckoutRef.current && cart.length > 0) {
@@ -426,21 +428,26 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className={`border rounded-2xl p-8 h-fit sticky top-28 ${isDark ? 'bg-dark-900 border-white/10' : 'bg-white border-light-border shadow-sm'}`}>
             <h3 className={`text-xl font-bold mb-6 ${isDark ? 'text-white' : 'text-light-text'}`}>{t('checkout_order_summary')}</h3>
             <div className="space-y-6 mb-8 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-              {cart.map((item) => (
+              {cart.map((item) => {
+                const effectiveUnit = getWholesaleUnitPrice(item.price, item.quantity);
+                const lineSubtotal = effectiveUnit * item.quantity;
+                const isPng = item.image?.toLowerCase().endsWith('.png');
+                return (
                 <div key={item.id} className="flex gap-4">
-                  <div className={`relative w-16 aspect-[4/5] rounded-lg overflow-hidden shrink-0 ${isDark ? 'bg-gray-800' : 'bg-light-card'}`}>
-                    <Image src={item.image} alt={getLocalizedText(item.name, lang)} fill sizes="64px" className="object-cover" />
+                  <div className={`relative w-16 aspect-[4/5] rounded-lg overflow-hidden shrink-0 ${isPng ? (isDark ? 'bg-neutral-800' : 'bg-stone-100') : (isDark ? 'bg-gray-800' : 'bg-light-card')}`}>
+                    <Image src={item.image} alt={getLocalizedText(item.name, lang)} fill sizes="64px" className={isPng ? 'object-contain p-1.5' : 'object-cover'} />
                   </div>
                   <div className="flex-1">
                     <h4 className={`text-sm font-medium ${isDark ? 'text-white' : 'text-light-text'}`}>{getLocalizedText(item.name, lang)}</h4>
-                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>{item.category}</p>
+                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>{getCategoryDisplayName(item.category, categories, lang)}</p>
                     <div className="flex justify-between mt-2">
                       <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-light-muted'}`}>x{item.quantity}</span>
-                      <span className="text-sm font-medium text-gold-400">{formatPrice(item.price * item.quantity)}</span>
+                      <span className="text-sm font-medium text-gold-400">{formatPrice(lineSubtotal)}</span>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             <div className={`space-y-3 pt-6 border-t ${isDark ? 'border-white/10' : 'border-light-border'}`}>
@@ -495,7 +502,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
           <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowPaynetModal(false)} className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
             <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-dark-900 border border-gold-400/30 rounded-3xl p-8 max-w-md w-full text-center shadow-[0_0_50px_rgba(251,191,36,0.1)] flex flex-col items-center">
-              <button onClick={() => setShowPaynetModal(false)} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white bg-white/5 rounded-full hover:bg-white/10 transition-colors">
+              <button type="button" aria-label="Close modal" onClick={() => setShowPaynetModal(false)} className="absolute top-4 right-4 p-2 text-gray-400 hover:text-white bg-white/5 rounded-full hover:bg-white/10 transition-colors">
                 <X size={20} />
               </button>
               <div className="w-16 h-16 bg-gold-400/10 rounded-full flex items-center justify-center mb-6 ring-1 ring-gold-400/30">
@@ -509,7 +516,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onBack }) => {
                 </p>
               )}
               <div className="p-4 bg-white rounded-2xl mb-6 shadow-xl">
-                <img src={PAYNET_QR_IMAGE} alt="Paynet QR Code" className="w-48 h-48 object-contain" onError={(e) => { e.currentTarget.src = QR_FALLBACK; }} />
+                <img src={PAYNET_QR_IMAGE} alt="Paynet QR Code" className="w-48 h-48 object-contain" />
               </div>
               <div className="flex flex-col gap-3 w-full">
                 <button onClick={() => createdOrderId && completeOrder(createdOrderId)} className="w-full bg-gold-400 text-black font-bold py-3.5 rounded-xl hover:bg-gold-500 transition-colors">{t('checkout_paynet_btn')}</button>

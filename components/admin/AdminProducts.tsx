@@ -28,7 +28,7 @@ import { requestGeminiJson } from '../../lib/geminiApi';
 import { getLocalizedText, parseLocalizedObject } from '../../lib/i18nUtils';
 import { getCategoryDisplayName, getCategorySlug, getProductCategoryKey } from '../../lib/categoryUtils';
 import { slugify } from '../../lib/slugify';
-import { mapProducts, mapCategories } from '../../lib/globalData';
+import { mapProducts, mapCategories } from '../../lib/dataMappers';
 
 interface AdminProductsProps {
   products: Product[];

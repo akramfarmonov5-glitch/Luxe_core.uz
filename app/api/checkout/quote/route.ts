@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const rateLimitKey = isTelegramBot
       ? `checkout-quote:telegram:${Number(telegramUserId)}`
       : `checkout-quote:${getClientIp(req)}`;
-    const rateLimit = checkRateLimit(rateLimitKey, isTelegramBot ? 60 : 30, 5 * 60 * 1000);
+    const rateLimit = await checkRateLimit(rateLimitKey, isTelegramBot ? 60 : 30, 5 * 60 * 1000);
     if (!rateLimit.allowed) {
       return NextResponse.json({ error: 'Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
     }

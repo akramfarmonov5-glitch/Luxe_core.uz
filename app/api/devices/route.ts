@@ -24,7 +24,7 @@ const MAX_DEVICE_INFO_LENGTH = 300;
 export async function POST(req: NextRequest) {
   // Service-role klient ishlatilgani uchun endpoint suiiste'molga ochiq edi:
   // endi IP bo'yicha rate-limit + qattiq validatsiya qo'llanadi.
-  const rateLimit = checkRateLimit(`devices:${getClientIp(req)}`, 10, 10 * 60 * 1000);
+  const rateLimit = await checkRateLimit(`devices:${getClientIp(req)}`, 10, 10 * 60 * 1000);
   if (!rateLimit.allowed) {
     return NextResponse.json({ error: 'Juda ko‘p urinish. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
   }

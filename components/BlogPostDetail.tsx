@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, User, Share2 } from 'lucide-react';
 import { BlogPost } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
 import { getLocalizedText } from '../lib/i18nUtils';
 
 interface BlogPostDetailProps {
@@ -12,7 +13,7 @@ interface BlogPostDetailProps {
   onBack: () => void;
 }
 
-function renderInlineContent(text: string) {
+function renderInlineContent(text: string, lang = 'uz') {
   const regex = /(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*)/g;
   const parts = text.split(regex);
 
@@ -53,7 +54,7 @@ function renderInlineContent(text: string) {
         return (
           <Link
             key={i}
-            href="https://luxe-core.uz/uz"
+            href={`/${lang}`}
             className="text-gold-400 hover:text-gold-300 underline font-semibold transition-colors"
           >
             LUXECORE (luxe-core.uz)
@@ -70,7 +71,7 @@ function renderInlineContent(text: string) {
   });
 }
 
-function renderMarkdownBlocks(content: string) {
+function renderMarkdownBlocks(content: string, lang = 'uz') {
   const blocks = content.split(/\n\s*\n/);
 
   return blocks.map((block, idx) => {
@@ -81,7 +82,7 @@ function renderMarkdownBlocks(content: string) {
       return (
         <h3 key={idx} className="text-xl md:text-2xl font-bold text-white mt-8 mb-4 flex items-center gap-2">
           <span className="w-1.5 h-6 bg-gold-400 rounded-full inline-block" />
-          <span>{renderInlineContent(trimmed.replace(/^###\s+/, ''))}</span>
+          <span>{renderInlineContent(trimmed.replace(/^###\s+/, ''), lang)}</span>
         </h3>
       );
     }
@@ -89,7 +90,7 @@ function renderMarkdownBlocks(content: string) {
     if (trimmed.startsWith('## ')) {
       return (
         <h2 key={idx} className="text-2xl md:text-3xl font-bold text-white mt-10 mb-5 border-b border-white/10 pb-2">
-          {renderInlineContent(trimmed.replace(/^##\s+/, ''))}
+          {renderInlineContent(trimmed.replace(/^##\s+/, ''), lang)}
         </h2>
       );
     }
@@ -104,7 +105,7 @@ function renderMarkdownBlocks(content: string) {
             return (
               <li key={lIdx} className="text-gray-300 leading-relaxed flex items-start gap-2">
                 <span className="text-gold-400 mt-1">•</span>
-                <span>{renderInlineContent(itemText)}</span>
+                <span>{renderInlineContent(itemText, lang)}</span>
               </li>
             );
           })}
@@ -114,7 +115,7 @@ function renderMarkdownBlocks(content: string) {
 
     return (
       <p key={idx} className="text-gray-300 text-base md:text-lg leading-relaxed mb-5">
-        {renderInlineContent(trimmed)}
+        {renderInlineContent(trimmed, lang)}
       </p>
     );
   });
@@ -123,6 +124,7 @@ function renderMarkdownBlocks(content: string) {
 const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
   const { lang } = useLanguage();
   const { isDark } = useTheme();
+  const { showToast } = useToast();
   const rawContent = getLocalizedText(post.content, lang);
 
   const handleShare = () => {
@@ -134,8 +136,8 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
           url: shareUrl,
         }).catch(() => {});
       } else {
-        navigator.clipboard.writeText(shareUrl);
-        alert("Maqola havolasi nusxalandi!");
+        navigator.clipboard?.writeText(shareUrl);
+        showToast(lang === 'ru' ? 'Ссылка на статью скопирована!' : lang === 'en' ? 'Article link copied!' : 'Maqola havolasi nusxalandi!', 'success');
       }
     }
   };
@@ -183,7 +185,7 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
         </div>
 
         <div className={`prose prose-lg max-w-none ${isDark ? 'prose-invert' : '[&_h2]:!text-gray-900 [&_h3]:!text-gray-900 [&_p]:!text-gray-700 [&_li]:!text-gray-700 [&_strong]:!text-gray-900'}`}>
-          {renderMarkdownBlocks(rawContent)}
+          {renderMarkdownBlocks(rawContent, lang)}
         </div>
 
         <div className={`mt-12 pt-8 border-t flex justify-between items-center ${isDark ? 'border-white/10' : 'border-light-border'}`}>

@@ -40,7 +40,10 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             root.classList.add('light');
             root.classList.remove('dark');
         }
-    }, [theme]);
+        // `mounted` ham dependency: aks holda saqlangan mavzu boshlang'ich
+        // qiymat bilan bir xil bo'lsa (`dark`), effekt qayta ishlamaydi va
+        // `.dark` klassi hujjatga qo'shilmay qoladi.
+    }, [theme, mounted]);
 
     const toggleTheme = () => {
         setTheme(prev => prev === 'dark' ? 'light' : 'dark');

@@ -4,7 +4,7 @@ import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 const TEXT_MODEL = process.env.GEMINI_TEXT_MODEL || 'gemini-2.5-flash';
 const TTS_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-2.5-flash-preview-tts';
 
-// ... Rate limiting and WAV header functions omitted for brevity in this step, but in practice I would copy them fully.
+/** 16-bit mono PCM ma'lumotiga WAV sarlavhasini qo'shish (TTS javobi uchun). */
 function createWavHeader(dataLength: number, sampleRate = 24000) {
   const buffer = Buffer.alloc(44);
   buffer.write('RIFF', 0);
@@ -25,7 +25,7 @@ function createWavHeader(dataLength: number, sampleRate = 24000) {
 
 export async function POST(req: NextRequest) {
   try {
-    const rateLimit = checkRateLimit(`gemini:${getClientIp(req)}`, 30, 5 * 60 * 1000);
+    const rateLimit = await checkRateLimit(`gemini:${getClientIp(req)}`, 30, 5 * 60 * 1000);
     if (!rateLimit.allowed) {
       return NextResponse.json({ error: 'Juda ko‘p so‘rov yuborildi. Birozdan keyin qayta urinib ko‘ring.' }, { status: 429 });
     }
