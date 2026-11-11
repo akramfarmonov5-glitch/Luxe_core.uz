@@ -8,27 +8,49 @@ import { SEO_LANGUAGES } from '../../../../lib/seoLanguage';
 import { loadApprovedProductReviews } from '../../../../lib/reviews';
 import type { Review } from '../../../../types';
 
-function resolveProductId(raw: string): string {
-  if (!isNaN(Number(raw))) return raw;
-  if (raw.includes('-')) {
-    const parts = raw.split('-');
-    return parts[parts.length - 1];
-  }
-  return raw;
+function resolveNumericProductId(raw: string): number | null {
+  if (/^\d+$/.test(raw)) return Number(raw);
+  const match = raw.match(/-(\d+)$/);
+  if (match) return Number(match[1]);
+  return null;
+}
+
+function toAbsoluteUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `${SITE_URL}${url.startsWith('/') ? url : `/${url}`}`;
 }
 
 async function loadProduct(rawId: string) {
-  const productId = resolveProductId(rawId);
-  // Mock data faqat Supabase sozlanmagan (lokal dev) muhitda ishlatiladi
-  if (!hasSupabaseCredentials) {
-    return MOCK_PRODUCTS.find((item) => item.id === Number(productId)) || null;
+  const numericId = resolveNumericProductId(rawId);
+
+  if (hasSupabaseCredentials) {
+    if (numericId !== null) {
+      const { data: product } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', numericId)
+        .maybeSingle();
+      if (product) return product;
+    }
+
+    const { data: bySlug } = await supabase
+      .from('products')
+      .select('*')
+      .ilike('slug', `%${rawId}%`)
+      .limit(1);
+    if (bySlug && bySlug.length > 0) return bySlug[0];
   }
-  const { data: product } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', productId)
-    .single();
-  return product || null;
+
+  return (
+    MOCK_PRODUCTS.find((item) => {
+      if (numericId !== null && item.id === numericId) return true;
+      const slugUz = getLocalizedText(item.slug, 'uz');
+      const slugRu = getLocalizedText(item.slug, 'ru');
+      const slugEn = getLocalizedText(item.slug, 'en');
+      return slugUz === rawId || slugRu === rawId || slugEn === rawId;
+    }) || null
+  );
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string, lang: string }> }) {
@@ -62,8 +84,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     }
     languages['x-default'] = languages.uz;
 
-    const ogImages = metadataProduct.image
-      ? [{ url: metadataProduct.image, alt: productName }]
+    const absImage = toAbsoluteUrl(metadataProduct.image);
+    const ogImages = absImage
+      ? [{ url: absImage, alt: productName }]
       : [];
 
     return {
@@ -85,7 +108,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         card: 'summary_large_image',
         title,
         description: productDesc,
-        images: metadataProduct.image ? [metadataProduct.image] : [],
+        images: absImage ? [absImage] : [],
       },
     };
   } catch (error) {
@@ -106,7 +129,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     '@context': 'https://schema.org/',
     '@type': 'Product',
     name: getLocalizedText(product.name, activeLang),
-    image: [product.image, ...(product.images || [])].filter(Boolean),
+    image: [product.image, ...(product.images || [])].map(toAbsoluteUrl).filter(Boolean),
     description: getLocalizedText(product.shortDescription || product.description || product.name, activeLang),
     sku: `LUXE-${product.id}`,
     brand: { '@type': 'Brand', name: 'LUXECORE' },

@@ -6,9 +6,16 @@ import { productSlug, slugify } from '../../../../lib/slugify';
 import { getLocalizedText } from '../../../../lib/i18nUtils';
 import { useTheme } from '../../../../context/ThemeContext';
 
+const CATEGORY_SLUG_ALIASES: Record<string, string> = {
+  'toy-va-sarpo': 'toy-qutilari',
+  'kraft-va-zip-lock': 'kraft-zip-paketlar',
+  'horeca-idishlar': 'horeca-xojalik',
+};
+
 export default function CategoryClient() {
   const params = useParams();
-  const slug = String(params?.slug || '');
+  const rawSlug = String(params?.slug || '');
+  const slug = CATEGORY_SLUG_ALIASES[rawSlug] || rawSlug;
   const lang = String(params?.lang || 'uz');
   const { products, categories, isLoading } = useGlobalData();
   const { isDark } = useTheme();

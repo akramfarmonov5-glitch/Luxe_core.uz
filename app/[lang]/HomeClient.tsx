@@ -35,22 +35,22 @@ export default function HomePage({ featuredReviews = [] }: HomePageProps) {
       ? [
           { label: 'Новогодняя упаковка 2027 оптом', href: '/ru/category/yangi-yil-2027' },
           { label: 'Подарки на Новый год 2027', href: '/ru/category/yangi-yil-2027' },
-          { label: 'Свадебные коробки и Сарпо оптом', href: '/ru/category/toy-va-sarpo' },
+          { label: 'Свадебные коробки и Сарпо оптом', href: '/ru/category/toy-qutilari' },
           { label: 'Подарочные коробки оптом', href: '/ru/category/sovga-qutilari' },
-          { label: 'Крафт и Zip-Lock пакеты оптом', href: '/ru/category/kraft-va-zip-lock' },
+          { label: 'Крафт и Zip-Lock пакеты оптом', href: '/ru/category/kraft-zip-paketlar' },
           { label: 'БОПП пакеты и упаковка', href: '/ru/category/bopp-paketlar' },
-          { label: 'Одноразовая посуда и HoReCa оптом', href: '/ru/category/horeca-idishlar' },
-          { label: 'Упаковочные материалы Урикзор', href: '/ru' },
+          { label: 'Одноразовая посуда и HoReCa оптом', href: '/ru/category/horeca-xojalik' },
+          { label: 'Весь оптовый каталог Урикзор', href: '/ru/catalog' },
         ]
       : [
           { label: 'Yangi yil uchun qutilar 2027 optom', href: `/${lang}/category/yangi-yil-2027` },
           { label: '2027 yil sovg\'a qutilari', href: `/${lang}/category/yangi-yil-2027` },
-          { label: 'To\'y va Sarpo qutilari optom', href: `/${lang}/category/toy-va-sarpo` },
+          { label: 'To\'y va Sarpo qutilari optom', href: `/${lang}/category/toy-qutilari` },
           { label: 'Sovg\'a qutilari ulgurji', href: `/${lang}/category/sovga-qutilari` },
-          { label: 'Paketlar va Qadoqlash (Kraft, Zip-Lock)', href: `/${lang}/category/kraft-va-zip-lock` },
+          { label: 'Paketlar va Qadoqlash (Kraft, Zip-Lock)', href: `/${lang}/category/kraft-zip-paketlar` },
           { label: 'BOPP selofan paketlar optom', href: `/${lang}/category/bopp-paketlar` },
-          { label: 'Bir martalik idishlar va HoReCa optom', href: `/${lang}/category/horeca-idishlar` },
-          { label: 'O\'rikzor optom qadoqlash bozori', href: `/${lang}` },
+          { label: 'Bir martalik idishlar va HoReCa optom', href: `/${lang}/category/horeca-xojalik` },
+          { label: 'O\'rikzor optom katalog', href: `/${lang}/catalog` },
         ];
 
   const handleCategorySelect = (categoryName: string) => {

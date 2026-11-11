@@ -57,14 +57,20 @@ const handleAddToCart = (e: React.MouseEvent) => {
           e.preventDefault();
           onNavigate();
         }}
-        className="relative aspect-[4/5] w-full overflow-hidden bg-gray-900 cursor-pointer block"
+        className={`relative aspect-[4/5] w-full overflow-hidden cursor-pointer block ${
+          product.image?.toLowerCase().endsWith('.png')
+            ? isDark
+              ? 'bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900'
+              : 'bg-gradient-to-br from-stone-100 to-amber-50/40'
+            : 'bg-gray-900'
+        }`}
       >
         <Image
           src={product.image}
           alt={getLocalizedText(product.name, lang)}
           fill
           sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
+          className={`${product.image?.toLowerCase().endsWith('.png') ? 'object-contain p-3' : 'object-cover'} transition-transform duration-700 group-hover:scale-110`}
         />
 
         {/* Badges */}

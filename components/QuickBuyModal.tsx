@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { Product } from '../types';
 import { useTheme } from '../context/ThemeContext';
+import { getWholesaleUnitPrice } from '../context/CartContext';
 import * as fpixel from '../lib/fpixel';
 import { trackQuickPurchase } from '../lib/analytics';
 import { useLanguage } from '../context/LanguageContext';
@@ -54,7 +55,9 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
     setSelectedQty(quantity > 1 ? quantity : (product.itemsPerPackage || 100));
   }, [quantity, product.itemsPerPackage]);
 
-  const total = product.price * selectedQty;
+  const unitPrice = getWholesaleUnitPrice(product.price, selectedQty);
+  const total = unitPrice * selectedQty;
+  const tierDiscountPct = selectedQty >= 1000 ? 10 : selectedQty >= 500 ? 5 : 0;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('uz-UZ').format(price) + ' UZS';
@@ -107,7 +110,7 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
       }
 
       fpixel.trackPurchase(data.orderId, Number(data.total || total), [product.id.toString()], 'UZS');
-      trackQuickPurchase(data.orderId, product, quantity, Number(data.total || total), lang);
+      trackQuickPurchase(data.orderId, product, selectedQty, Number(data.total || total), lang);
       setIsSuccess(true);
 
       setTimeout(() => {
@@ -160,11 +163,18 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
               <>
                 <div className={`flex gap-4 p-4 rounded-xl mb-6 ${isDark ? 'bg-white/5 border border-white/5' : 'bg-gray-50 border border-gray-100'}`}>
                   <div className="relative w-16 aspect-[4/5] rounded-lg bg-gray-800 shrink-0 overflow-hidden">
-                    <Image src={product.image} alt={getLocalizedText(product.name, lang)} fill sizes="64px" className="object-cover" />
+                    <Image src={product.image} alt={getLocalizedText(product.name, lang)} fill sizes="64px" className={product.image?.toLowerCase().endsWith('.png') ? 'object-contain p-1' : 'object-cover'} />
                   </div>
                   <div>
                     <h3 className={`font-medium text-sm line-clamp-1 ${isDark ? 'text-white' : 'text-light-text'}`}>{getLocalizedText(product.name, lang)}</h3>
-                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>Narxi: {formatPrice(product.price)} / dona</p>
+                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
+                      Narxi: {formatPrice(unitPrice)} / dona
+                      {tierDiscountPct > 0 && (
+                        <span className="ml-1.5 px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 font-bold text-[10px]">
+                          -{tierDiscountPct}% ulgurji
+                        </span>
+                      )}
+                    </p>
                     <p className="text-gold-400 font-bold mt-1 max-w-full truncate">Jami: {formatPrice(total)} ({selectedQty} dona)</p>
                   </div>
                 </div>

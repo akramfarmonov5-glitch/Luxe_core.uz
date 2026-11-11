@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, Box, Activity, Zap, PlayCircle, X, Youtube, ExternalLink, ArrowRight, Heart, Play, Share2 } from 'lucide-react';
 import { Category, Product } from '../types';
@@ -34,8 +35,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
   const { showToast } = useToast();
   const { isDark } = useTheme();
   const { lang, t } = useLanguage();
-  const [aiDescription, setAiDescription] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
+  const router = useRouter();
+  const initialDesc = getLocalizedText(product.shortDescription, lang);
+  const [aiDescription, setAiDescription] = useState<string>(initialDesc);
+  const [loading, setLoading] = useState<boolean>(!initialDesc);
   const [activeImage, setActiveImage] = useState<string>(product.image);
   const [showVideo, setShowVideo] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -67,24 +70,25 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
     });
     trackViewItem(product, lang);
 
-    const fallbackDesc = getLocalizedText(product.shortDescription, lang) || "Eksklyuziv dizayn va yuqori sifat uyg'unligi. Ushbu mahsulot sizning stilingizni yangi darajaga olib chiqadi.";
+    const existingDesc = getLocalizedText(product.shortDescription, lang);
+    if (existingDesc && existingDesc.trim().length > 10) {
+      setAiDescription(existingDesc);
+      setLoading(false);
+      return;
+    }
+
+    const fallbackDesc = "Eksklyuziv dizayn va yuqori sifat uyg'unligi. Toshkent O'rikzor omboridan ulgurji narxda 100 donadan boshlab yetkazib beriladi.";
 
     const generateAIDescription = async () => {
-      // Create an AbortController for timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-
       try {
-        const languageName = lang === 'uz' ? 'Uzbek (Cyrillic or Latin as common)' : lang === 'ru' ? 'Russian' : 'English';
+        const languageName = lang === 'uz' ? 'Uzbek Latin script' : lang === 'ru' ? 'Russian' : 'English';
         const text = await requestGeminiText({
           systemInstruction: 'You write concise, compelling product copy for wholesale gift boxes, packaging and bag supplies.',
           message: `Write a short, practical, and persuasive product description for a wholesale packaging item named "${getLocalizedText(product.name, 'uz')}" in the "${getCategoryDisplayName(product.category, categories, 'uz')}" category. The description must be in ${languageName}. Emphasize quality, business suitability, and wholesale bulk availability. Keep it within 3 sentences.`,
         });
-        clearTimeout(timeoutId);
 
         setAiDescription(text || fallbackDesc);
       } catch (error) {
-        clearTimeout(timeoutId);
         setAiDescription(fallbackDesc);
       } finally {
         setLoading(false);
@@ -166,7 +170,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
           <Breadcrumbs
             onHomeClick={onBack}
             items={[
-              { label: getCategoryDisplayName(product.category, categories, lang), onClick: onBack },
+              {
+                label: getCategoryDisplayName(product.category, categories, lang),
+                onClick: () => router.push(`/${lang}/category/${productCategoryKey}`),
+              },
               { label: getLocalizedText(product.name, lang), active: true }
             ]}
           />
@@ -180,7 +187,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
             className="lg:col-span-6"
           >
             <div className="sticky top-24 md:top-28 space-y-3">
-              <div className="aspect-[4/5] w-full rounded-2xl md:rounded-3xl overflow-hidden border border-white/5 shadow-2xl bg-dark-800 relative group">
+              <div className={`aspect-[4/5] w-full rounded-2xl md:rounded-3xl overflow-hidden border shadow-2xl relative group ${
+                activeImage.toLowerCase().endsWith('.png')
+                  ? isDark
+                    ? 'border-white/10 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900'
+                    : 'border-light-border bg-gradient-to-br from-stone-100 to-amber-50/40'
+                  : 'border-white/5 bg-dark-800'
+              }`}>
                 <div className="absolute -inset-1 bg-gradient-to-r from-gold-500/20 to-purple-500/20 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
                 <Image
                   src={activeImage}
@@ -188,7 +201,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   fill
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
-                  className="object-cover z-10 transition-opacity duration-300"
+                  className={`${activeImage.toLowerCase().endsWith('.png') ? 'object-contain p-4' : 'object-cover'} z-10 transition-opacity duration-300`}
                 />
 
                 {hasVideo && (

@@ -110,14 +110,19 @@ async function sendProductPostToChannel(token: string, botUsername: string, prod
     inline_keyboard: inlineKeyboard,
   };
 
+  const toFullImageUrl = (u: any): string => {
+    if (typeof u !== 'string') return '';
+    const trimmed = u.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+    if (trimmed.startsWith('/')) return `${SITE_URL}${trimmed}`;
+    return '';
+  };
+
   const images: string[] = Array.isArray(product.images)
-    ? product.images.filter((u: any) => typeof u === 'string' && u.trim().startsWith('http'))
+    ? product.images.map(toFullImageUrl).filter(Boolean)
     : [];
-  const mainImage =
-    images[0] ||
-    (typeof product.image === 'string' && product.image.trim().startsWith('http')
-      ? product.image.trim()
-      : '');
+  const mainImage = images[0] || toFullImageUrl(product.image);
 
   if (mainImage) {
     await postTelegramMessage(token, {

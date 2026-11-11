@@ -6,6 +6,7 @@ import ProductDetail from '../../../../components/ProductDetail';
 import { useRouter, useParams } from 'next/navigation';
 import { ProductDetailSkeleton } from '../../../../components/Skeleton';
 import { productSlug } from '../../../../lib/slugify';
+import { getLocalizedText } from '../../../../lib/i18nUtils';
 
 export default function ProductClient({ id }: { id: string }) {
   const { products, categories, isLoading } = useGlobalData();
@@ -13,13 +14,15 @@ export default function ProductClient({ id }: { id: string }) {
   const params = useParams();
   const lang = String(params?.lang || 'uz');
 
-  let productId = id;
-  if (isNaN(Number(id)) && id.includes('-')) {
-    const parts = id.split('-');
-    productId = parts[parts.length - 1];
-  }
+  const numericMatch = /^\d+$/.test(id) ? Number(id) : id.match(/-(\d+)$/)?.[1] ? Number(id.match(/-(\d+)$/)![1]) : null;
 
-  const product = products.find((p) => p.id === Number(productId));
+  const product = products.find((p) => {
+    if (numericMatch !== null && p.id === numericMatch) return true;
+    const slugUz = getLocalizedText(p.slug, 'uz');
+    const slugRu = getLocalizedText(p.slug, 'ru');
+    const slugEn = getLocalizedText(p.slug, 'en');
+    return slugUz === id || slugRu === id || slugEn === id || productSlug(p, lang) === id;
+  });
 
   useEffect(() => {
     if (!product || typeof window === 'undefined') return;

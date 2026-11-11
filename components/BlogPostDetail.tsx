@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Share2 } from 'lucide-react';
 import { BlogPost } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
 import { getLocalizedText } from '../lib/i18nUtils';
 
 interface BlogPostDetailProps {
@@ -121,6 +122,7 @@ function renderMarkdownBlocks(content: string) {
 
 const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
   const { lang } = useLanguage();
+  const { isDark } = useTheme();
   const rawContent = getLocalizedText(post.content, lang);
 
   const handleShare = () => {
@@ -139,11 +141,11 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
   };
 
   return (
-    <div className="pt-24 pb-20 min-h-screen bg-black text-white">
+    <div className={`pt-24 pb-20 min-h-screen transition-colors duration-300 ${isDark ? 'bg-black text-white' : 'bg-light-bg text-light-text'}`}>
       <article className="container mx-auto px-4 md:px-6 max-w-4xl">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors"
+          className={`flex items-center gap-2 mb-8 transition-colors ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}`}
         >
           <ArrowLeft size={18} />
           <span>Ortga qaytish</span>
@@ -151,27 +153,27 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
 
         <div className="mb-8">
           <span className="text-gold-400 text-xs font-bold uppercase tracking-widest mb-3 block">B2B Ulgurji Blog</span>
-          <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-6">
+          <h1 className={`text-3xl md:text-5xl font-bold leading-tight mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}>
             {getLocalizedText(post.title, lang)}
           </h1>
 
-          <div className="flex items-center gap-6 text-sm text-gray-400 border-b border-white/10 pb-8">
+          <div className={`flex items-center gap-6 text-sm border-b pb-8 ${isDark ? 'text-gray-400 border-white/10' : 'text-gray-600 border-light-border'}`}>
             <div className="flex items-center gap-2">
               <Calendar size={16} />
               <span>{post.date}</span>
             </div>
             <div className="flex items-center gap-2">
               <User size={16} />
-              <Link href="https://luxe-core.uz/uz" className="hover:text-gold-400 transition-colors">
+              <Link href={`/${lang}`} className="hover:text-gold-400 transition-colors">
                 LUXECORE (luxe-core.uz) — O'rikzor Ombori
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="relative aspect-video w-full rounded-2xl overflow-hidden mb-10 bg-zinc-900 border border-white/10">
+        <div className={`relative aspect-video w-full rounded-2xl overflow-hidden mb-10 border ${isDark ? 'bg-zinc-900 border-white/10' : 'bg-gray-100 border-light-border'}`}>
           <Image
-            src={post.image}
+            src={post.image || '/logo.jpg'}
             alt={getLocalizedText(post.title, lang)}
             fill
             sizes="(max-width: 768px) 100vw, 768px"
@@ -180,11 +182,11 @@ const BlogPostDetail: React.FC<BlogPostDetailProps> = ({ post, onBack }) => {
           />
         </div>
 
-        <div className="prose prose-invert prose-lg max-w-none">
+        <div className={`prose prose-lg max-w-none ${isDark ? 'prose-invert' : '[&_h2]:!text-gray-900 [&_h3]:!text-gray-900 [&_p]:!text-gray-700 [&_li]:!text-gray-700 [&_strong]:!text-gray-900'}`}>
           {renderMarkdownBlocks(rawContent)}
         </div>
 
-        <div className="mt-12 pt-8 border-t border-white/10 flex justify-between items-center">
+        <div className={`mt-12 pt-8 border-t flex justify-between items-center ${isDark ? 'border-white/10' : 'border-light-border'}`}>
           <p className="text-gray-500 italic">O'qiganingiz uchun rahmat. B2B savdo va ulgurji narxlar uchun LUXECORE (luxe-core.uz) ga murojaat qiling.</p>
           <button
             onClick={handleShare}

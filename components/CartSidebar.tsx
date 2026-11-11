@@ -5,7 +5,9 @@ import { X, Plus, Minus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { useCart, getWholesaleUnitPrice } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useGlobalData } from '../context/GlobalContext';
 import { getLocalizedText } from '../lib/i18nUtils';
+import { getCategoryDisplayName } from '../lib/categoryUtils';
 
 const FREE_DELIVERY_THRESHOLD = 2_000_000;
 const DELIVERY_FEE = 40_000;
@@ -16,6 +18,7 @@ interface CartSidebarProps {
 
 const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
   const { cart, isCartOpen, toggleCart, closeCart, removeFromCart, updateQuantity, cartTotal, wholesaleSavings } = useCart();
+  const { categories } = useGlobalData();
   const { isDark } = useTheme();
   const { lang, t } = useLanguage();
   const deliveryFee = cartTotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
@@ -92,8 +95,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                     animate={{ opacity: 1, y: 0 }}
                     className="flex gap-4 group"
                   >
-                    <div className="relative w-24 aspect-[4/5] rounded-xl overflow-hidden bg-gray-800 border border-white/5 shrink-0">
-                      <Image src={item.image} alt={getLocalizedText(item.name, lang)} fill sizes="96px" className="object-cover" />
+                    <div className={`relative w-24 aspect-[4/5] rounded-xl overflow-hidden border border-white/5 shrink-0 ${item.image?.toLowerCase().endsWith('.png') ? (isDark ? 'bg-neutral-800' : 'bg-stone-100') : 'bg-gray-800'}`}>
+                      <Image src={item.image} alt={getLocalizedText(item.name, lang)} fill sizes="96px" className={item.image?.toLowerCase().endsWith('.png') ? 'object-contain p-1.5' : 'object-cover'} />
                     </div>
                     <div className="flex-1 flex flex-col justify-between py-1">
                       <div>
@@ -106,7 +109,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                             <Trash2 size={16} />
                           </button>
                         </div>
-                        <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>{getLocalizedText(item.category, lang)}</p>
+                        <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>{getCategoryDisplayName(item.category, categories, lang)}</p>
                       </div>
 
                       <div className="flex items-end justify-between">

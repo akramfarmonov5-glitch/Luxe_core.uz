@@ -51,6 +51,8 @@ export async function GET() {
     let urls = '';
 
     urls += renderLocalizedUrl('/', today, 'daily', '1.0');
+    urls += renderLocalizedUrl('/catalog', today, 'daily', '0.9');
+    urls += renderLocalizedUrl('/blog', today, 'weekly', '0.8');
     urls += renderLocalizedUrl('/delivery', today, 'monthly', '0.5');
     urls += renderLocalizedUrl('/returns', today, 'monthly', '0.5');
     urls += renderLocalizedUrl('/faq', today, 'monthly', '0.5');
@@ -109,16 +111,23 @@ export async function GET() {
   }
 }
 
+function toAbsoluteImageUrl(img: string | undefined): string {
+  if (!img) return '';
+  if (img.startsWith('http://') || img.startsWith('https://')) return img;
+  return `${BASE_URL}${img.startsWith('/') ? img : `/${img}`}`;
+}
+
 function renderLocalizedUrl(path: string, lastmod: string, changefreq: string, priority: string, imageData: SitemapImageData = {}) {
+  const absImg = toAbsoluteImageUrl(imageData.image);
   return LANGUAGES.map((lang) => {
     const loc = localizedUrl(path, lang);
     const alternates = LANGUAGES.map((altLang) =>
       `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${localizedUrl(path, altLang)}" />`
     ).join('\n');
     const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${localizedUrl(path, 'uz')}" />`;
-    const image = imageData.image ? `
+    const image = absImg ? `
     <image:image>
-      <image:loc>${escapeXml(imageData.image)}</image:loc>
+      <image:loc>${escapeXml(absImg)}</image:loc>
       <image:title>${escapeXml(imageData.imageTitle || '')}</image:title>${imageData.imageCaption ? `
       <image:caption>${escapeXml(imageData.imageCaption)}</image:caption>` : ''}
     </image:image>` : '';
@@ -136,15 +145,16 @@ ${xDefault}
 }
 
 function renderLocalizedCategoryUrl(category: any, lastmod: string, changefreq: string, priority: string, imageData: SitemapImageData = {}) {
+  const absImg = toAbsoluteImageUrl(imageData.image);
   return LANGUAGES.map((lang) => {
     const loc = localizedUrl(`/category/${getCategorySlug(category, lang)}`, lang);
     const alternates = LANGUAGES.map((altLang) =>
       `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${localizedUrl(`/category/${getCategorySlug(category, altLang)}`, altLang)}" />`
     ).join('\n');
     const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${localizedUrl(`/category/${getCategorySlug(category, 'uz')}`, 'uz')}" />`;
-    const image = imageData.image ? `
+    const image = absImg ? `
     <image:image>
-      <image:loc>${escapeXml(imageData.image)}</image:loc>
+      <image:loc>${escapeXml(absImg)}</image:loc>
       <image:title>${escapeXml(imageData.imageTitle || '')}</image:title>${imageData.imageCaption ? `
       <image:caption>${escapeXml(imageData.imageCaption)}</image:caption>` : ''}
     </image:image>` : '';
@@ -162,6 +172,7 @@ ${xDefault}
 }
 
 function renderLocalizedEntityUrl(entityType: string, entity: any, lastmod: string, changefreq: string, priority: string, imageData: SitemapImageData = {}) {
+  const absImg = toAbsoluteImageUrl(imageData.image);
   return LANGUAGES.map((lang) => {
     const path = `/${entityType}/${getEntitySlug(entityType, entity, lang)}`;
     const loc = localizedUrl(path, lang);
@@ -169,9 +180,9 @@ function renderLocalizedEntityUrl(entityType: string, entity: any, lastmod: stri
       `    <xhtml:link rel="alternate" hreflang="${altLang}" href="${localizedUrl(`/${entityType}/${getEntitySlug(entityType, entity, altLang)}`, altLang)}" />`
     ).join('\n');
     const xDefault = `    <xhtml:link rel="alternate" hreflang="x-default" href="${localizedUrl(`/${entityType}/${getEntitySlug(entityType, entity, 'uz')}`, 'uz')}" />`;
-    const image = imageData.image ? `
+    const image = absImg ? `
     <image:image>
-      <image:loc>${escapeXml(imageData.image)}</image:loc>
+      <image:loc>${escapeXml(absImg)}</image:loc>
       <image:title>${escapeXml(imageData.imageTitle || '')}</image:title>${imageData.imageCaption ? `
       <image:caption>${escapeXml(imageData.imageCaption)}</image:caption>` : ''}
     </image:image>` : '';
@@ -230,14 +241,17 @@ function escapeXml(str: string) {
 
 function getFallbackProducts() {
   return [
-    { id: 1, name: { uz: 'Midnight Chronograph', ru: 'Midnight Chronograph', en: 'Midnight Chronograph' }, category: 'soatlar', image: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=1000&auto=format&fit=crop', shortDescription: { uz: 'Eksklyuziv premium soat.', ru: 'Eksklyuziv premium soat.', en: 'Exclusive premium watch.' } },
+    { id: 101, name: { uz: "Yangi yil 2027 sovg'a paketi", ru: 'Новогодний подарочный пакет 2027', en: 'New Year 2027 Gift Bag' }, category: 'yangi-yil-2027', image: `${BASE_URL}/products/yangi-yil/yangi-yil-karobkalar-optom-1.png`, shortDescription: { uz: "Toshkent O'rikzor omboridan ulgurji sovg'a paketi.", ru: 'Новогодний пакет оптом со склада Урикзор.', en: 'Wholesale holiday gift bag.' } },
   ];
 }
 
 function getFallbackCategories() {
   return [
-    { slug: 'soatlar', name: { uz: 'Soatlar', ru: 'Soatlar', en: 'Watches' } },
-    { slug: 'sumkalar', name: { uz: 'Sumkalar', ru: 'Sumkalar', en: 'Bags' } },
-    { slug: 'parfyumeriya', name: { uz: 'Parfyumeriya', ru: 'Parfyumeriya', en: 'Perfume' } },
+    { slug: 'yangi-yil-2027', name: { uz: 'Yangi Yil 2027 Qutilari', ru: 'Новогодняя упаковка 2027', en: 'New Year 2027 Boxes' } },
+    { slug: 'toy-qutilari', name: { uz: "To'y va Sarpo Qutilari", ru: 'Свадебные коробки и сарпо', en: 'Wedding & Sarpo Boxes' } },
+    { slug: 'sovga-qutilari', name: { uz: "Bayram va Sovg'a Qutilari", ru: 'Подарочные коробки', en: 'Gift Boxes' } },
+    { slug: 'kraft-zip-paketlar', name: { uz: 'Kraft va Zip-Lock Paketlar', ru: 'Крафт и Zip-Lock пакеты', en: 'Kraft & Zip-Lock Bags' } },
+    { slug: 'bopp-paketlar', name: { uz: 'BOPP va Qadoqlash Paketlari', ru: 'БОПП пакеты', en: 'BOPP Bags' } },
+    { slug: 'horeca-xojalik', name: { uz: "HoReCa va Xo'jalik Ulgurji", ru: 'HoReCa и одноразовая посуда', en: 'HoReCa Supplies' } },
   ];
 }

@@ -9,6 +9,14 @@ function cleanMd(text: string): string {
     return String(text || '').replace(/[*_`\[\]]/g, '');
 }
 
+function resolveBotImageUrl(img?: string): string {
+    const raw = String(img || '').trim();
+    if (!raw) return 'https://via.placeholder.com/400';
+    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+    const base = (config.SITE_URL || 'https://luxe-core.uz').replace(/\/+$/, '');
+    return `${base}${raw.startsWith('/') ? raw : `/${raw}`}`;
+}
+
 async function fetchProductsByCategorySlug(slug: string) {
     const [{ data: allProducts, error }, { data: categories }] = await Promise.all([
         supabase.from('products').select('*').order('created_at', { ascending: false }),
@@ -168,12 +176,13 @@ export async function sendProductCard(
 
     // Check if product has multiple images
     const hasMultipleImages = p.images && Array.isArray(p.images) && p.images.length > 1;
+    const mainPhotoUrl = resolveBotImageUrl(p.image);
 
     if (hasMultipleImages && !edit) {
         // Send media gallery (first time only)
         const mediaGroup = p.images.slice(0, 4).map((img: string, i: number) => ({
             type: 'photo' as const,
-            media: img,
+            media: resolveBotImageUrl(img),
             caption: i === 0 ? caption : undefined,
             parse_mode: i === 0 ? 'Markdown' as const : undefined,
         }));
@@ -187,7 +196,7 @@ export async function sendProductCard(
             });
         } catch {
             // Fallback to single photo
-            await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {
+            await ctx.replyWithPhoto(mainPhotoUrl, {
                 caption,
                 parse_mode: 'Markdown',
                 reply_markup: kb,
@@ -198,20 +207,20 @@ export async function sendProductCard(
             if (ctx.callbackQuery.message.photo) {
                 await ctx.editMessageMedia({
                     type: 'photo',
-                    media: p.image || 'https://via.placeholder.com/400',
+                    media: mainPhotoUrl,
                     caption,
                     parse_mode: 'Markdown',
                 }, { reply_markup: kb });
             } else {
                 await ctx.deleteMessage();
-                await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {
+                await ctx.replyWithPhoto(mainPhotoUrl, {
                     caption,
                     parse_mode: 'Markdown',
                     reply_markup: kb,
                 });
             }
         } catch {
-            await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {
+            await ctx.replyWithPhoto(mainPhotoUrl, {
                 caption,
                 parse_mode: 'Markdown',
                 reply_markup: kb,
@@ -219,7 +228,7 @@ export async function sendProductCard(
         }
     } else {
         try {
-            await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {
+            await ctx.replyWithPhoto(mainPhotoUrl, {
                 caption,
                 parse_mode: 'Markdown',
                 reply_markup: kb,

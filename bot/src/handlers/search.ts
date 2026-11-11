@@ -77,8 +77,15 @@ export async function handleSearchQuery(ctx: Context) {
                 .row()
                 .url(t(userId, 'btn_view_site'), productUrl);
 
+            const rawImg = String(p.image || '').trim();
+            const photoUrl = rawImg.startsWith('http://') || rawImg.startsWith('https://')
+                ? rawImg
+                : rawImg
+                ? `${(config.SITE_URL || 'https://luxe-core.uz').replace(/\/+$/, '')}${rawImg.startsWith('/') ? rawImg : `/${rawImg}`}`
+                : 'https://via.placeholder.com/400';
+
             try {
-                await ctx.replyWithPhoto(p.image || 'https://via.placeholder.com/400', {
+                await ctx.replyWithPhoto(photoUrl, {
                     caption,
                     parse_mode: 'Markdown',
                     reply_markup: kb,

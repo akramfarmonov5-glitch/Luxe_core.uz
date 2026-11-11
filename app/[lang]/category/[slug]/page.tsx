@@ -7,11 +7,22 @@ import { SEO_LANGUAGES } from '../../../../lib/seoLanguage';
 import { slugify, productSlug } from '../../../../lib/slugify';
 import type { Category, Product } from '../../../../types';
 
+const CATEGORY_SLUG_ALIASES: Record<string, string> = {
+  'toy-va-sarpo': 'toy-qutilari',
+  'kraft-va-zip-lock': 'kraft-zip-paketlar',
+  'horeca-idishlar': 'horeca-xojalik',
+};
+
+function normalizeCategorySlugInput(slug: string): string {
+  return CATEGORY_SLUG_ALIASES[slug] || slug;
+}
+
 function getCategorySlug(category: Category, lang: string): string {
   return getLocalizedText(category.slug, lang) || slugify(getLocalizedText(category.name, lang));
 }
 
-function findCategoryBySlug(slug: string, categories: Category[]): Category | undefined {
+function findCategoryBySlug(rawSlug: string, categories: Category[]): Category | undefined {
+  const slug = normalizeCategorySlugInput(rawSlug);
   return categories.find((cat) => {
     const slugs = SEO_LANGUAGES.map((l) => getCategorySlug(cat, l));
     return slugs.includes(slug) || slugify(getLocalizedText(cat.name, 'uz')) === slug;

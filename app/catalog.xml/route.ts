@@ -44,13 +44,18 @@ export async function GET() {
       product.googleProductCategory ||
       'Office Supplies > General Office Supplies > Paper Products';
 
+    const rawImg = String(product.image || '');
+    const imageLink = rawImg.startsWith('http://') || rawImg.startsWith('https://')
+      ? rawImg
+      : `${BASE_URL}${rawImg.startsWith('/') ? rawImg : `/${rawImg}`}`;
+
     return `
     <item>
       <g:id>${product.id}</g:id>
       <g:title><![CDATA[${getLocalizedText(product.name, 'uz')}]]></g:title>
       <g:description><![CDATA[${getLocalizedText(product.shortDescription || product.description || product.name, 'uz')}]]></g:description>
       <g:link>${BASE_URL}/uz/product/${productSlug(product, 'uz')}</g:link>
-      <g:image_link>${product.image}</g:image_link>
+      <g:image_link>${escapeXml(imageLink)}</g:image_link>
       <g:brand>LUXECORE (luxe-core.uz)</g:brand>
       <g:condition>new</g:condition>
       <g:availability>${(product.stock && product.stock > 0) ? 'in stock' : 'out of stock'}</g:availability>

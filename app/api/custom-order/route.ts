@@ -36,11 +36,13 @@ export async function POST(req: NextRequest) {
 
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
-      await supabase.from('chat_leads').insert([
+      await supabase.from('leads').insert([
         {
+          id: `lead_${Date.now()}`,
           name: `${name} (Logotip B2B)`,
           phone,
           last_message: `Logotip tushirish: ${packageType} | Tiraj: ${quantity}${notes ? ` | Izoh: ${notes}` : ''}`,
+          created_at: new Date().toISOString(),
         },
       ]);
     }

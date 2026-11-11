@@ -25,7 +25,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick, isLoading }) =>
   if (!isLoading && displayPosts.length === 0) return null;
 
   return (
-    <section className={`py-20 border-t transition-colors duration-300 ${isDark ? 'bg-dark-900 border-white/5' : 'bg-light-card border-light-border'}`}>
+    <section id="blog-section" className={`py-20 border-t scroll-mt-20 transition-colors duration-300 ${isDark ? 'bg-dark-900 border-white/5' : 'bg-light-card border-light-border'}`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12">
           <div className="space-y-2">
@@ -36,9 +36,9 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick, isLoading }) =>
               {t('blog_subtitle')}
             </h2>
           </div>
-          <button className={`hidden md:flex items-center gap-2 hover:text-gold-400 transition-colors text-sm font-medium ${isDark ? 'text-white' : 'text-light-text'}`}>
+          <Link href={`/${lang}/blog`} className={`hidden md:flex items-center gap-2 hover:text-gold-400 transition-colors text-sm font-medium ${isDark ? 'text-white' : 'text-light-text'}`}>
             {t('all_articles')} <ArrowRight size={16} />
-          </button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
