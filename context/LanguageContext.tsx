@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { isSeoLanguage, LOCALE_BY_LANG, SeoLanguage, withLanguagePrefix } from '../lib/seoLanguage';
+import { usePathname, useRouter } from 'next/navigation';
+import { getLanguageFromPath, LOCALE_BY_LANG, SeoLanguage, withLanguagePrefix } from '../lib/seoLanguage';
 
 type Language = SeoLanguage;
 
@@ -297,23 +298,35 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [lang, setLangState] = useState<Language>(() => {
-        const pathLang = (typeof window !== 'undefined' ? window.location.pathname : '/').split('/').filter(Boolean)[0];
-        if (isSeoLanguage(pathLang)) return pathLang;
-        const saved = (typeof window !== 'undefined' ? localStorage.getItem('luxecore_lang') : null);
-        return (saved as Language) || 'uz';
-    });
+    const router = useRouter();
+    const pathname = usePathname() || '/';
+
+    // Til manbai — faqat URL prefiksi (`/uz`, `/ru`, `/en`) yoki default `uz`.
+    // SSR va klientda bir xil qiymat olinadi, shuning uchun hydration
+    // mos kelmay qolish muammosi yo'q.
+    const [lang, setLangState] = useState<Language>(() => getLanguageFromPath(pathname));
 
     const setLang = (newLang: Language) => {
         setLangState(newLang);
-        localStorage.setItem('luxecore_lang', newLang);
-        document.documentElement.lang = newLang;
-
-        const nextPath = withLanguagePrefix((typeof window !== 'undefined' ? window.location.pathname : '/'), newLang);
-        const nextUrl = `${nextPath}${window.location.search}${window.location.hash}`;
-        if (nextUrl !== `${(typeof window !== 'undefined' ? window.location.pathname : '/')}${window.location.search}${window.location.hash}`) {
-            window.history.pushState({ lang: newLang }, '', nextUrl);
+        try {
+            localStorage.setItem('luxecore_lang', newLang);
+        } catch {
+            // localStorage yopiq bo'lishi mumkin (private mode) — e'tiborsiz qoldiramiz.
         }
+        if (typeof document !== 'undefined') {
+            document.documentElement.lang = newLang;
+        }
+
+        const currentPath = typeof window !== 'undefined' ? window.location.pathname : pathname;
+        const nextPath = withLanguagePrefix(currentPath, newLang);
+        if (nextPath === currentPath) return;
+
+        // MUHIM: `history.pushState` o'rniga router. Aks holda Next.js qayta
+        // render qilmaydi va server komponentlar (metadata, JSON-LD, mahsulot
+        // nomlari) eski tilda qolib ketadi.
+        const search = typeof window !== 'undefined' ? window.location.search : '';
+        const hash = typeof window !== 'undefined' ? window.location.hash : '';
+        router.push(`${nextPath}${search}${hash}`);
     };
 
     const t = (key: string): string => {
@@ -330,19 +343,19 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
         }
     }, [lang]);
 
+    // URL tili o'zgarsa (router.push, back/forward, ichki havolalar) —
+    // kontekst ham shu tilda bo'ladi. oldin faqat `popstate` kuzatilardi.
     useEffect(() => {
-        const handlePopState = () => {
-            const pathLang = (typeof window !== 'undefined' ? window.location.pathname : '/').split('/').filter(Boolean)[0];
-            if (isSeoLanguage(pathLang) && pathLang !== lang) {
-                setLangState(pathLang);
+        const pathLang = getLanguageFromPath(pathname);
+        if (pathLang !== lang) {
+            setLangState(pathLang);
+            try {
                 localStorage.setItem('luxecore_lang', pathLang);
-                document.documentElement.lang = pathLang;
+            } catch {
+                // ignore
             }
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, [lang]);
+        }
+    }, [pathname, lang]);
 
     return (
         <LanguageContext.Provider value={{ lang, setLang, t }}>

@@ -150,6 +150,8 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
               Tezkor xarid
             </h2>
             <button
+              type="button"
+              aria-label="Close modal"
               onClick={onClose}
               disabled={isLoading}
               className={`p-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400' : 'hover:bg-gray-100 text-light-muted'}`}
@@ -215,8 +217,10 @@ const QuickBuyModal: React.FC<QuickBuyModalProps> = ({ isOpen, onClose, product,
                     <input
                       type="number"
                       min={product.itemsPerPackage || 1}
+                      max={Math.max(product.itemsPerPackage || 1, Number(product.stock) > 0 ? Number(product.stock) : 1000000)}
                       step={product.itemsPerPackage || 10}
                       value={selectedQty}
+                      aria-label="Buyurtma miqdori"
                       onChange={(e) => setSelectedQty(Math.max(1, Number(e.target.value) || 1))}
                       className={`flex-1 border rounded-xl px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-gold-400/50 transition-all ${
                         isDark

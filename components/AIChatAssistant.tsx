@@ -184,13 +184,17 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
               </div>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => setAudioEnabled(v => !v)}
                   title={audioEnabled ? 'Audio javobni o\'chirish' : 'Audio javobni yoqish'}
+                  aria-label={audioEnabled ? 'Audio javobni o\'chirish' : 'Audio javobni yoqish'}
                   className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
                 >
                   {audioEnabled ? <Volume2 size={20} /> : <VolumeX size={20} />}
                 </button>
                 <button
+                  type="button"
+                  aria-label="Close AI chat"
                   onClick={() => setIsOpen(false)}
                   className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
                 >
@@ -299,6 +303,8 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
                       className="w-full bg-white/5 border border-white/10 rounded-full pl-5 pr-12 py-3.5 text-sm text-white focus:outline-none focus:border-gold-400/50 focus:ring-1 focus:ring-gold-400/50 transition-all placeholder:text-gray-600"
                     />
                     <button
+                      type="button"
+                      aria-label="Send message"
                       onClick={handleSend}
                       disabled={!input.trim() || isLoading}
                       className="absolute right-2 p-2 bg-gold-400 text-black rounded-full hover:bg-gold-500 disabled:opacity-50 disabled:hover:bg-gold-400 transition-colors"
@@ -314,6 +320,8 @@ const AIChatAssistant: React.FC<AIChatAssistantProps> = ({ products }) => {
       </AnimatePresence>
 
       <motion.button
+        type="button"
+        aria-label={isOpen ? 'Close LUXECORE Assistant' : 'Open LUXECORE Assistant'}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}

@@ -67,6 +67,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                 </span>
               </div>
               <button
+                type="button"
+                aria-label="Close cart"
                 onClick={closeCart}
                 className={`p-2 rounded-full transition-colors ${isDark ? 'hover:bg-white/10 text-gray-400 hover:text-white' : 'hover:bg-light-card text-light-muted hover:text-light-text'}`}
               >
@@ -103,6 +105,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                         <div className="flex justify-between items-start">
                           <h3 className={`font-medium line-clamp-1 ${isDark ? 'text-white' : 'text-light-text'}`}>{getLocalizedText(item.name, lang)}</h3>
                           <button
+                            type="button"
+                            aria-label="Remove item"
                             onClick={() => removeFromCart(item.id)}
                             className="text-gray-500 hover:text-red-400 transition-colors p-1"
                           >
@@ -136,6 +140,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
 
                         <div className="flex items-center gap-3 bg-white/5 rounded-full px-2 py-1 border border-white/5">
                           <button
+                            type="button"
+                            aria-label="Decrease quantity"
                             onClick={() => updateQuantity(item.id, item.quantity - (item.itemsPerPackage || 1))}
                             className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                           >
@@ -143,6 +149,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ onCheckout }) => {
                           </button>
                           <span className="text-sm w-8 text-center">{item.quantity}</span>
                           <button
+                            type="button"
+                            aria-label="Increase quantity"
                             onClick={() => updateQuantity(item.id, item.quantity + (item.itemsPerPackage || 1))}
                             className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
                           >

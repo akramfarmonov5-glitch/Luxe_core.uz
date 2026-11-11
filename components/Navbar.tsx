@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { ShoppingBag, Search, User, Menu, X, ChevronRight, Instagram, Send, Facebook, Youtube, Twitter, Heart, Sun, Moon, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../context/CartContext';
@@ -25,11 +26,6 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
   const { lang, setLang, t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
-
-  const handleMobileLinkClick = () => {
-    onNavigateHome();
-    setIsMobileMenuOpen(false);
-  };
 
   const languages = [
     { code: 'uz', label: 'UZ' },
@@ -58,32 +54,34 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
       >
         <div className="flex items-center gap-3 md:gap-4">
           <button
+            type="button"
+            aria-label="Open menu"
             onClick={() => setIsMobileMenuOpen(true)}
             className={`md:hidden transition-colors p-1 ${isDark ? 'text-white hover:text-gold-400' : 'text-light-text hover:text-gold-500'}`}
           >
             <Menu size={24} />
           </button>
-          <button onClick={onNavigateHome} className={`flex items-center gap-2 text-xl md:text-2xl font-bold tracking-wider ${isDark ? 'text-white' : 'text-light-text'}`}>
+          <Link href={`/${lang}`} className={`flex items-center gap-2 text-xl md:text-2xl font-bold tracking-wider ${isDark ? 'text-white' : 'text-light-text'}`}>
             <Image src="/logo.jpg" alt="LUXECORE" width={36} height={36} className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover" />
             LUXE<span className="text-gold-400">CORE</span>
-          </button>
+          </Link>
         </div>
 
         {/* Desktop Links */}
-        <div className={`hidden md:flex gap-8 text-sm font-medium tracking-wide ${isDark ? 'text-gray-300' : 'text-light-muted'}`}>
-          <button onClick={onNavigateHome} className="hover:text-gold-400 transition-colors">
+        <nav aria-label="Main navigation" className={`hidden md:flex gap-8 text-sm font-medium tracking-wide ${isDark ? 'text-gray-300' : 'text-light-muted'}`}>
+          <Link href={`/${lang}`} className="hover:text-gold-400 transition-colors">
             {t('nav_home')}
-          </button>
-          <button onClick={() => { onNavigateHome(); setTimeout(() => { const el = document.getElementById('featured-products'); if (el) { const y = el.getBoundingClientRect().top + window.scrollY - 100; window.scrollTo({ top: y, behavior: 'smooth' }); }}, 150); }} className="hover:text-gold-400 transition-colors">
+          </Link>
+          <Link href={`/${lang}/catalog`} className="hover:text-gold-400 transition-colors">
             {t('nav_catalog')}
-          </button>
-          <button onClick={() => { onNavigateHome(); setTimeout(() => { const el = document.getElementById('blog-section'); if (el) { const y = el.getBoundingClientRect().top + window.scrollY - 80; window.scrollTo({ top: y, behavior: 'smooth' }); } }, 150); }} className="hover:text-gold-400 transition-colors">
+          </Link>
+          <Link href={`/${lang}/blog`} className="hover:text-gold-400 transition-colors">
             {t('nav_blog')}
-          </button>
-          <button onClick={onTrackingClick} className="hover:text-gold-400 transition-colors">
+          </Link>
+          <Link href={`/${lang}/tracking`} className="hover:text-gold-400 transition-colors">
             {t('nav_tracking')}
-          </button>
-        </div>
+          </Link>
+        </nav>
 
         {/* Desktop Icons */}
         <div className={`hidden md:flex items-center gap-5 ${isDark ? 'text-white' : 'text-light-text'}`}>
@@ -98,6 +96,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
           {/* Language Switcher */}
           <div className="relative">
             <button
+              type="button"
+              aria-label="Select language"
               onClick={() => setIsLangOpen(!isLangOpen)}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold transition-all border ${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-gray-100 border-gray-200 hover:bg-gray-200'}`}
             >
@@ -132,31 +132,46 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
 
           {/* Theme Toggle */}
           <button
+            type="button"
             onClick={toggleTheme}
             className={`p-2 rounded-full transition-all duration-300 ${isDark ? 'bg-white/5 hover:bg-white/10 text-yellow-400' : 'bg-light-card hover:bg-gray-200 text-amber-600'}`}
             title={isDark ? t('theme_light') : t('theme_dark')}
+            aria-label={isDark ? t('theme_light') : t('theme_dark')}
           >
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
           </button>
 
-          <button onClick={onSearchClick} className="hover:text-gold-400 transition-colors">
+          <button type="button" onClick={onSearchClick} aria-label={t('search') || 'Qidiruv'} className="hover:text-gold-400 transition-colors">
             <Search size={22} strokeWidth={1.5} />
           </button>
 
-          <button onClick={onWishlistClick} className="relative hover:text-gold-400 transition-colors">
+          <Link
+            href={`/${lang}/wishlist`}
+            aria-label={t('wishlist') || 'Sevimlilar'}
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+              if (onWishlistClick) {
+                e.preventDefault();
+                onWishlistClick();
+              }
+            }}
+            className="relative hover:text-gold-400 transition-colors"
+          >
             <Heart size={22} strokeWidth={1.5} />
             {wishlist.length > 0 && (
               <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-black bg-gold-400 rounded-full">
                 {wishlist.length}
               </span>
             )}
-          </button>
+          </Link>
 
-          <button onClick={onProfileClick} className="hover:text-gold-400 transition-colors">
+          <button type="button" onClick={onProfileClick} aria-label={t('profile') || 'Profil'} className="hover:text-gold-400 transition-colors">
             <User size={22} strokeWidth={1.5} />
           </button>
 
           <button
+            type="button"
+            aria-label={t('cart_title') || 'Savat'}
             onClick={toggleCart}
             className="relative cursor-pointer group hover:text-gold-400 transition-colors"
           >
@@ -173,6 +188,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
         <div className="md:hidden flex items-center gap-2">
           {/* Mobile Theme Toggle */}
           <button
+            type="button"
+            aria-label={isDark ? t('theme_light') : t('theme_dark')}
             onClick={toggleTheme}
             className={`p-1.5 flex items-center justify-center rounded-lg transition-all border ${isDark ? 'bg-white/5 border-white/10 text-yellow-500' : 'bg-gray-100 border-gray-200 text-amber-600'}`}
           >
@@ -182,6 +199,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
           {/* Mobile Language Switcher */}
           <div className="relative">
             <button
+              type="button"
+              aria-label="Select language"
               onClick={() => setIsLangOpen(!isLangOpen)}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${isDark ? 'bg-white/5 border-white/10' : 'bg-gray-100 border-gray-200'}`}
             >
@@ -242,6 +261,8 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
                   </h2>
                   <div className="flex items-center gap-2">
                     <button
+                      type="button"
+                      aria-label="Close menu"
                       onClick={() => setIsMobileMenuOpen(false)}
                       className={`p-2 rounded-full ${isDark ? 'bg-white/5 text-gray-400 hover:text-white' : 'bg-light-card text-light-muted hover:text-light-text'}`}
                     >
@@ -252,22 +273,22 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
 
                 {/* Navigation Links */}
                 <div className="space-y-2 flex-1 overflow-y-auto">
-                  <button key="home" onClick={handleMobileLinkClick} className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors group ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-light-card hover:bg-gray-100 text-light-text'}`}>
+                  <Link key="home" href={`/${lang}`} onClick={() => setIsMobileMenuOpen(false)} className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors group ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-light-card hover:bg-gray-100 text-light-text'}`}>
                     <span className="font-medium">{t('nav_home')}</span>
                     <ChevronRight size={16} className={`${isDark ? 'text-gray-500' : 'text-light-muted'} group-hover:text-gold-400`} />
-                  </button>
-                  <button key="catalog" onClick={() => { onNavigateHome(); setIsMobileMenuOpen(false); setTimeout(() => { const el = document.getElementById('featured-products'); if (el) { const y = el.getBoundingClientRect().top + window.scrollY - 100; window.scrollTo({ top: y, behavior: 'smooth' }); }}, 300); }} className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors group ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-light-card hover:bg-gray-100 text-light-text'}`}>
+                  </Link>
+                  <Link key="catalog" href={`/${lang}/catalog`} onClick={() => setIsMobileMenuOpen(false)} className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors group ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-light-card hover:bg-gray-100 text-light-text'}`}>
                     <span className="font-medium">{t('nav_catalog')}</span>
                     <ChevronRight size={16} className={`${isDark ? 'text-gray-500' : 'text-light-muted'} group-hover:text-gold-400`} />
-                  </button>
-                  <button key="blog" onClick={() => { onNavigateHome(); setIsMobileMenuOpen(false); setTimeout(() => { const el = document.getElementById('blog-section'); if (el) { const y = el.getBoundingClientRect().top + window.scrollY - 80; window.scrollTo({ top: y, behavior: 'smooth' }); } }, 300); }} className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors group ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-light-card hover:bg-gray-100 text-light-text'}`}>
+                  </Link>
+                  <Link key="blog" href={`/${lang}/blog`} onClick={() => setIsMobileMenuOpen(false)} className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors group ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-light-card hover:bg-gray-100 text-light-text'}`}>
                     <span className="font-medium">{t('nav_blog')}</span>
                     <ChevronRight size={16} className={`${isDark ? 'text-gray-500' : 'text-light-muted'} group-hover:text-gold-400`} />
-                  </button>
-                  <button key="tracking" onClick={() => { setIsMobileMenuOpen(false); if (onTrackingClick) onTrackingClick(); }} className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors group ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-light-card hover:bg-gray-100 text-light-text'}`}>
+                  </Link>
+                  <Link key="tracking" href={`/${lang}/tracking`} onClick={() => setIsMobileMenuOpen(false)} className={`w-full flex items-center justify-between p-4 rounded-xl text-left transition-colors group ${isDark ? 'bg-white/5 hover:bg-white/10 text-white' : 'bg-light-card hover:bg-gray-100 text-light-text'}`}>
                     <span className="font-medium">{t('nav_tracking')}</span>
                     <ChevronRight size={16} className={`${isDark ? 'text-gray-500' : 'text-light-muted'} group-hover:text-gold-400`} />
-                  </button>
+                  </Link>
 
                   {/* Tillar bosh sahifaga (navbar-ga) olingan */}
                 </div>
@@ -295,6 +316,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigateHome, navigationSettings = DE
                         href={social.url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label={social.platform}
                         className={`w-10 h-10 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-card text-light-muted'}`}
                       >
                         {getSocialIcon(social.platform)}

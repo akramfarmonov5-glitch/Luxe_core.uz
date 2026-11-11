@@ -59,7 +59,8 @@ export async function GET() {
       <g:brand>LUXECORE (luxe-core.uz)</g:brand>
       <g:condition>new</g:condition>
       <g:availability>${(product.stock && product.stock > 0) ? 'in stock' : 'out of stock'}</g:availability>
-      <g:price>${product.price} UZS</g:price>
+      <g:price>${toGooglePrice(product.price)}</g:price>
+      <g:identifier_exists>no</g:identifier_exists>
       <g:google_product_category>${escapeXml(googleProductCategory)}</g:google_product_category>
     </item>
     `;
@@ -82,6 +83,16 @@ export async function GET() {
       'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
     },
   });
+}
+
+/**
+ * Google Merchant `g:price` formati: `6500.00 UZS`.
+ * Avval `6500 UZS` chiqarilardi va feed validatsiyadan o'tmasdi.
+ */
+function toGooglePrice(value: unknown): string {
+  const amount = Number(value || 0);
+  const safe = Number.isFinite(amount) && amount > 0 ? amount : 0;
+  return `${safe.toFixed(2)} UZS`;
 }
 
 function escapeXml(value: string) {

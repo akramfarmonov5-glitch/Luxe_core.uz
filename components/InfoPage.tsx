@@ -29,7 +29,8 @@ const InfoPage: React.FC<InfoPageProps> = ({ topic }) => {
           {content.sections.map((section, idx) => (
             <section
               key={idx}
-              className={`rounded-2xl border p-6 md:p-8 ${isDark ? 'bg-dark-900 border-white/10' : 'bg-white border-light-border'}`}
+              id={topic === 'faq' && idx === 1 ? 'payment' : undefined}
+              className={`scroll-mt-28 rounded-2xl border p-6 md:p-8 ${isDark ? 'bg-dark-900 border-white/10' : 'bg-white border-light-border'}`}
             >
               <h2 className={`text-lg md:text-xl font-semibold mb-3 ${isDark ? 'text-gold-400' : 'text-amber-600'}`}>
                 {section.heading}

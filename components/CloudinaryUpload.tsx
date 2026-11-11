@@ -1,14 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Upload, X, Loader2, Image as ImageIcon, Link as LinkIcon, Check } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 interface CloudinaryUploadProps {
     onUpload: (url: string) => void;
     currentImage?: string;
     label?: string;
 }
-
-const CLOUD_NAME = 'daazevmhg';
-const UPLOAD_PRESET = 'unsigned_preset';
 
 const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
     onUpload,
@@ -46,29 +44,32 @@ const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
         setIsUploading(true);
 
         try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', UPLOAD_PRESET);
-            formData.append('folder', 'luxecore');
-
-            const response = await fetch(
-                `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-                {
-                    method: 'POST',
-                    body: formData,
-                }
-            );
-
-            if (!response.ok) {
-                const errJson = await response.json().catch(() => ({}));
-                throw new Error(errJson?.error?.message || 'Yuklashda xatolik yuz berdi');
+            // Yuklash endi server orqali (imzolangan) amalga oshiriladi.
+            // Avval brauzerdan `unsigned_preset` bilan yuklanardi — bu istalgan
+            // odamga Cloudinary akkauntiga fayl yuklash imkonini berardi.
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData.session?.access_token;
+            if (!accessToken) {
+                throw new Error('Sessiya topilmadi. Qaytadan login qiling.');
             }
 
-            const data = await response.json();
-            const optimizedUrl = data.secure_url.replace('/upload/', '/upload/q_auto,f_auto,w_1200/');
+            const formData = new FormData();
+            formData.append('file', file);
 
-            setPreview(optimizedUrl);
-            onUpload(optimizedUrl);
+            const response = await fetch('/api/admin/upload', {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${accessToken}` },
+                body: formData,
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok || !data?.url) {
+                throw new Error(data?.error || 'Yuklashda xatolik yuz berdi');
+            }
+
+            setPreview(data.url);
+            onUpload(data.url);
         } catch (err: any) {
             console.error('Upload error:', err);
             setError(`Fayl yuklashda xatolik (${err.message || 'qayta urinib ko\'ring'}). 'Havola (URL)' bo'limi orqali rasm linkini kiritishingiz mumkin.`);
@@ -169,7 +170,7 @@ const CloudinaryUpload: React.FC<CloudinaryUploadProps> = ({
                     {isUploading ? (
                         <>
                             <Loader2 size={28} className="text-gold-400 animate-spin" />
-                            <span className="text-gray-300 text-xs">Cloudinary ga yuklanmoqda...</span>
+                            <span className="text-gray-300 text-xs">Yuklanmoqda...</span>
                         </>
                     ) : (
                         <>

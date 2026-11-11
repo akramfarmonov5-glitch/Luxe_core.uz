@@ -57,7 +57,10 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick, isLoading }) =>
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              onClick={() => onPostClick(post.id)}
+              onClick={(e) => {
+                if ((e.target as HTMLElement).closest('a') || e.metaKey || e.ctrlKey || e.shiftKey) return;
+                onPostClick(post.id);
+              }}
               className="group cursor-pointer flex flex-col h-full"
             >
               <div className="relative aspect-[16/10] overflow-hidden rounded-2xl mb-6">
@@ -80,6 +83,7 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, onPostClick, isLoading }) =>
                   <Link
                     href={`/${lang}/blog/${blogSlug(post, lang)}`}
                     onClick={(e) => {
+                      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
                       e.preventDefault();
                       onPostClick(post.id);
                     }}

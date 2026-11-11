@@ -169,9 +169,11 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
         <div className="mb-6 md:mb-8">
           <Breadcrumbs
             onHomeClick={onBack}
+            homeHref={`/${lang}`}
             items={[
               {
                 label: getCategoryDisplayName(product.category, categories, lang),
+                href: `/${lang}/category/${productCategoryKey}`,
                 onClick: () => router.push(`/${lang}/category/${productCategoryKey}`),
               },
               { label: getLocalizedText(product.name, lang), active: true }
@@ -219,6 +221,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                 {galleryImages.map((img, idx) => (
                   <button
                     key={idx}
+                    type="button"
+                    aria-label={`View image ${idx + 1}`}
                     onClick={() => setActiveImage(img)}
                     className={`relative w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-lg md:rounded-xl overflow-hidden border-2 transition-all ${activeImage === img ? 'border-gold-400 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
                   >
@@ -294,14 +298,18 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={handleShare}
-                    title={lang === 'ru' ? 'Поделиться' : 'Ulashish'}
+                    title={lang === 'ru' ? 'Поделиться' : lang === 'en' ? 'Share' : 'Ulashish'}
+                    aria-label={lang === 'ru' ? 'Поделиться' : lang === 'en' ? 'Share' : 'Ulashish'}
                     className="p-3 rounded-xl border bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/30 transition-all"
                   >
                     <Share2 size={22} />
                   </button>
                   <button
+                    type="button"
                     onClick={handleToggleWishlist}
+                    aria-label={isLiked ? t('product.wishlist_removed') || 'Remove from wishlist' : t('product.wishlist_added') || 'Add to wishlist'}
                     className={`p-3 rounded-xl border transition-all ${isLiked ? 'bg-gold-400 border-gold-400 text-black' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/30'}`}
                   >
                     <Heart size={22} className={isLiked ? 'fill-black' : ''} />
@@ -375,8 +383,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
                   <input
                     type="number"
                     min={packSize}
+                    max={Math.max(packSize, Number(product.stock) > 0 ? Number(product.stock) : 1000000)}
                     step={packSize}
                     value={selectedQty}
+                    aria-label={lang === 'ru' ? 'Количество' : lang === 'en' ? 'Quantity' : 'Miqdor'}
                     onChange={(e) => setSelectedQty(Math.max(packSize, Number(e.target.value) || packSize))}
                     className={`flex-1 text-center rounded-lg border py-1.5 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-gold-400/50 ${isDark ? 'bg-dark-800 border-white/10 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
                   />
@@ -520,6 +530,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product, allProducts = []
               className="relative w-full max-w-md md:max-w-lg aspect-[4/5] bg-black rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex flex-col group mx-auto"
             >
               <button
+                type="button"
+                aria-label="Close video"
                 onClick={handleCloseVideo}
                 className="absolute top-4 right-4 md:top-6 md:right-6 z-50 p-2 bg-black/50 text-white rounded-full hover:bg-white/10 transition-colors backdrop-blur-sm"
               >

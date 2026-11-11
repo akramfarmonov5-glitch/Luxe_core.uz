@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Instagram, Twitter, Facebook, Mail, Lock, Phone, MapPin, Clock, Send } from 'lucide-react';
+import { Instagram, Mail, Lock, Phone, MapPin, Clock, Send } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useGlobalData } from '../context/GlobalContext';
@@ -22,7 +22,7 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
   const { t, lang } = useLanguage();
   const { categories } = useGlobalData();
   const helpLabels = HELP_LINKS[lang] || HELP_LINKS.uz;
-  const footerCategories = (categories || []).slice(0, 4);
+  const footerCategories = (categories || []).slice(0, 6);
 
   return (
     <footer className={`pt-16 pb-8 border-t transition-colors duration-300 ${isDark ? 'bg-dark-900 border-white/10' : 'bg-light-card border-light-border'}`}>
@@ -56,9 +56,11 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
             <h4 className={`font-semibold mb-6 ${isDark ? 'text-white' : 'text-light-text'}`}>{t('footer_help')}</h4>
             <ul className={`space-y-3 text-sm ${isDark ? 'text-gray-400' : 'text-light-muted'}`}>
               <li><Link href={`/${lang}/delivery`} className="hover:text-gold-400 transition-colors">{helpLabels.delivery}</Link></li>
-              <li><Link href={`/${lang}/faq`} className="hover:text-gold-400 transition-colors">{helpLabels.payment}</Link></li>
+              <li><Link href={`/${lang}/faq#payment`} className="hover:text-gold-400 transition-colors">{helpLabels.payment}</Link></li>
               <li><Link href={`/${lang}/returns`} className="hover:text-gold-400 transition-colors">{helpLabels.returns}</Link></li>
               <li><Link href={`/${lang}/faq`} className="hover:text-gold-400 transition-colors">{helpLabels.faq}</Link></li>
+              <li><Link href={`/${lang}/catalog`} className="hover:text-gold-400 transition-colors">{t('nav_catalog')}</Link></li>
+              <li><Link href={`/${lang}/tracking`} className="hover:text-gold-400 transition-colors">{t('nav_tracking')}</Link></li>
             </ul>
           </div>
 
@@ -89,16 +91,13 @@ const Footer: React.FC<FooterProps> = ({ onAdminClick }) => {
 
             {/* Social Links */}
             <div className="flex gap-3">
-              <a href="https://instagram.com/luxe_core_uz" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
+              <a href="https://instagram.com/luxe_core_uz" target="_blank" rel="noopener noreferrer" aria-label="LUXECORE Instagram" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
                 <Instagram size={16} />
               </a>
-              <a href="https://t.me/Luxecoreuzbot" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
+              <a href="https://t.me/Luxecoreuzbot" target="_blank" rel="noopener noreferrer" aria-label="LUXECORE Telegram" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
                 <Send size={16} />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
-                <Facebook size={16} />
-              </a>
-              <a href="mailto:support@luxe-core.uz" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
+              <a href="mailto:support@luxe-core.uz" aria-label="LUXECORE Email" className={`w-9 h-9 rounded-full flex items-center justify-center hover:bg-gold-400 hover:text-black transition-all ${isDark ? 'bg-white/5 text-gray-400' : 'bg-light-bg text-light-muted'}`}>
                 <Mail size={16} />
               </a>
             </div>

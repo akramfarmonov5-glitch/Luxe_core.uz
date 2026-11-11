@@ -54,6 +54,7 @@ const handleAddToCart = (e: React.MouseEvent) => {
       <Link
         href={productHref}
         onClick={(e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
           e.preventDefault();
           onNavigate();
         }}
@@ -101,7 +102,9 @@ const handleAddToCart = (e: React.MouseEvent) => {
         {/* Overlay Buttons - Mobile: Always visible (translate-x-0), Desktop: Visible on hover */}
         <div className="absolute top-2 right-2 md:top-3 md:right-3 flex flex-col gap-2 translate-x-0 md:translate-x-12 md:group-hover:translate-x-0 transition-transform duration-300 z-10">
           <button
+            type="button"
             onClick={handleWishlistClick}
+            aria-label={isLiked ? t('removed_from_wishlist_desc') || 'Remove from wishlist' : t('added_to_wishlist_desc') || 'Add to wishlist'}
             className={`p-2 md:p-3 backdrop-blur-md rounded-full transition-all shadow-lg ${isLiked
               ? 'bg-gold-400 text-black scale-110'
               : 'bg-black/40 text-white hover:bg-gold-400 hover:text-black border border-white/10'
@@ -117,6 +120,7 @@ const handleAddToCart = (e: React.MouseEvent) => {
         <Link
           href={productHref}
           onClick={(e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
             e.preventDefault();
             onNavigate();
           }}
