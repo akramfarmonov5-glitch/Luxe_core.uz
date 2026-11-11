@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit, getClientIp } from '../../../lib/rateLimit';
 import { normalizePhone } from '../../../lib/checkout.server';
+import { hasSecondFactor, maskOrderId } from '../../../lib/orderMask';
 
 const MAX_ORDERS_FULL = 3;
 const MAX_ORDERS_LIMITED = 3;
@@ -68,36 +69,43 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
-    const hasSecondFactor = normalizedOrderId.length >= 6;
+    const secondFactorVerified = hasSecondFactor(normalizedOrderId);
 
     const orders = (data || []).map((order) => {
-      const base = {
-        id: order.id,
+      if (secondFactorVerified) {
+        return {
+          id: order.id,
+          total: Number(order.total || 0),
+          status: order.status,
+          date: order.date,
+          paymentMethod: order.paymentMethod,
+          items: Array.isArray(order.items) ? order.items : [],
+          created_at: order.created_at,
+          customerName: order.customerName,
+          phone: order.phone,
+        };
+      }
+
+      // Ikkinchi omil (buyurtma ID) tasdiqlanmagan bo'lsa: telefon raqamini
+      // bilgan odam buyurtma TARKIBINI (nima sotib olingan) va PII ni
+      // ko'rmaydi — faqat holat/sana/summa qaytadi, ID maskalanadi.
+      return {
+        id: maskOrderId(String(order.id || '')),
         total: Number(order.total || 0),
         status: order.status,
         date: order.date,
-        paymentMethod: order.paymentMethod,
-        items: Array.isArray(order.items) ? order.items : [],
+        paymentMethod: null,
+        items: [],
         created_at: order.created_at,
-      };
-
-      // Ikkinchi omil (buyurtma ID) tasdiqlanmagan bo'lsa, shaxsiy
-      // ma'lumotlar (ism, telefon) qaytarilmaydi.
-      if (!hasSecondFactor) {
-        return { ...base, customerName: null, phone: null };
-      }
-
-      return {
-        ...base,
-        customerName: order.customerName,
-        phone: order.phone,
+        customerName: null,
+        phone: null,
       };
     });
 
     return NextResponse.json({
       orders,
-      limited: !hasSecondFactor,
-      ...(hasSecondFactor ? {} : {
+      limited: !secondFactorVerified,
+      ...(secondFactorVerified ? {} : {
         hint: 'To‘liq ma’lumot uchun telefon raqam bilan birga buyurtma ID sini kiriting.',
       }),
     });
@@ -106,3 +114,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+

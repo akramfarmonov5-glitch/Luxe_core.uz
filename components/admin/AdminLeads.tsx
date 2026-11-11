@@ -36,7 +36,12 @@ const AdminLeads: React.FC = () => {
 
     try {
       const [{ data: leadsData }, { data: sessionData }] = await Promise.all([
-        supabase.from('leads').select('*').order('created_at', { ascending: false }),
+        // Eng so'nggi 500 lid — cheksiz yuklash brauzerni sekinlashtiradi.
+        supabase
+          .from('leads')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(500),
         supabase.auth.getSession(),
       ]);
 

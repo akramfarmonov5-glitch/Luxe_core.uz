@@ -152,19 +152,24 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ botUsersCount: 0, promos: [] });
     }
 
-    const [{ count: botUsersCount, data: botUsers }, { data: promos }] = await Promise.all([
-      supabase
-        .from('bot_users')
-        .select('telegram_id, name, phone, address, lang, created_at', { count: 'exact' })
-        .order('created_at', { ascending: false })
-        .limit(500),
-      supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
-    ]);
+    const [{ count: botUsersCount, data: botUsers }, { data: promos }, { count: deviceCount }] =
+      await Promise.all([
+        supabase
+          .from('bot_users')
+          .select('telegram_id, name, phone, address, lang, created_at', { count: 'exact' })
+          .order('created_at', { ascending: false })
+          .limit(500),
+        supabase.from('promo_codes').select('*').order('created_at', { ascending: false }),
+        // Web push obunachilari soni — klientdan `user_devices` ni o'qib bo'lmaydi
+        // (RLS select'ni faqat adminga beradi), shuning uchun serverda sanaymiz.
+        supabase.from('user_devices').select('*', { count: 'exact', head: true }),
+      ]);
 
     return NextResponse.json({
       botUsersCount: botUsersCount || 0,
       botUsers: botUsers || [],
       promos: promos || [],
+      deviceCount: deviceCount || 0,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err?.message || 'Internal error' }, { status: 500 });

@@ -20,6 +20,7 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [searched, setSearched] = useState(false);
+  const [limited, setLimited] = useState(false);
 
   const runSearch = async (phoneToSearch: string, orderIdToSearch = '') => {
     if (!phoneToSearch) return;
@@ -45,9 +46,11 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
       }
 
       setOrders(data.orders || []);
+      setLimited(Boolean(data.limited));
     } catch (error) {
       console.error('Search error:', error);
       setOrders([]);
+      setLimited(false);
     } finally {
       setLoading(false);
     }
@@ -208,6 +211,12 @@ const OrderTracker: React.FC<OrderTrackerProps> = ({ onBack }) => {
                   <Package className="text-gold-400" />
                   Topilgan Buyurtmalar ({orders.length})
                 </h2>
+                {limited && (
+                  <div className="mb-4 text-xs text-gray-300 bg-white/5 border border-white/10 rounded-xl p-3 leading-relaxed">
+                    🔒 Xavfsizlik uchun faqat buyurtma holati ko'rsatildi. Buyurtma tarkibini
+                    ko'rish uchun telefon raqam bilan birga <b>buyurtma ID</b> sini ham kiriting.
+                  </div>
+                )}
                 {orders.map((order) => (
                   <div key={order.id} className="bg-zinc-900 border border-white/10 rounded-2xl p-6 hover:border-gold-400/30 transition-all">
                     <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-4 border-b border-white/5 pb-4">

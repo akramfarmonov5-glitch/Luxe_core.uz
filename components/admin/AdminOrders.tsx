@@ -18,10 +18,13 @@ const AdminOrders: React.FC = () => {
 
   const fetchOrders = async () => {
     try {
+      // Admin panelda barcha buyurtmalarni cheksiz yuklamaymiz —
+      // eng so'nggi 300 tasi yetarli (tezlik va xotira uchun).
       const { data, error } = await supabase
         .from('orders')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(300);
 
       if (error) throw error;
 

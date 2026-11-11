@@ -40,11 +40,7 @@ const AdminPush: React.FC = () => {
   const fetchStatsAndPromos = async () => {
     setIsLoadingCount(true);
     try {
-      const [{ count: webCount }, { data: sessionData }] = await Promise.all([
-        supabase.from('user_devices').select('*', { count: 'exact', head: true }),
-        supabase.auth.getSession(),
-      ]);
-      setDeviceCount(webCount || 0);
+      const { data: sessionData } = await supabase.auth.getSession();
 
       const token = sessionData.session?.access_token;
       const res = await fetch('/api/admin/telegram-broadcast', {
@@ -54,6 +50,8 @@ const AdminPush: React.FC = () => {
         const data = await res.json();
         setBotUsersCount(data.botUsersCount ?? 0);
         setPromos(data.promos ?? []);
+        // `user_devices` ni klientda sanab bo'lmaydi (RLS) — server qaytaradi.
+        setDeviceCount(data.deviceCount ?? 0);
       }
     } catch (err) {
       console.error('Error fetching stats:', err);

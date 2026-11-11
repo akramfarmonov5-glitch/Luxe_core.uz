@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test": "npm run test:pricing && npm run test:order-mask",
     "test:pricing": "node --experimental-strip-types scripts/check_pricing.mjs",
+    "test:order-mask": "node --experimental-strip-types scripts/check_order_mask.mjs",
     "audit:prod": "npm audit --omit=dev"
   },
   "dependencies": {

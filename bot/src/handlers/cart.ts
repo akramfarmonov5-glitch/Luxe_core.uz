@@ -7,9 +7,11 @@ import { t, getLang, localizeText, getProductUrl, getSitePageUrl } from '../i18n
 import { notifyAdmin } from './admin';
 import { getUserProfile, ensureUser } from './profile';
 import { createTelegramOrder, quoteTelegramCart, type CheckoutQuote } from '../orderApi';
+import { clearPersistedCart, hydrateCart, persistCart } from '../cartStore';
 
-// In-memory storage
-const carts = new Map<number, CartItem[]>();
+// Savat endi `bot_users.cart` (jsonb) ustunida saqlanadi — `bot/src/cartStore.ts`.
+// Render restart yoki uyqudan keyin ham savat tiklanadi.
+// `checkoutState` — qisqa muddatli suhbat holati, xotirada qolishi mumkin.
 const checkoutState = new Map<number, {
     step: string;
     phone?: string;
@@ -23,8 +25,8 @@ const checkoutState = new Map<number, {
 let botInstance: Bot | null = null;
 export function setBotInstance(bot: Bot) { botInstance = bot; }
 
-export function getUserCart(userId: number): CartItem[] {
-    return carts.get(userId) || [];
+export async function getUserCart(userId: number): Promise<CartItem[]> {
+    return hydrateCart(userId);
 }
 
 export function isInCheckoutMode(userId: number): boolean {
@@ -58,7 +60,7 @@ export async function handleAddToCart(ctx: Context) {
         const productName = localizeText(product.name, getLang(userId));
         const step = Number(product.itemsPerPackage) > 1 ? Number(product.itemsPerPackage) : 100;
         const addQty = step * mult;
-        const cart = getUserCart(userId);
+        const cart = await getUserCart(userId);
         const existing = cart.find(i => i.productId === productId);
 
         if (existing) {
@@ -76,7 +78,7 @@ export async function handleAddToCart(ctx: Context) {
             });
         }
 
-        carts.set(userId, cart);
+        await persistCart(userId, cart);
 
         // Register user
         await ensureUser(userId, ctx.from?.first_name);
@@ -104,7 +106,7 @@ export async function handleShowCart(ctx: Context) {
     if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     const userId = ctx.from?.id || 0;
 
-    const cart = getUserCart(userId);
+    const cart = await getUserCart(userId);
     if (cart.length === 0) {
         await ctx.reply(t(userId, 'cart_empty'), {
             reply_markup: new InlineKeyboard()
@@ -152,12 +154,12 @@ export async function handleCartPlus(ctx: Context) {
     const userId = ctx.from?.id || 0;
     const data = ctx.callbackQuery?.data || '';
     const productId = parseInt(data.replace('cart_plus:', ''));
-    const cart = getUserCart(userId);
+    const cart = await getUserCart(userId);
     const item = cart.find(i => i.productId === productId);
     if (item) {
         const step = item.itemsPerPackage && item.itemsPerPackage > 1 ? item.itemsPerPackage : 100;
         item.quantity += step;
-        carts.set(userId, cart);
+        await persistCart(userId, cart);
     }
     await ctx.answerCallbackQuery(t(userId, 'cart_updated'));
     await handleShowCart(ctx);
@@ -167,7 +169,7 @@ export async function handleCartMinus(ctx: Context) {
     const userId = ctx.from?.id || 0;
     const data = ctx.callbackQuery?.data || '';
     const productId = parseInt(data.replace('cart_minus:', ''));
-    const cart = getUserCart(userId);
+    const cart = await getUserCart(userId);
     const idx = cart.findIndex(i => i.productId === productId);
     if (idx >= 0) {
         const step = cart[idx].itemsPerPackage && cart[idx].itemsPerPackage! > 1 ? cart[idx].itemsPerPackage! : 100;
@@ -176,7 +178,7 @@ export async function handleCartMinus(ctx: Context) {
         } else {
             cart.splice(idx, 1);
         }
-        carts.set(userId, cart);
+        await persistCart(userId, cart);
     }
     await ctx.answerCallbackQuery(t(userId, 'cart_updated'));
     await handleShowCart(ctx);
@@ -186,10 +188,10 @@ export async function handleCartDelete(ctx: Context) {
     const userId = ctx.from?.id || 0;
     const data = ctx.callbackQuery?.data || '';
     const productId = parseInt(data.replace('cart_del:', ''));
-    const cart = getUserCart(userId);
+    const cart = await getUserCart(userId);
     const idx = cart.findIndex(i => i.productId === productId);
     if (idx >= 0) cart.splice(idx, 1);
-    carts.set(userId, cart);
+    await persistCart(userId, cart);
     await ctx.answerCallbackQuery(t(userId, 'cart_removed'));
     await handleShowCart(ctx);
 }
@@ -197,7 +199,7 @@ export async function handleCartDelete(ctx: Context) {
 export async function handleClearCart(ctx: Context) {
     const userId = ctx.from?.id || 0;
     if (ctx.callbackQuery) await ctx.answerCallbackQuery(t(userId, 'cart_cleared'));
-    carts.delete(userId);
+    await clearPersistedCart(userId);
     await ctx.reply(t(userId, 'cart_cleared'));
 }
 
@@ -219,7 +221,7 @@ export async function handleCheckout(ctx: Context) {
     if (ctx.callbackQuery) await ctx.answerCallbackQuery();
     const userId = ctx.from?.id || 0;
 
-    const cart = getUserCart(userId);
+    const cart = await getUserCart(userId);
     if (cart.length === 0) {
         await ctx.reply(t(userId, 'cart_empty'));
         return;
@@ -323,7 +325,7 @@ export async function handleCheckoutInput(ctx: Context) {
 }
 
 async function processPromoStep(ctx: Context, userId: number, state: any, promoCode: string | undefined) {
-    const cart = getUserCart(userId);
+    const cart = await getUserCart(userId);
     try {
         const quote = await quoteTelegramCart(cart, promoCode, userId);
 
@@ -411,7 +413,7 @@ export async function handlePayCash(ctx: Context) {
 }
 
 async function finalizeOrder(ctx: Context, userId: number, state: any, paymentMethod: 'cash' | 'card') {
-    const cart = getUserCart(userId);
+    const cart = await getUserCart(userId);
 
     try {
         const order = await createTelegramOrder({
@@ -424,7 +426,7 @@ async function finalizeOrder(ctx: Context, userId: number, state: any, paymentMe
             paymentMethod,
         });
 
-        carts.delete(userId);
+        await clearPersistedCart(userId);
         clearCheckoutMode(userId);
 
         let itemsText = '';
